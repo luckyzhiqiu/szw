@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t138">92</v>
+<v t="n" n="__sys__t127">82</v>
+<v t="n" n="__sys__t112">70</v>
+<v t="n" n="__sys__t87">46</v>
+<v t="n" n="__sys__t73">35</v>
+<v t="n" n="__sys__t48">11</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="s" n="__sys__t3">.@__unnamed__116.</v>
+<v t="s" n="__sys__t4">.select id,name,level,leaderNickname,peopleNum,power,effect,peopleNumMax  from `union` order by level desc,power desc,effect desc limit 50.</v>
+<v t="n" n="__sys__t5">0</v>
+<v t="n" n="__sys__t6">0</v>
+<v t="n" n="__sys__t7">1</v>
+<v t="n" n="__sys__t8">2</v>
+<v t="n" n="__sys__t9">3</v>
+<v t="n" n="__sys__t10">4</v>
+<v t="n" n="__sys__t11">5</v>
+<v t="n" n="__sys__t12">6</v>
+<v t="n" n="__sys__t13">7</v>
+<v t="s" n="__sys__t14">.unionRank50.</v>
+<v t="n" n="__sys__t15">1000</v>
+<v t="n" n="__sys__t16">1</v>
+<v t="s" n="__sys__t17">.select id,name,level,leaderNickname,peopleNum,power,effect,peopleNumMax from `union` order by level desc,power desc,effect desc limit 100.</v>
+<v t="n" n="__sys__t18">0</v>
+<v t="n" n="__sys__t19">0</v>
+<v t="n" n="__sys__t20">1</v>
+<v t="n" n="__sys__t21">2</v>
+<v t="n" n="__sys__t22">3</v>
+<v t="n" n="__sys__t23">4</v>
+<v t="n" n="__sys__t24">5</v>
+<v t="n" n="__sys__t25">6</v>
+<v t="n" n="__sys__t26">7</v>
+<v t="s" n="__sys__t27">.unionRank100.</v>
+<v t="n" n="__sys__t28">1000</v>
+<v t="n" n="__sys__t29">1</v>
+<v t="s" n="__sys__t30">.select id from `union` order by level desc,power desc,effect desc.</v>
+<v t="n" n="__sys__t31">0</v>
+<v t="n" n="__sys__t32">0</v>
+<v t="n" n="__sys__t33">0</v>
+<v t="s" n="__sys__t34">.unionRankAll.</v>
+<v t="n" n="__sys__t35">1000</v>
+<v t="n" n="__sys__t36">1</v>
+<o n="input"><o>__sys__t37</o><i>__sys__t1</i></o>
+<o n="="><o>cnn</o><i>__sys__t37</i></o>
+<o n="input"><o>__sys__t39</o><i>__sys__t2</i></o>
+<o n="="><o>rd</o><i>__sys__t39</i></o>
+<o n="full"><o>__sys__t41</o><i>__sys__t3</i></o>
+<o n="=" r="2631"><o>genUnionRankFunc</o><i>__sys__t41</i></o>
+<o n="arr" r="2636"><o>__sys__t43</o></o>
+<o n="=" r="2636"><o>rankJson50</o><i>__sys__t43</i></o>
+<o n="=" r="2637"><o>sql</o><i>__sys__t4</i></o>
+<o n="mysqlCreateRs" r="2638"><o>__sys__t46</o><i>cnn</i><i>sql</i></o>
+<o n="=" r="2638"><o>rs</o><i>__sys__t46</i></o>
+<o n="mysqlNextRow" r="2639"><o>__sys__t49</o><i>rs</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t49</i></o>
+<o n="=="><o>__sys__t51</o><i>__sys__rt</i><i>__sys__t5</i></o>
+<o n="if_goto"><o>__sys__t52</o><i>__sys__t51</i><i>__sys__t73</i></o>
+<o n="arr" r="2641"><o>__sys__t53</o></o>
+<o n="=" r="2641"><o>arr</o><i>__sys__t53</i></o>
+<o n="mysqlGetColVal" r="2642"><o>__sys__t55</o><i>rs</i><i>__sys__t6</i></o>
+<o n="push" r="2642"><o>__sys__t56</o><i>arr</i><i>__sys__t55</i></o>
+<o n="mysqlGetColVal" r="2643"><o>__sys__t57</o><i>rs</i><i>__sys__t7</i></o>
+<o n="push" r="2643"><o>__sys__t58</o><i>arr</i><i>__sys__t57</i></o>
+<o n="mysqlGetColVal" r="2644"><o>__sys__t59</o><i>rs</i><i>__sys__t8</i></o>
+<o n="push" r="2644"><o>__sys__t60</o><i>arr</i><i>__sys__t59</i></o>
+<o n="mysqlGetColVal" r="2645"><o>__sys__t61</o><i>rs</i><i>__sys__t9</i></o>
+<o n="push" r="2645"><o>__sys__t62</o><i>arr</i><i>__sys__t61</i></o>
+<o n="mysqlGetColVal" r="2646"><o>__sys__t63</o><i>rs</i><i>__sys__t10</i></o>
+<o n="push" r="2646"><o>__sys__t64</o><i>arr</i><i>__sys__t63</i></o>
+<o n="mysqlGetColVal" r="2647"><o>__sys__t65</o><i>rs</i><i>__sys__t11</i></o>
+<o n="push" r="2647"><o>__sys__t66</o><i>arr</i><i>__sys__t65</i></o>
+<o n="mysqlGetColVal" r="2648"><o>__sys__t67</o><i>rs</i><i>__sys__t12</i></o>
+<o n="push" r="2648"><o>__sys__t68</o><i>arr</i><i>__sys__t67</i></o>
+<o n="mysqlGetColVal" r="2649"><o>__sys__t69</o><i>rs</i><i>__sys__t13</i></o>
+<o n="push" r="2649"><o>__sys__t70</o><i>arr</i><i>__sys__t69</i></o>
+<o n="push" r="2650"><o>__sys__t71</o><i>rankJson50</i><i>arr</i></o>
+<o n="goto"><o>__sys__t72</o><i>__sys__t48</i></o>
+<o n="mysqlDestroyRs" r="2652"><o>__sys__t74</o><i>rs</i></o>
+<o n="=" r="2653"><o>rankName</o><i>__sys__t14</i></o>
+<v t="s" n="__sys__t77">.getStr.</v>
+<o n="." r="2654"><o>__sys__t76</o><i>rd</i><i>__sys__t77</i></o>
+<o n="json_encode" r="2658"><o>__sys__t79</o><i>rankJson50</i></o>
+<o n=" -" r="2660"><o>__sys__t80</o><i>__sys__t16</i></o>
+<o n="__sys__t76" r="2654"><o>__sys__t81</o><i>rd</i><i>rankName</i><i>genUnionRankFunc</i><i>__sys__t79</i><i>__sys__t15</i><i>__sys__t80</i></o>
+<o n="arr" r="2664"><o>__sys__t82</o></o>
+<o n="=" r="2664"><o>rankJson100</o><i>__sys__t82</i></o>
+<o n="=" r="2665"><o>sql</o><i>__sys__t17</i></o>
+<o n="mysqlCreateRs" r="2666"><o>__sys__t85</o><i>cnn</i><i>sql</i></o>
+<o n="=" r="2666"><o>rs</o><i>__sys__t85</i></o>
+<o n="mysqlNextRow" r="2667"><o>__sys__t88</o><i>rs</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t88</i></o>
+<o n="=="><o>__sys__t90</o><i>__sys__rt</i><i>__sys__t18</i></o>
+<o n="if_goto"><o>__sys__t91</o><i>__sys__t90</i><i>__sys__t112</i></o>
+<o n="arr" r="2669"><o>__sys__t92</o></o>
+<o n="=" r="2669"><o>arr</o><i>__sys__t92</i></o>
+<o n="mysqlGetColVal" r="2670"><o>__sys__t94</o><i>rs</i><i>__sys__t19</i></o>
+<o n="push" r="2670"><o>__sys__t95</o><i>arr</i><i>__sys__t94</i></o>
+<o n="mysqlGetColVal" r="2671"><o>__sys__t96</o><i>rs</i><i>__sys__t20</i></o>
+<o n="push" r="2671"><o>__sys__t97</o><i>arr</i><i>__sys__t96</i></o>
+<o n="mysqlGetColVal" r="2672"><o>__sys__t98</o><i>rs</i><i>__sys__t21</i></o>
+<o n="push" r="2672"><o>__sys__t99</o><i>arr</i><i>__sys__t98</i></o>
+<o n="mysqlGetColVal" r="2673"><o>__sys__t100</o><i>rs</i><i>__sys__t22</i></o>
+<o n="push" r="2673"><o>__sys__t101</o><i>arr</i><i>__sys__t100</i></o>
+<o n="mysqlGetColVal" r="2674"><o>__sys__t102</o><i>rs</i><i>__sys__t23</i></o>
+<o n="push" r="2674"><o>__sys__t103</o><i>arr</i><i>__sys__t102</i></o>
+<o n="mysqlGetColVal" r="2675"><o>__sys__t104</o><i>rs</i><i>__sys__t24</i></o>
+<o n="push" r="2675"><o>__sys__t105</o><i>arr</i><i>__sys__t104</i></o>
+<o n="mysqlGetColVal" r="2676"><o>__sys__t106</o><i>rs</i><i>__sys__t25</i></o>
+<o n="push" r="2676"><o>__sys__t107</o><i>arr</i><i>__sys__t106</i></o>
+<o n="mysqlGetColVal" r="2677"><o>__sys__t108</o><i>rs</i><i>__sys__t26</i></o>
+<o n="push" r="2677"><o>__sys__t109</o><i>arr</i><i>__sys__t108</i></o>
+<o n="push" r="2678"><o>__sys__t110</o><i>rankJson100</i><i>arr</i></o>
+<o n="goto"><o>__sys__t111</o><i>__sys__t87</i></o>
+<o n="mysqlDestroyRs" r="2680"><o>__sys__t113</o><i>rs</i></o>
+<o n="=" r="2681"><o>rankName</o><i>__sys__t27</i></o>
+<v t="s" n="__sys__t116">.getStr.</v>
+<o n="." r="2682"><o>__sys__t115</o><i>rd</i><i>__sys__t116</i></o>
+<o n="json_encode" r="2686"><o>__sys__t118</o><i>rankJson100</i></o>
+<o n=" -" r="2688"><o>__sys__t119</o><i>__sys__t29</i></o>
+<o n="__sys__t115" r="2682"><o>__sys__t120</o><i>rd</i><i>rankName</i><i>genUnionRankFunc</i><i>__sys__t118</i><i>__sys__t28</i><i>__sys__t119</i></o>
+<o n="dict" r="2692"><o>__sys__t121</o></o>
+<o n="=" r="2692"><o>rankJsonAll</o><i>__sys__t121</i></o>
+<o n="=" r="2693"><o>sql</o><i>__sys__t30</i></o>
+<o n="=" r="2694"><o>i</o><i>__sys__t31</i></o>
+<o n="mysqlCreateRs" r="2695"><o>__sys__t125</o><i>cnn</i><i>sql</i></o>
+<o n="=" r="2695"><o>rs</o><i>__sys__t125</i></o>
+<o n="mysqlNextRow" r="2696"><o>__sys__t128</o><i>rs</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t128</i></o>
+<o n="=="><o>__sys__t130</o><i>__sys__rt</i><i>__sys__t32</i></o>
+<o n="if_goto"><o>__sys__t131</o><i>__sys__t130</i><i>__sys__t138</i></o>
+<o n="mysqlGetColVal" r="2698"><o>__sys__t132</o><i>rs</i><i>__sys__t33</i></o>
+<o n="=" r="2698"><o>unionID</o><i>__sys__t132</i></o>
+<o n="[]" r="2699"><o>__sys__t134</o><i>rankJsonAll</i><i>unionID</i></o>
+<o n="=" r="2699"><o>__sys__t134</o><i>i</i></o>
+<o n="++" r="2700"><o>i</o><i>i</i></o>
+<o n="goto"><o>__sys__t137</o><i>__sys__t127</i></o>
+<o n="mysqlDestroyRs" r="2702"><o>__sys__t139</o><i>rs</i></o>
+<o n="=" r="2703"><o>rankName</o><i>__sys__t34</i></o>
+<v t="s" n="__sys__t142">.getStr.</v>
+<o n="." r="2704"><o>__sys__t141</o><i>rd</i><i>__sys__t142</i></o>
+<o n="json_encode" r="2708"><o>__sys__t144</o><i>rankJsonAll</i></o>
+<o n=" -" r="2710"><o>__sys__t145</o><i>__sys__t36</i></o>
+<o n="__sys__t141" r="2704"><o>__sys__t146</o><i>rd</i><i>rankName</i><i>genUnionRankFunc</i><i>__sys__t144</i><i>__sys__t35</i><i>__sys__t145</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t100" />
+<v n="__sys__t101" />
+<v n="__sys__t102" />
+<v n="__sys__t103" />
+<v n="__sys__t104" />
+<v n="__sys__t105" />
+<v n="__sys__t106" />
+<v n="__sys__t107" />
+<v n="__sys__t108" />
+<v n="__sys__t109" />
+<v n="__sys__t110" />
+<v n="__sys__t111" />
+<v n="__sys__t113" />
+<v n="__sys__t115" />
+<v n="__sys__t118" />
+<v n="__sys__t119" />
+<v n="__sys__t120" />
+<v n="__sys__t121" />
+<v n="__sys__t125" />
+<v n="__sys__t128" />
+<v n="__sys__t130" />
+<v n="__sys__t131" />
+<v n="__sys__t132" />
+<v n="__sys__t134" />
+<v n="__sys__t137" />
+<v n="__sys__t139" />
+<v n="__sys__t141" />
+<v n="__sys__t144" />
+<v n="__sys__t145" />
+<v n="__sys__t146" />
+<v n="__sys__t37" />
+<v n="__sys__t39" />
+<v n="__sys__t41" />
+<v n="__sys__t43" />
+<v n="__sys__t46" />
+<v n="__sys__t49" />
+<v n="__sys__t51" />
+<v n="__sys__t52" />
+<v n="__sys__t53" />
+<v n="__sys__t55" />
+<v n="__sys__t56" />
+<v n="__sys__t57" />
+<v n="__sys__t58" />
+<v n="__sys__t59" />
+<v n="__sys__t60" />
+<v n="__sys__t61" />
+<v n="__sys__t62" />
+<v n="__sys__t63" />
+<v n="__sys__t64" />
+<v n="__sys__t65" />
+<v n="__sys__t66" />
+<v n="__sys__t67" />
+<v n="__sys__t68" />
+<v n="__sys__t69" />
+<v n="__sys__t70" />
+<v n="__sys__t71" />
+<v n="__sys__t72" />
+<v n="__sys__t74" />
+<v n="__sys__t76" />
+<v n="__sys__t79" />
+<v n="__sys__t80" />
+<v n="__sys__t81" />
+<v n="__sys__t82" />
+<v n="__sys__t85" />
+<v n="__sys__t88" />
+<v n="__sys__t90" />
+<v n="__sys__t91" />
+<v n="__sys__t92" />
+<v n="__sys__t94" />
+<v n="__sys__t95" />
+<v n="__sys__t96" />
+<v n="__sys__t97" />
+<v n="__sys__t98" />
+<v n="__sys__t99" />
+<v n="arr" />
+<v n="cnn" />
+<v n="genUnionRankFunc" />
+<v n="i" />
+<v n="rankJson100" />
+<v n="rankJson50" />
+<v n="rankJsonAll" />
+<v n="rankName" />
+<v n="rd" />
+<v n="rs" />
+<v n="sql" />
+<v n="unionID" />
+</script>

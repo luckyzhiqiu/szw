@@ -1,0 +1,40 @@
+//论战被打记录未读计数
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//获取信息
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+
+if(empty(user))
+{
+	//不存在
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+	
+}
+jsonExt=json_decode(user.jsonExt);
+
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,jsonExt.waterBattleExt.hitUnreadCount)
+);

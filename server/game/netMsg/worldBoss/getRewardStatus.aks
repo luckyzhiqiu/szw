@@ -1,0 +1,27 @@
+//获取阶段
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+jsonExt=json_decode(user.jsonExt);
+worldBoss=jsonExt.worldBoss;
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,worldBoss.status)
+);

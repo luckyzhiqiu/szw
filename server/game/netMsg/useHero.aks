@@ -1,0 +1,150 @@
+//上阵
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+type=int(netMsg[3]);//上阵类型:0=商业;1=农业;2=征兵;3=军营;
+heroIndex=int(netMsg[4]);//豪杰位置
+pos=int(netMsg[5]);//座位
+
+if(pos<0||pos>=5)//座位值无效
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)//座位值无效
+	);
+	exit();
+}
+
+if(type<0||type>=4)//上阵类型无效
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)//上阵类型无效
+	);
+	exit();
+}
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,type,heroIndex,pos;
+	
+		json=json_decode(user.json);
+		heroArr=json.hero;//豪杰数组
+		
+		heroCount=size(heroArr);
+		if(heroIndex<0||heroIndex>=heroCount)//豪杰位置无效
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			exit();
+		}
+		
+		useSign=ref(heroArr[heroIndex].useSign);
+		if(useSign==0)//没有上阵
+		{
+			if(type==0)
+			{
+				useHero=json.makeMoney;//经营:商业
+			}
+			else if(type==1)
+			{
+				useHero=json.makeFood;//经营:农业
+			}
+			 else if(type==2)
+			{
+				useHero=json.makeSoldier;//经营:征兵
+			}
+			else if(type==3)
+			{
+				useHero=json.battle;//经营:军营
+				useHero.hero[pos]=heroIndex;
+			}
+			
+			if(type==0 || type==1 || type==2)
+			{
+				hero=useHero.hero;//上阵豪杰列表
+				heroIndexInfo=ref(hero[pos].heroIndex);//上阵豪杰位置
+				beginTimeInfo=ref(hero[pos].beginTime);//上阵豪杰位置
+				beginTime=time_milli();
+
+				if(heroIndexInfo==-1)//空位
+				{
+					heroIndexInfo=heroIndex;//存入上阵豪杰位置
+					beginTimeInfo=beginTime;//存入上阵时间
+				}
+				else//已存在上阵豪杰
+				{
+					return(0);
+				}
+			}
+			
+			//更新豪杰已上阵
+			useSign=1;
+			
+			//编码
+			user.json=json_encode(json);
+				
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,useHero)
+			);
+			
+		}
+		else
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+		}
+
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

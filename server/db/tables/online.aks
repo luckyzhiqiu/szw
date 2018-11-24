@@ -1,0 +1,4 @@
+//在线日志表（每天一个表）
+mysqlCol("key","id");
+mysqlCol("int","count",0);//在线数
+mysqlCol("datetime","genTime");//生成时间

@@ -1,0 +1,161 @@
+//邮件-获取邮件奖励®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+mailId=netMsg[3];//mailID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+cnn=game.cnn;
+//修改行数据
+user=game.rd.updateRow
+(
+	cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID,mailId,cnn;
+		json=json_decode(user.json);
+		userInstTableName=createIDTable(cnn,"mail",userID);
+		
+		sql="select id,genTime,title,body,soldier,money,food,gold2,item,`read`,gold from "+userInstTableName+" where id = "+mailId;
+		
+		rs=mysqlCreateRs(cnn,sql);
+		info=arr();
+		
+		while(mysqlNextRow(rs))
+		{
+			push
+			(
+				info,
+				mysqlGetColVal(rs,1),//genTime
+				mysqlGetColVal(rs,2),//title
+				mysqlGetColVal(rs,3),//body
+				int(mysqlGetColVal(rs,4)),//soldier
+				int(mysqlGetColVal(rs,5)),//money
+				int(mysqlGetColVal(rs,6)),//food 
+				int(mysqlGetColVal(rs,7)),//gold2 /元宝（赠送）
+				mysqlGetColVal(rs,8),//item
+				int(mysqlGetColVal(rs,9))//read
+				int(mysqlGetColVal(rs,10)),//gold ;//元宝（充值
+			);
+		}
+		
+		mysqlDestroyRs(rs);
+		
+		infoLength=size(info);
+		 //保存
+		if(infoLength!=0)
+		{
+			if(info[3]!=0)
+			{
+				soldier=number(user.soldier);
+				soldier+=info[3];
+				user.soldier=soldier;
+			}
+			if(info[4]!=0)
+			{
+				money=number(user.money);
+				money+=info[4];
+				user.money=money;
+			}
+			if(info[5]!=0)
+			{
+				food=number(user.food);
+				food+=info[5];
+				user.food=food;
+			}
+			if(info[6]!=0)//元宝（赠送）
+			{
+				gold2=number(user.gold2); 
+				gold2+=info[6];
+				if(gold2!=0)
+				{
+					user.gold2=gold2;
+				}
+			}
+			if(info[7]!="")
+			{
+				itemDict=json.item;
+				numMgr=game.numMgr;
+				itemsArr=split(arr(),info[7],",");
+				i=0;c=size(itemsArr);
+				while(i<c)
+				{
+					itemID=itemsArr[i];
+					itemCount=number(itemsArr[i+1]);
+					numMgr.addItem(itemID,itemCount,itemDict);
+					i+=2;
+				}
+			}
+			if(info[9]!=0) //元宝（充值）
+			{
+				gold=number(user.gold);
+				rmb=number(info[9]);
+				gold+=number(info[9]);
+				if(gold!=0)
+				{
+					user.gold=gold;
+				}
+				
+				rmbEd=int(user.rmb);
+				rmbEd+=rmb;//CNY
+				user.rmb=rmbEd;
+				numMgr=game.numMgr;
+				vipEd=int(user.vip);
+				vip=numMgr.computeVip(rmbEd,vipEd);
+				if(vipEd!=vip)
+				{
+					nickname=user.nickname;
+					//公告群发
+					worldSendMsg(game,0,nickname,0,0,0,"恭喜 <font color=\"#33CC00\">"+nickname+"</font>将VIP等级提升至<font color=\"#33CC00\">"+vip+"</font>级，获得更多VIP特权！",0,2);
+				}
+				user.vip=vip;
+			}
+			
+			//流水
+			addGold=info[9]+info[6];
+			if(addGold!=0)
+			{
+				allGold=number(user.gold)+number(user.gold2);//元宝余额
+				game.saveResIO(userID,15,0,1,addGold,allGold);//邮件(type,itemID,（0=消耗，1=获得）,count,allGold)
+			}
+		}
+		user.json=json_encode(json);
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,info,json.titleMap,user.rmb,user.vip)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

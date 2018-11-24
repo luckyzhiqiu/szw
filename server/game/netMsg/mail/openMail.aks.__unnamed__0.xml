@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="s" n="__sys__t3">.methodName.</v>
+<v t="s" n="__sys__t4">.sessionID.</v>
+<v t="n" n="__sys__t5">1</v>
+<v t="s" n="__sys__t6">.Result.</v>
+<v t="n" n="__sys__t7">1</v>
+<v t="n" n="__sys__t8">1</v>
+<o n="input"><o>__sys__t9</o><i>__sys__t1</i></o>
+<o n="="><o>mail</o><i>__sys__t9</i></o>
+<o n="input"><o>__sys__t11</o><i>__sys__t2</i></o>
+<o n="="><o>game</o><i>__sys__t11</i></o>
+<o n="link" r="27"><o>__sys__t13</o><i>__sys__t3</i></o>
+<o n="=" r="27"><o>methodName</o><i>__sys__t13</i></o>
+<o n="link" r="27"><o>__sys__t15</o><i>__sys__t4</i></o>
+<o n="=" r="27"><o>sessionID</o><i>__sys__t15</i></o>
+<v t="s" n="__sys__t18">.read.</v>
+<o n="." r="28"><o>__sys__t17</o><i>mail</i><i>__sys__t18</i></o>
+<o n="int" r="28"><o>__sys__t20</o><i>__sys__t17</i></o>
+<o n="=" r="28"><o>read</o><i>__sys__t20</i></o>
+<v t="s" n="__sys__t23">.modifTime.</v>
+<o n="." r="29"><o>__sys__t22</o><i>mail</i><i>__sys__t23</i></o>
+<o n="=" r="29"><o>modifTime</o><i>__sys__t22</i></o>
+<o n="=" r="30"><o>read</o><i>__sys__t5</i></o>
+<v t="s" n="__sys__t28">.read.</v>
+<o n="." r="32"><o>__sys__t27</o><i>mail</i><i>__sys__t28</i></o>
+<o n="=" r="32"><o>__sys__t27</o><i>read</i></o>
+<v t="s" n="__sys__t32">.modifTime.</v>
+<o n="." r="33"><o>__sys__t31</o><i>mail</i><i>__sys__t32</i></o>
+<o n="time" r="33"><o>__sys__t34</o></o>
+<o n="=" r="33"><o>__sys__t31</o><i>__sys__t34</i></o>
+<v t="s" n="__sys__t37">.sendMsg.</v>
+<o n="." r="35"><o>__sys__t36</o><i>game</i><i>__sys__t37</i></o>
+<o n="+" r="38"><o>__sys__t39</o><i>methodName</i><i>__sys__t6</i></o>
+<o n="arr" r="38"><o>__sys__t40</o><i>__sys__t39</i><i>__sys__t7</i></o>
+<o n="__sys__t36" r="35"><o>__sys__t41</o><i>game</i><i>sessionID</i><i>__sys__t40</i></o>
+<o n="return" r="40"><o>__sys__t42</o><i>__sys__t8</i></o>
+<v n="__sys__t11" />
+<v n="__sys__t13" />
+<v n="__sys__t15" />
+<v n="__sys__t17" />
+<v n="__sys__t20" />
+<v n="__sys__t22" />
+<v n="__sys__t27" />
+<v n="__sys__t31" />
+<v n="__sys__t34" />
+<v n="__sys__t36" />
+<v n="__sys__t39" />
+<v n="__sys__t40" />
+<v n="__sys__t41" />
+<v n="__sys__t42" />
+<v n="__sys__t9" />
+<v n="game" />
+<v n="mail" />
+<v n="methodName" />
+<v n="modifTime" />
+<v n="read" />
+<v n="sessionID" />
+</script>

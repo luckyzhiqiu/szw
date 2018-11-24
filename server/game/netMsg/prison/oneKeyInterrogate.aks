@@ -1,0 +1,201 @@
+//一键审问
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+prisonerIndex=int(netMsg[3]);//犯人下标
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,prisonerIndex,userID;
+		json=json_decode(user.json);
+		prison=json.prison;
+		prisonerArr=prison.prisonerArr;
+		count=size(prisonerArr);
+		if(count<=prisonerIndex)//犯人下标错误
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		prisoner=prisonerArr[prisonerIndex];
+		check=ref(prisoner.check);//审查次数
+		if(check!=8)//未终审
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		tableData=game.table;
+		rowPC=tableData.prisonerConfigure.getRow(0);
+		
+		itemDict=json.item;
+		numMgr=game.numMgr;
+		
+		hitFame=number(rowPC.getValFromColName("hitFame"));//每次打消耗名望
+		hitLife=number(rowPC.getValFromColName("hitLife"));//每次打血量
+		hitPercent=prison.hitPercent;//严刑拷打（万份比加成）
+		hitLife*=1+hitPercent/10000;
+		
+		prisonerHitRewardTable=tableData.prisonerHitReward;
+		c=prisonerHitRewardTable.size();
+		
+		hitCount=ref(prison.hitCount);//打犯人次数
+		hp=ref(prisoner.hp);//血量
+		fame=number(user.fame);//名望值
+		
+		if(fame<hitFame)//名望不足
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+		
+		moneyAdd=0;
+		foodAdd=0;
+		soldierAdd=0;
+		gold2Add=0;
+		addItemArrAll=arr();
+		uGold2=number(user.gold2);
+		
+		while(hp>0)
+		{
+			if(fame<hitFame)//名望不足
+			{
+				break;
+			}
+			fame-=hitFame;
+					
+			if(hp<=0)//无血量
+			{
+				break;
+			}
+			hp-=hitLife;//更新血量
+			if(hp<=0)
+			{
+				hp=0;
+			}
+				
+			//打犯人次数奖励
+			index=hitCount%c;
+			hitCount+=1;//更新打犯人次数
+			
+			rowHR=prisonerHitRewardTable.getRow(index);
+			money=number(rowHR.getValFromColName("money"));
+			food=number(rowHR.getValFromColName("food"));
+			soldier=number(rowHR.getValFromColName("soldier"));
+			gold2=number(rowHR.getValFromColName("gold"));
+			itemStrAdd=rowHR.getValFromColName("item");
+			
+			addItemArr=split(arr(),itemStrAdd,",");
+			addIDCount=size(addItemArr);
+			if(addIDCount>=2)
+			{
+				i=0;j=0;addCount=addIDCount/2;
+				while(i<addCount)
+				{
+					itemID=number(addItemArr[j]);
+					itemCount=number(addItemArr[j+1]);
+					numMgr.addItem(itemID,itemCount,itemDict);//奖励道具
+					j+=2;
+					++i;
+					
+					pass=1;
+					k=0;
+					num=size(addItemArrAll);
+					while(k<num)
+					{
+						itemIDAdd=addItemArrAll[k];
+						if(itemIDAdd==itemID)
+						{
+							addItemArrAll[k+1]+=itemCount;
+							pass=0;
+							break;
+						}
+						k+=2;
+					}
+					
+					if(pass)
+					{
+						push(addItemArrAll,itemID,itemCount);
+					}
+				}
+			}
+			
+			moneyAdd+=money;
+			foodAdd+=food;
+			soldierAdd+=soldier;
+			gold2Add+=gold2;
+			
+			uGold2+=gold2;
+			if(gold2>0)
+			{
+				allGold=number(user.gold)+uGold2;//元宝余额
+				game.saveResIO(userID,29,0,1,gold2,allGold);//一键牢房打犯人(type,itemID,（0=消耗，1=获得）,count,allGold)
+			}
+		}
+
+		//保存
+		user.money=number(user.money)+moneyAdd;
+		user.food=number(user.food)+foodAdd;
+		user.soldier=number(user.soldier)+soldierAdd;
+		if(uGold2!=0)
+		{
+			user.gold2=uGold2;
+		}
+		user.fame=fame;
+		user.json=json_encode(json);
+		
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,prison,itemDict,addItemArrAll,moneyAdd,foodAdd,soldierAdd,gold2Add,fame)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

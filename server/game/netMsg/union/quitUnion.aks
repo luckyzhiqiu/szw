@@ -1,0 +1,135 @@
+//退出联盟
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+userData=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+unionID=userData.unionID;
+if(unionID==0)//未加入联盟
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+updateUser=##<game,userID>
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			//保存
+			user.unionID=0;
+			user.unionBuildID=0;
+			devote=number(user.devote);
+			user.devoteTotal=0;
+			user.devote=floor(devote/2);
+			return(1);//修改
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	return(user);
+##.;
+
+unionData=game.rd.updateRow
+(
+	game.cnn,"union","id",unionID,"*",
+	//修改回调
+	##<unionData,game>
+		@link sessionID,methodName,userID,updateUser,unionID;
+		leaderUserID=number(unionData.leaderUserID);
+		if(leaderUserID==userID)//盟主不能退盟
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+		}
+		unionJson=json_decode(unionData.json);
+		userIDMap=unionJson.userIDMap;
+		if(exist(userIDMap,userID))
+		{
+			user=updateUser(game,userID);
+			remove(userIDMap,userID);
+			
+			viceLeaderUserIDMap=unionJson.viceLeaderUserIDMap;
+			if(exist(viceLeaderUserIDMap,userID))
+			{
+				remove(viceLeaderUserIDMap,userID);
+			}
+			
+			pickUserIDMap=unionJson.pickUserIDMap;
+			if(exist(pickUserIDMap,userID))
+			{
+				remove(pickUserIDMap,userID);
+			}
+		
+			unionData.json=json_encode(unionJson);
+			unionData.peopleNum-=1;
+			
+			//退出联盟聊天记录
+			nickname=user.nickname;
+			textTable=game.table.text;
+			rowT=textTable.getRowFromColName("id",401);
+			str=rowT.getValFromColName("text");//%0退出了联盟
+			outStr=sprintf(str,nickname);
+
+			//nickname:用户昵称;outStr:输出文本
+			userType=0;//user:0=退出联盟;
+			unionSendMsg(game,userType,nickname,outStr,userIDMap,unionID,0);
+			
+			devote=number(user.devote);
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,unionData.peopleNum,devote)
+			);
+			return(1);//修改
+		}
+		else//不是联盟成员
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//修改
+		}
+		
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);

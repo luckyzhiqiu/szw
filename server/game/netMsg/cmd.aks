@@ -1,0 +1,221 @@
+//GM命令
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+cmd=netMsg[3];//命令
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+if(game.gameConfig.debug==0)//正式服模式
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}
+
+splitCmd=##<cmdStr>
+	arr=split(arr(),cmdStr," ");
+	i=0;c=size(arr);
+	while(i<c)
+	{
+		if(arr[i]=="")
+		{
+			remove(arr,i);
+			--c;
+		}
+		else
+		{
+			++i;
+		}
+	}
+	return(arr);
+##.;
+
+cmdArr=splitCmd(cmd);
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link sessionID,methodName,cmdArr;
+		numMgr=game.numMgr;
+		json=json_decode(user.json);
+		cmdName=cmdArr[0];
+		if(cmdName=="gold")//增加元宝
+		{
+			point=int(cmdArr[1]);
+			user.gold2=number(user.gold2)+point;
+		}
+		else if(cmdName=="money")//增加银两
+		{
+			point=int(cmdArr[1]);
+			user.money=number(user.money)+point;
+		}
+		else if(cmdName=="score")//增加政绩
+		{
+			point=int(cmdArr[1]);
+			user.score=number(user.score)+point;
+		}
+		else if(cmdName=="soldier")//增加兵力
+		{
+			point=int(cmdArr[1]);
+			user.soldier=number(user.soldier)+point;
+		}
+		else if(cmdName=="item")//增加道具
+		{
+			itemID=int(cmdArr[1]);
+			count=int(cmdArr[2]);
+			
+			itemTable=game.table.item;
+			row=itemTable.getRowFromColName("id",itemID);
+			if(empty(row))//没有此编号
+			{
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-2)
+				);
+				return(0);//不修改
+			}
+			
+			numMgr.addItem(itemID,count,json.item);
+		}
+		else if(cmdName=="wife")//创建红颜
+		{
+			wifeID=int(cmdArr[1]);
+			wifeTable=game.table.wife;
+			row=wifeTable.getRowFromColName("id",wifeID);
+			if(empty(row))//没有此编号
+			{
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)
+				);
+				return(0);//不修改
+			}
+			numMgr.createWife(wifeID,json.wife);
+		}
+		else if(cmdName=="hero")//创建豪杰
+		{
+			heroID=int(cmdArr[1]);
+			heroTable=game.table.hero;
+			row=heroTable.getRowFromColName("id",heroID);
+			if(empty(row))//没有此编号
+			{
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)
+				);
+				return(0);//不修改
+			}
+			numMgr.createHero(heroID,json.hero,json);
+		}
+		else if(cmdName=="prisoner")//添加犯人
+		{
+			prisonerID=int(cmdArr[1]);
+			prisonerTable=game.table.prisoner;
+			row=prisonerTable.getRowFromColName("id",prisonerID);
+			if(empty(row))//没有此编号
+			{
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-5)
+				);
+				return(0);//不修改
+			}
+			numMgr.addPrisoner(game.table,json,prisonerID);
+		}
+		else if(cmdName=="fame")//增加名望
+		{
+			point=int(cmdArr[1]);
+			user.fame=number(user.fame)+point;
+		}
+		else if(cmdName=="devote")//增加联盟贡献
+		{
+			point=int(cmdArr[1]);
+			user.devote=number(user.devote)+point;
+		}
+		else if(cmdName=="unionMoney")//增加联盟财富
+		{
+			unionID=int(user.unionID);
+			if(unionID!=0)
+			{
+				money=int(cmdArr[1]);
+				unionData=game.rd.updateRow
+				(
+					game.cnn,"union","id",unionID,"*",
+					//修改回调
+					##<unionData,game>
+						@link money;
+						unionData.money=number(unionData.money)+money;
+						return(1);//修改
+					##.,
+					//修改完成回调
+					##<row,userData>
+						//...
+					##.,
+					//解锁后回调
+					##<row,userData>
+						//...
+					##.,
+					game,//自定义数据userData
+					1000//加锁时间（毫秒），例如：1000
+				);
+			}
+		}
+		
+		//计算所有豪杰加成
+		numMgr.computeHeroArr(json);
+		numMgr.computeUser(user,json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1)
+		);
+		
+		//保存
+		user.json=json_encode(json);
+		
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

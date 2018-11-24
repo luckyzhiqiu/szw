@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t46">24</v>
+<v t="n" n="__sys__t45">24</v>
+<v t="n" n="__sys__t31">15</v>
+<v t="n" n="__sys__t30">15</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">1000</v>
+<v t="n" n="__sys__t4">30</v>
+<v t="n" n="__sys__t5">0</v>
+<v t="n" n="__sys__t6">1000</v>
+<v t="n" n="__sys__t7">5</v>
+<v t="n" n="__sys__t8">0</v>
+<o n="input"><o>__sys__t9</o><i>__sys__t1</i></o>
+<o n="="><o>server</o><i>__sys__t9</i></o>
+<o n="input"><o>__sys__t11</o><i>__sys__t2</i></o>
+<o n="="><o>game</o><i>__sys__t11</i></o>
+<v t="s" n="__sys__t14">.updateHubClient.</v>
+<o n="." r="109"><o>__sys__t13</o><i>game</i><i>__sys__t14</i></o>
+<o n="__sys__t13" r="109"><o>__sys__t16</o><i>game</i></o>
+<v t="s" n="__sys__t18">.timer.</v>
+<o n="." r="110"><o>__sys__t17</o><i>game</i><i>__sys__t18</i></o>
+<o n="*" r="110"><o>__sys__t20</o><i>__sys__t3</i><i>__sys__t4</i></o>
+<o n="isTimeout" r="110"><o>__sys__t21</o><i>__sys__t17</i><i>__sys__t20</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t21</i></o>
+<o n="=="><o>__sys__t23</o><i>__sys__rt</i><i>__sys__t5</i></o>
+<o n="if_goto"><o>__sys__t24</o><i>__sys__t23</i><i>__sys__t30</i></o>
+<v t="s" n="__sys__t26">.loadManyGlobalVar.</v>
+<o n="." r="116"><o>__sys__t25</o><i>game</i><i>__sys__t26</i></o>
+<o n="__sys__t25" r="116"><o>__sys__t28</o><i>game</i></o>
+<o n="goto"><o>__sys__t29</o><i>__sys__t31</i></o>
+<v t="s" n="__sys__t33">.cleanTmpDataTimer.</v>
+<o n="." r="118"><o>__sys__t32</o><i>game</i><i>__sys__t33</i></o>
+<o n="*" r="118"><o>__sys__t35</o><i>__sys__t6</i><i>__sys__t7</i></o>
+<o n="isTimeout" r="118"><o>__sys__t36</o><i>__sys__t32</i><i>__sys__t35</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t36</i></o>
+<o n="=="><o>__sys__t38</o><i>__sys__rt</i><i>__sys__t8</i></o>
+<o n="if_goto"><o>__sys__t39</o><i>__sys__t38</i><i>__sys__t45</i></o>
+<v t="s" n="__sys__t41">.cleanTmpData.</v>
+<o n="." r="121"><o>__sys__t40</o><i>game</i><i>__sys__t41</i></o>
+<o n="__sys__t40" r="121"><o>__sys__t43</o><i>game</i></o>
+<o n="goto"><o>__sys__t44</o><i>__sys__t46</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t11" />
+<v n="__sys__t13" />
+<v n="__sys__t16" />
+<v n="__sys__t17" />
+<v n="__sys__t20" />
+<v n="__sys__t21" />
+<v n="__sys__t23" />
+<v n="__sys__t24" />
+<v n="__sys__t25" />
+<v n="__sys__t28" />
+<v n="__sys__t29" />
+<v n="__sys__t32" />
+<v n="__sys__t35" />
+<v n="__sys__t36" />
+<v n="__sys__t38" />
+<v n="__sys__t39" />
+<v n="__sys__t40" />
+<v n="__sys__t43" />
+<v n="__sys__t44" />
+<v n="__sys__t9" />
+<v n="game" />
+<v n="server" />
+</script>

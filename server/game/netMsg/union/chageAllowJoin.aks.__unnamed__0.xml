@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t46">24</v>
+<v t="n" n="__sys__t45">24</v>
+<v t="n" n="__sys__t35">17</v>
+<v t="n" n="__sys__t34">17</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="s" n="__sys__t3">.methodName.</v>
+<v t="s" n="__sys__t4">.sessionID.</v>
+<v t="s" n="__sys__t5">.change.</v>
+<v t="n" n="__sys__t6">0</v>
+<v t="n" n="__sys__t7">0</v>
+<v t="n" n="__sys__t8">0</v>
+<v t="n" n="__sys__t9">1</v>
+<v t="n" n="__sys__t10">0</v>
+<v t="n" n="__sys__t11">1</v>
+<v t="s" n="__sys__t12">.Result.</v>
+<v t="n" n="__sys__t13">1</v>
+<v t="n" n="__sys__t14">1</v>
+<o n="input"><o>__sys__t15</o><i>__sys__t1</i></o>
+<o n="="><o>unionX</o><i>__sys__t15</i></o>
+<o n="input"><o>__sys__t17</o><i>__sys__t2</i></o>
+<o n="="><o>game</o><i>__sys__t17</i></o>
+<o n="link" r="42"><o>__sys__t19</o><i>__sys__t3</i></o>
+<o n="=" r="42"><o>methodName</o><i>__sys__t19</i></o>
+<o n="link" r="42"><o>__sys__t21</o><i>__sys__t4</i></o>
+<o n="=" r="42"><o>sessionID</o><i>__sys__t21</i></o>
+<o n="link" r="42"><o>__sys__t23</o><i>__sys__t5</i></o>
+<o n="=" r="42"><o>change</o><i>__sys__t23</i></o>
+<o n="==" r="43"><o>__sys__t25</o><i>change</i><i>__sys__t6</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t25</i></o>
+<o n="=="><o>__sys__t27</o><i>__sys__rt</i><i>__sys__t7</i></o>
+<o n="if_goto"><o>__sys__t28</o><i>__sys__t27</i><i>__sys__t34</i></o>
+<v t="s" n="__sys__t30">.allowJoin.</v>
+<o n="." r="45"><o>__sys__t29</o><i>unionX</i><i>__sys__t30</i></o>
+<o n="=" r="45"><o>__sys__t29</o><i>__sys__t8</i></o>
+<o n="goto"><o>__sys__t33</o><i>__sys__t35</i></o>
+<o n="==" r="47"><o>__sys__t36</o><i>change</i><i>__sys__t9</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t36</i></o>
+<o n="=="><o>__sys__t38</o><i>__sys__rt</i><i>__sys__t10</i></o>
+<o n="if_goto"><o>__sys__t39</o><i>__sys__t38</i><i>__sys__t45</i></o>
+<v t="s" n="__sys__t41">.allowJoin.</v>
+<o n="." r="49"><o>__sys__t40</o><i>unionX</i><i>__sys__t41</i></o>
+<o n="=" r="49"><o>__sys__t40</o><i>__sys__t11</i></o>
+<o n="goto"><o>__sys__t44</o><i>__sys__t46</i></o>
+<v t="s" n="__sys__t48">.sendMsg.</v>
+<o n="." r="52"><o>__sys__t47</o><i>game</i><i>__sys__t48</i></o>
+<o n="+" r="55"><o>__sys__t50</o><i>methodName</i><i>__sys__t12</i></o>
+<o n="arr" r="55"><o>__sys__t51</o><i>__sys__t50</i><i>__sys__t13</i></o>
+<o n="__sys__t47" r="52"><o>__sys__t52</o><i>game</i><i>sessionID</i><i>__sys__t51</i></o>
+<o n="return" r="57"><o>__sys__t53</o><i>__sys__t14</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t15" />
+<v n="__sys__t17" />
+<v n="__sys__t19" />
+<v n="__sys__t21" />
+<v n="__sys__t23" />
+<v n="__sys__t25" />
+<v n="__sys__t27" />
+<v n="__sys__t28" />
+<v n="__sys__t29" />
+<v n="__sys__t33" />
+<v n="__sys__t36" />
+<v n="__sys__t38" />
+<v n="__sys__t39" />
+<v n="__sys__t40" />
+<v n="__sys__t44" />
+<v n="__sys__t47" />
+<v n="__sys__t50" />
+<v n="__sys__t51" />
+<v n="__sys__t52" />
+<v n="__sys__t53" />
+<v n="change" />
+<v n="game" />
+<v n="methodName" />
+<v n="sessionID" />
+<v n="unionX" />
+</script>

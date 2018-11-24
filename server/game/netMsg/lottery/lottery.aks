@@ -1,0 +1,651 @@
+//抽奖
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+type=int(netMsg[3]);//类型1=抽一次;2=抽十次
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,type,userID;
+		json=json_decode(user.json);
+		tableData=game.table;
+		nickname=user.nickname;
+		level=user.level;
+		vip=user.vip;
+							
+		lotteryConfigTable=tableData.lotteryConfig;
+		rowLC=lotteryConfigTable.getRow(0);
+		vow=number(rowLC.getValFromColName("vow"));//求签
+		water=40;
+		if(type==2)
+		{
+			vow=number(rowLC.getValFromColName("tenvow"));//求签10次
+			water=41;
+		}
+		
+		gold=number(user.gold);//元宝（充值，优先使用）
+		gold2=number(user.gold2);//元宝（赠送）
+		if(vow>(gold+gold2))//元宝不足
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		
+		//扣减元宝
+		if(vow>gold)
+		{
+			vow-=gold;
+			gold=0;
+			gold2-=vow;
+		}
+		else
+		{
+			gold-=vow;
+		}
+		
+		//流水
+		allGold=gold+gold2;//元宝余额
+		game.saveResIO(userID,water,0,0,vow,allGold);//抽奖(type,itemID,（0=消耗，1=获得）,count,allGold)
+		
+		//抽奖阶段
+		lotteryTable=tableData.lottery;
+		lTCount=lotteryTable.size();
+		
+		numMgr=game.numMgr;
+		heroArr=json.hero;
+		wifeDict=json.wife;
+		itemDict=json.item;
+		pass=0;hOrWPass=1;
+		allLotteryDataArr=arr();
+		////////////////////////////////
+		allNum=1;
+		if(type==2)
+		{
+			allNum=10;
+		}
+		num=0;
+		achievement=json.achievement;
+		lotteryItemMap=achievement.lotteryItemMap;
+		luckDrawCount=number(user.luckDrawCount);
+		while(num<allNum)
+		{
+			lotteryDataArr=arr();
+			i=0;
+			rateArr=arr();//概率数组
+			while(i<lTCount)
+			{
+				rowL=lotteryTable.getRowFromColName("id",i+1);
+				rate=number(rowL.getValFromColName("rate"));//几率（万分比）
+				push(rateArr,rate);
+				++i;
+			}
+			indexS=randSelect(rateArr);//抽中的奖励
+			
+			targetTime=number(rowLC.getValFromColName("targetTime"));//必出次数
+			luckDrawCount+=1;
+			win=luckDrawCount%targetTime;
+			if(win==0)//100次必中
+			{
+				newHeroArr=arr();
+				newHeroLotteryIDArr=arr();
+				againNewHeroLotteryIDArr=arr();
+				newWifeArr=arr();
+				newWifeLotteryIDArr=arr();
+				againNewWifeLotteryIDArr=arr();
+				newItemArr=arr();
+				newItemLotteryIDArr=arr();
+				newItem1Arr=arr();
+				newItem1LotteryIDArr=arr();
+				a=0;
+				while(a<lTCount)
+				{
+					rowNL=lotteryTable.getRow(a);
+					++a;
+					
+					xzLotteryID=number(rowNL.getValFromColName("id"));
+					target=number(rowNL.getValFromColName("target"));//是否必出项目（1=是，0=不是）
+					hero=number(rowNL.getValFromColName("hero"));//豪杰
+					wife=number(rowNL.getValFromColName("wife"));//红颜
+					item=rowNL.getValFromColName("item");//物品
+					
+					if(target==1 && hero!=0)
+					{
+						push(newHeroArr,hero);
+						push(newHeroLotteryIDArr,xzLotteryID);
+						push(againNewHeroLotteryIDArr,xzLotteryID);
+					}
+					if(target==1 && wife!=0)
+					{
+						push(newWifeArr,wife);
+						push(newWifeLotteryIDArr,xzLotteryID);
+						push(againNewWifeLotteryIDArr,xzLotteryID);
+					}
+					if(target==1 && wife==0 && hero==0)
+					{
+						push(newItemArr,item);
+						push(newItemLotteryIDArr,xzLotteryID);
+					}
+					if(hero!=0)
+					{
+						push(newItem1Arr,item);
+						push(newItem1LotteryIDArr,xzLotteryID);
+					}
+				}
+				
+				lotteryID=0;quality=0;b=0;heroID=0;wifeID=0;itemID=0;itemCount=0;hundredItemArr=arr();onehundred=arr();
+				while(b!=1)
+				{
+					hOrW=rand()%2;
+					if(hOrW==1)
+					{
+						heroCount=size(newHeroArr);
+						if(heroCount>0)
+						{
+							heroS=rand()%heroCount;
+							heroIDS=newHeroArr[heroS];
+							newHero=numMgr.createHero(heroIDS,heroArr,json);
+							if(!empty(newHero))
+							{
+								heroID=heroIDS;
+								lotteryID=newHeroLotteryIDArr[heroS];
+								push(lotteryDataArr,lotteryID);
+								rowNL=lotteryTable.getRow(lotteryID-1);
+								quality=number(rowNL.getValFromColName("quality"));//品质
+								b=1;
+								hOrWPass=0;
+							}
+							else
+							{
+								remove(newHeroArr,heroS);
+								remove(newHeroLotteryIDArr,heroS);
+							}
+						}
+					}
+					else if(hOrW==0)
+					{
+						wifeCount=size(newWifeArr);
+						if(wifeCount>0)
+						{
+							wifeS=rand()%wifeCount;
+							wifeIDS=newWifeArr[wifeS];
+							newWife=numMgr.createWife(wifeIDS,wifeDict);
+							if(!empty(newWife))
+							{
+								wifeID=wifeIDS;
+								lotteryID=newWifeLotteryIDArr[wifeS];
+								push(lotteryDataArr,lotteryID);
+								rowNL=lotteryTable.getRow(lotteryID-1);
+								quality=number(rowNL.getValFromColName("quality"));//品质
+								//计算user红颜数值
+								numMgr.computeUserWifeProperty(user,wifeDict);
+								b=1;
+								hOrWPass=0;
+							}
+							else
+							{
+								remove(newWifeArr,wifeS);
+								remove(newWifeLotteryIDArr,wifeS);
+							}
+						}
+						else
+						{
+							b=1;
+						}
+					}
+				}
+				
+				//获取装备
+				if(hOrWPass)
+				{
+					q=0;selectItem1ID=0;
+					while(q<size(newItem1LotteryIDArr))
+					{
+						if(selectItem1ID!=0)
+						{
+							break;
+						}
+						lotteryID=newItem1LotteryIDArr[q];
+						rowNL=lotteryTable.getRow(lotteryID-1);
+						itemNewStr=rowNL.getValFromColName("item1");//物品
+						quality=number(rowNL.getValFromColName("quality"));//品质
+					
+						addItemArr=split(arr(),itemNewStr,",");
+						addIDCount=size(addItemArr);
+						if(addIDCount>=2)
+						{
+							i=0;j=0;addCount=addIDCount/2;
+							while(i<addCount)
+							{
+								itemID=number(addItemArr[j]);
+								itemCount=number(addItemArr[j+1]);
+								if(!exist(lotteryItemMap,itemID))
+								{
+									selectItem1ID=itemID;
+									hOrWPass=0;
+									lotteryItemMap[itemID]=itemCount;//抽签已抽物品字典
+									numMgr.addItem(itemID,itemCount,itemDict);//奖励道具
+									push(hundredItemArr,itemID,itemCount);
+									
+									push(lotteryDataArr,lotteryID);
+									break;
+								}
+								else
+								{
+									remove(newItem1LotteryIDArr,q);
+								}
+								j+=2;
+								++i;
+							}
+						}
+					}
+				}
+				
+				//无豪杰红颜奖励道具
+				if(hOrWPass)
+				{
+					selectLotteryItemIDArr=arr();
+					newItemCount=size(newItemArr);
+					itemNewStr="";
+					if(newItemCount>0)
+					{
+						itemS=rand()%newItemCount;
+						itemNewStr=newItemArr[itemS];
+						push(lotteryDataArr,newItemLotteryIDArr[itemS]);
+					}
+					else
+					{
+						hCount=size(againNewHeroLotteryIDArr);
+						wCount=size(againNewWifeLotteryIDArr);
+						d=0;
+						while(d<hCount)
+						{
+							push(selectLotteryItemIDArr,againNewHeroLotteryIDArr[d]);
+							++d;
+						}
+						e=0;
+						while(e<hCount)
+						{
+							push(selectLotteryItemIDArr,againNewWifeLotteryIDArr[e]);
+							++e;
+						}
+						sCount=size(selectLotteryItemIDArr);
+						sLotteryID=rand()%sCount;
+						lotteryID=selectLotteryItemIDArr[sLotteryID];
+						rowNL=lotteryTable.getRow(lotteryID-1);
+						itemNewStr=rowNL.getValFromColName("item");//物品
+						quality=number(rowNL.getValFromColName("quality"));//品质
+						
+						push(lotteryDataArr,lotteryID);
+					}
+					
+					addItemArr=split(arr(),itemNewStr,",");
+					addIDCount=size(addItemArr);
+					if(addIDCount>=2)
+					{
+						i=0;j=0;addCount=addIDCount/2;
+						while(i<addCount)
+						{
+							itemID=number(addItemArr[j]);
+							itemCount=number(addItemArr[j+1]);
+							numMgr.addItem(itemID,itemCount,itemDict);//奖励道具
+							push(hundredItemArr,itemID,itemCount);
+							j+=2;
+							++i;
+
+							break;
+						}
+					}
+				}
+				
+				rowNL=lotteryTable.getRow(lotteryID-1);
+				goldGet=number(rowNL.getValFromColName("gold"));//元宝
+				
+				if(quality>=3)
+				{
+					//道具记录
+					sql="insert into luck_draw set ";
+					sql+="genTime='"+now()+"'";
+					sql+=",userID='"+userID+"'";
+					sql+=",nickname='"+nickname+"'";
+					sql+=",level='"+level+"'";
+					sql+=",vip='"+vip+"'";
+					sql+=",heroID='"+heroID+"'";
+					sql+=",wifeID='"+wifeID+"'";
+					sql+=",itemID='"+itemID+"'";
+					sql+=",itemCount='"+itemCount+"'";
+					sql+=",gold='"+goldGet+"'";
+					sql+=",q='"+quality+"'";
+					mysqlExec(game.cnn,sql);
+				}
+
+				push(lotteryDataArr,heroID,wifeID,hundredItemArr,quality,goldGet);
+				push(allLotteryDataArr,lotteryDataArr);
+			}
+			else
+			{
+				targetTime2=number(rowLC.getValFromColName("targetTime2"));//必出次数2
+				ten=luckDrawCount%targetTime2;
+				tenNewLotteryRowArr=arr();//品质3以上的lotteryID
+				if(ten==0)//10次中品质3+
+				{
+					targetQuality2=number(rowLC.getValFromColName("targetQuality2"));//必出品质2
+					g=0;
+					while(g<lTCount)
+					{
+						rowL=lotteryTable.getRow(g);
+						quality=number(rowL.getValFromColName("quality"));//品质
+						if(quality==targetQuality2)
+						{
+							push(tenNewLotteryRowArr,g);
+						}
+						
+						++g;
+					}
+					tenNewLotteryIDArrCount=size(tenNewLotteryRowArr);
+					tenNumS=rand()%tenNewLotteryIDArrCount;
+					indexS=tenNewLotteryRowArr[tenNumS];
+				}
+				
+				//只奖励一次
+				targetTime3=number(rowLC.getValFromColName("targetTime3"));//必出次数3
+				targetTime4=number(rowLC.getValFromColName("targetTime4"));//必出次数4
+				targetTime5=number(rowLC.getValFromColName("targetTime5"));//必出次数5
+				targetTime6=number(rowLC.getValFromColName("targetTime6"));//必出次数6
+				targetQuality3=number(rowLC.getValFromColName("targetQuality3"));//必出ID3
+				targetQuality4=number(rowLC.getValFromColName("targetQuality4"));//必出ID4
+				targetQuality5=number(rowLC.getValFromColName("targetQuality5"));//必出ID5
+				targetQuality6=number(rowLC.getValFromColName("targetQuality6"));//必出ID6
+				if(luckDrawCount==targetTime3)
+				{
+					indexS=targetQuality3-1;
+				}
+				else if(luckDrawCount==targetTime4)
+				{
+					indexS=targetQuality4-1;
+				}
+				else if(luckDrawCount==targetTime5)
+				{
+					indexS=targetQuality5-1;
+				}
+				else if(luckDrawCount==targetTime6)
+				{
+					indexS=targetQuality6-1;
+				}
+				
+				rowL=lotteryTable.getRow(indexS);
+				heroID=0;wifeID=0;
+				hero=number(rowL.getValFromColName("hero"));//豪杰
+				wife=number(rowL.getValFromColName("wife"));//红颜
+				item=rowL.getValFromColName("item");//物品
+				item1=rowL.getValFromColName("item1");//物品
+				quality=number(rowL.getValFromColName("quality"));//品质
+				goldGet=number(rowL.getValFromColName("gold"));//奖励元宝
+
+				isNeedAddItem=1;
+				push(lotteryDataArr,indexS+1);
+				if(hero!=0)
+				{
+					newHero=numMgr.createHero(hero,heroArr,json);
+					if(!empty(newHero))
+					{
+						push(lotteryDataArr,hero);
+						isNeedAddItem=0;
+						heroID=hero;
+					}
+					else
+					{
+						push(lotteryDataArr,0);
+					}
+				}
+				else
+				{
+					push(lotteryDataArr,0);
+				}
+				
+				if(wife!=0)
+				{
+					newWife=numMgr.createWife(wife,wifeDict);
+					if(!empty(newWife))
+					{
+						//计算user红颜数值
+						numMgr.computeUserWifeProperty(user,wifeDict);
+						push(lotteryDataArr,wife);
+						isNeedAddItem=0;
+						wifeID=wife;
+					}
+					else
+					{
+						push(lotteryDataArr,0);
+					}
+				}
+				else
+				{
+					push(lotteryDataArr,0);
+				}
+				
+				//重新计算豪杰属性加成
+				if(hero!=0&&isNeedAddItem==0 || wife!=0&&isNeedAddItem==0)
+				{
+					pass=1;
+				}
+				
+				newAddItemArr=arr();
+				//获取装备
+				if(isNeedAddItem)
+				{
+					addItemArr=split(arr(),item1,",");
+					addIDCount=size(addItemArr);
+					if(addIDCount>=2)
+					{
+						i=0;j=0;addCount=addIDCount/2;
+						while(i<addCount)
+						{
+							itemID=number(addItemArr[j]);
+							itemCount=number(addItemArr[j+1]);
+							if(!exist(lotteryItemMap,itemID))
+							{
+								isNeedAddItem=0;
+								lotteryItemMap[itemID]=itemCount;//抽签已抽物品字典
+								numMgr.addItem(itemID,itemCount,itemDict);//奖励道具
+								push(newAddItemArr,itemID,itemCount);
+							}
+							
+							j+=2;
+							++i;
+						}
+					}
+				}
+				
+				if(isNeedAddItem)
+				{
+					addItemArr=split(arr(),item,",");
+					addIDCount=size(addItemArr);
+					if(addIDCount>=2)
+					{
+						i=0;j=0;addCount=addIDCount/2;
+						while(i<addCount)
+						{
+							itemID=number(addItemArr[j]);
+							itemCount=number(addItemArr[j+1]);
+							numMgr.addItem(itemID,itemCount,itemDict);//奖励道具
+							push(newAddItemArr,itemID,itemCount);
+							j+=2;
+							++i;
+						}
+					}
+				}
+				
+				newAddItemArrCount=size(newAddItemArr);
+				if(newAddItemArrCount==0 && goldGet>0)//抽中元宝
+				{
+					gold2+=goldGet;
+					//流水
+					allGold=gold+gold2;//元宝余额
+					game.saveResIO(userID,43,0,1,goldGet,allGold);//抽奖获得(type,itemID,（0=消耗，1=获得）,count,allGold)
+				}
+
+				//道具记录
+				if(quality>=3)
+				{
+					itemID=0;
+					itemCount=0;
+					idCount=size(newAddItemArr);
+					if(idCount>=2)
+					{
+						itemID=newAddItemArr[0];
+						itemCount=newAddItemArr[1];
+					}
+					
+					sql="insert into luck_draw set ";
+					sql+="genTime='"+now()+"'";
+					sql+=",userID='"+userID+"'";
+					sql+=",nickname='"+nickname+"'";
+					sql+=",level='"+level+"'";
+					sql+=",vip='"+vip+"'";
+					sql+=",heroID='"+heroID+"'";
+					sql+=",wifeID='"+wifeID+"'";
+					sql+=",itemID='"+itemID+"'";
+					sql+=",itemCount='"+itemCount+"'";
+					sql+=",gold='"+goldGet+"'";
+					sql+=",q='"+quality+"'";
+					mysqlExec(game.cnn,sql);
+				}
+				
+				push(lotteryDataArr,newAddItemArr,quality,goldGet);
+				push(allLotteryDataArr,lotteryDataArr);
+			}
+			++num;
+		}
+		////////////////////////////////
+		//公告群发
+		allLotteryCount=size(allLotteryDataArr);
+		h=0;
+		while(h<allLotteryCount)
+		{
+			infoLotteryArr=allLotteryDataArr[h];
+			qualityS=infoLotteryArr[4];
+			heroIDS=infoLotteryArr[1];
+			wifeIDS=infoLotteryArr[2];
+			itemCountS=size(infoLotteryArr[3]);
+			getGoldS=infoLotteryArr[5];
+			if(qualityS>3)
+			{
+				name="";
+				
+				if(heroIDS!=0)
+				{
+					heroArrCount=size(heroArr);
+					r=0;
+					while(r<heroArrCount)
+					{
+						heroInfo=heroArr[r];
+						heroID=heroInfo.heroID;
+						if(heroIDS==heroID)
+						{
+							name=heroInfo.name;
+						}
+						++r;
+					}
+				}
+				else if(wifeIDS!=0)
+				{
+					rowW=tableData.wife.getRowFromColName("id",wifeIDS);
+					name=rowW.getValFromColName("name");//名称
+				}
+				else if(itemCountS>=2)
+				{
+					rowI=tableData.item.getRowFromColName("id",infoLotteryArr[3][0]);
+					name=rowI.getValFromColName("name");//名称
+				}
+				else if(getGoldS>0)
+				{
+					name="大量元宝*"+getGoldS;
+				}
+				
+				color="";
+				if(qualityS==4)
+				{
+					color="FF66FF";
+				}
+				else if(qualityS==5)
+				{
+					color="FFCC00";
+				}
+				
+				worldSendMsg(game,0,nickname,0,0,0,"恭喜<font color=\"#33CC00\">"+nickname+"</font>在求签中获得了<font color=\"#"+color+"\">"+name+"</font>！诸位大人也去试试运势吧！",0,7);
+			}
+			++h;
+		}
+		
+
+		if(pass || hOrWPass==0)
+		{
+			numMgr.computeHeroArr(json);
+			numMgr.computeUser(user,json);
+		}
+		
+		wifePlus=json.wifePlus;
+		
+		//保存
+		user.luckDrawCount=luckDrawCount;
+		user.gold=gold;
+		user.gold2=gold2;
+		user.json=json_encode(json);
+		
+		power=number(user.power);
+		strength=number(user.strength);
+		wisdom=number(user.wisdom);
+		charm=number(user.charm);
+		politics=number(user.politics);
+		intimate=number(user.intimate);
+		beauty=number(user.beauty);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,gold,gold2,power,strength,wisdom,charm,politics,intimate,beauty,luckDrawCount,heroArr,wifeDict,itemDict,allLotteryDataArr,wifePlus,lotteryItemMap)
+		);
+		
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

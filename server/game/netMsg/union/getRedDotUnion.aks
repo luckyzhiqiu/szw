@@ -1,0 +1,123 @@
+//获取红点信息
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+unionID=number(user.unionID);
+if(unionID==0)//未加入联盟
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+//联盟ID
+unionData=game.rd.getRow(game.cnn,"union","id",unionID,"*",1000);
+if(empty(unionData))//联盟不存在
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}
+
+infoDict=dict();
+unionJson=json_decode(unionData.json);
+reqUserIDMap=unionJson.reqUserIDMap;//申请加入盟字典
+
+reqUserIDMapCount=size(reqUserIDMap);
+if(reqUserIDMapCount>0)
+{
+	infoDict["reqUserIDMap"]=1;
+}
+else
+{
+	infoDict["reqUserIDMap"]=0;
+}
+
+level=number(unionData.level);
+allianceBarrier=game.table.allianceBarrier;
+bossMap=unionJson.bossMap;//boss字典
+bossMapCount=size(bossMap);
+if(bossMapCount>0)
+{
+	infoDict["bossMap"]=0;
+	
+	i=0;
+	it=dictIt();
+	dictItBegin(bossMap,it);
+	while(!dictItEmpty(it))
+	{
+		++i;
+		boss=dictItVal(it);
+		hp=boss.hp;
+		if(hp>0)
+		{
+			infoDict["bossMap"]=1;
+			infoDict["openBossMap"]=0;
+		}
+		else
+		{
+			if(i!=3)
+			{
+				rowAB=allianceBarrier.getRow(i);
+				levelAB=number(rowAB.getValFromColName("level"));
+				if(level>=levelAB)
+				{
+					infoDict["openBossMap"]=1;
+				}
+				else
+				{
+					infoDict["openBossMap"]=0;
+				}
+			}
+			else
+			{
+				infoDict["openBossMap"]=0;
+			}
+		}
+		dictItNext(it);	
+	}
+}
+else
+{
+	infoDict["openBossMap"]=1;
+	infoDict["bossMap"]=0;
+}
+
+uJson=json_decode(user.json);
+unionBuildMap=uJson.dailyTask.unionBuildMap;//联盟每日建设记录字典
+unionBuildMapCount=size(unionBuildMap);
+if(unionBuildMapCount>0)
+{
+	infoDict["unionBuildMap"]=0;
+}
+else
+{
+	infoDict["unionBuildMap"]=1;
+}
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,infoDict)
+);

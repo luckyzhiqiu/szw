@@ -1,0 +1,256 @@
+//日常任务领取奖励
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+dailyTaskID=netMsg[3];//日常任务ID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+if(dailyTaskID<0||dailyTaskID>=17)//日常任务ID无效
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link sessionID,methodName,dailyTaskID;
+		json=json_decode(user.json);
+		dailyTask=json.dailyTask;//日常任务
+			
+		row=game.table.dailyTask.getRowFromColName("id",dailyTaskID);//任务数据
+		num=number(row.getValFromColName("num"));//目标数值
+		money=number(row.getValFromColName("money"));//银两奖励
+		food=number(row.getValFromColName("food"));//粮草奖励
+		soldier=number(row.getValFromColName("soldier"));//士兵奖励
+		itemStr=row.getValFromColName("item");//道具奖励
+		activePoint=number(row.getValFromColName("activePoint"));//活跃点奖励
+		score=number(row.getValFromColName("score"));//政绩
+	
+		userMoney=number(user.money);
+		userFood=number(user.food);
+		userSoldier=number(user.soldier);
+		userScore=number(user.score);
+		
+		condition=1;
+		if(dailyTaskID==1)//豪杰升级次数
+		{
+			heroUpCount=dailyTask.heroUpCount;
+			if(heroUpCount<num)
+			{
+				condition=0;
+			}
+		}
+		else if(dailyTaskID==2)//商业经营次数
+		{
+			makeMoneyCount=dailyTask.makeMoneyCount;
+			if(makeMoneyCount<num)
+			{
+				condition=0;
+			}
+		}
+		else if(dailyTaskID==3)//农业经营次数
+		{
+			makeFoodCount=dailyTask.makeFoodCount;
+			if(makeFoodCount<num)
+			{
+				condition=0;
+			}
+		}
+		else if(dailyTaskID==4)//征兵次数
+		{
+			makeSoldierCount=dailyTask.makeSoldierCount;
+			if(makeSoldierCount<num)
+			{
+				condition=0;
+			}
+		}
+		else if(dailyTaskID==5)//通关次数
+		{
+			barrierCount=dailyTask.barrierCount;
+			if(barrierCount<num)
+			{
+				condition=0;
+			}
+		}
+		else if(dailyTaskID==6)//翻牌子次数（随机宠幸次数）
+		{
+			randomFuckCount=dailyTask.randomFuckCount;
+			if(randomFuckCount<num)
+			{
+				condition=0;
+			}
+		}
+		else if(dailyTaskID==7)//培养子女10次
+		{
+			upChild=dailyTask.upChild;
+			if(upChild<num)
+			{
+				condition=0;
+			}
+		}
+		else if(dailyTaskID==8)//膜拜3次
+		{
+			knee1=dailyTask.knee1;
+			knee2=dailyTask.knee2;
+			knee3=dailyTask.knee3;
+			knee=knee1+knee2+knee3;
+			
+			if(knee<num)
+			{
+				condition=0;
+			}
+		}
+		else if(dailyTaskID==9)//使用1个资质果
+		{
+			useItem9_12=dailyTask.useItem9_12;
+			if(useItem9_12<num)
+			{
+				condition=0;
+			}
+		}
+		else if(dailyTaskID==10)//议政厅论战4次
+		{
+			waterCount=dailyTask.waterCount;
+			if(waterCount<num)
+			{
+				condition=0;
+			}
+		}
+		else if(dailyTaskID==11)//微服私访15次
+		{
+			visitCount=dailyTask.visitCount;
+			if(visitCount<num)
+			{
+				condition=0;
+			}
+		}
+		else if(dailyTaskID==12)//联盟捐献1次
+		{
+			unionBuildMap=dailyTask.unionBuildMap;
+			unionCount=size(unionBuildMap);
+			if(unionCount==0)
+			{
+				condition=0;
+			}
+		}
+		else if(dailyTaskID==13)//皇宫请安1次
+		{
+			helloCount=dailyTask.helloCount;
+			if(helloCount<num)
+			{
+				condition=0;
+			}
+		}
+		else if(dailyTaskID==14)//商城购物1次
+		{
+			buyCount=dailyTask.buyCount;
+			if(buyCount<num)
+			{
+				condition=0;
+			}
+		}
+		else if(dailyTaskID==15)//领取月卡
+		{
+			monthCard=dailyTask.monthCard;
+			if(monthCard<num)
+			{
+				condition=0;
+			}
+		}
+		else if(dailyTaskID==16)//领取年卡
+		{
+			yearCard=dailyTask.yearCard;
+			if(yearCard<num)
+			{
+				condition=0;
+			}
+		}
+		
+		if(condition)//条件满足
+		{
+			//保存
+			user.score=userScore+score;//政绩奖励
+			user.money=userMoney+money;//银两奖励
+			user.food=userFood+food;//粮草奖励		
+			user.soldier=userSoldier+soldier;//士兵奖励
+			dailyTask.active+=activePoint;//活跃点奖励
+			dailyTask.idMap[dailyTaskID]=1;
+			
+			numMgr=game.numMgr;
+			addItemArr=split(arr(),itemStr,",");
+			itemDict=json.item;
+			addIDCount=size(addItemArr);
+			if(addIDCount>=2)
+			{
+				i=0;j=0;addCount=addIDCount/2;
+				while(i<addCount)
+				{
+					itemID=number(addItemArr[j]);
+					itemCount=number(addItemArr[j+1]);
+					numMgr.addItem(itemID,itemCount,itemDict);//奖励道具
+					j+=2;
+					++i;
+				}
+			}
+			
+			user.json=json_encode(json);
+			
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,money,food,soldier,itemStr,activePoint,dailyTask.idMap)
+			);
+			return(1);//修改
+		}
+		else//条件不满足
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

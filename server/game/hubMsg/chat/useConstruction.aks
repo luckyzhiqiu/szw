@@ -1,0 +1,4 @@
+//世界聊天转发
+<game,netMsg>
+// debug(netMsg);
+game.sendMsgToAllExceptUserID(netMsg,0);

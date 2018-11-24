@@ -1,0 +1,8 @@
+//新手引导日志表（每天一个表）
+mysqlCol("key","id");
+mysqlCol("datetime","genTime");//生成时间
+mysqlCol("varchar","uid");//平台uid
+mysqlCol("int","userID",0);//用户ID
+mysqlCol("int","sysID",0);//游戏系统ID
+mysqlCol("int","storyID",0);//剧情ID
+mysqlCol("int","step",0);//引导第几步或剧情ID

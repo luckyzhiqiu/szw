@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t34">22</v>
+<v t="n" n="__sys__t31">20</v>
+<v t="n" n="__sys__t30">20</v>
+<v t="n" n="__sys__t14">7</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">0</v>
+<v t="n" n="__sys__t4">0</v>
+<v t="n" n="__sys__t5">0</v>
+<v t="n" n="__sys__t6">1</v>
+<o n="input"><o>__sys__t7</o><i>__sys__t1</i></o>
+<o n="="><o>enemyHeroArr</o><i>__sys__t7</i></o>
+<o n="input"><o>__sys__t9</o><i>__sys__t2</i></o>
+<o n="="><o>heroID</o><i>__sys__t9</i></o>
+<o n="=" r="21"><o>i</o><i>__sys__t3</i></o>
+<o n="size" r="21"><o>__sys__t12</o><i>enemyHeroArr</i></o>
+<o n="=" r="21"><o>c</o><i>__sys__t12</i></o>
+<o n="&lt;" r="22"><o>__sys__t15</o><i>i</i><i>c</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t15</i></o>
+<o n="=="><o>__sys__t17</o><i>__sys__rt</i><i>__sys__t4</i></o>
+<o n="if_goto"><o>__sys__t18</o><i>__sys__t17</i><i>__sys__t34</i></o>
+<o n="[]" r="24"><o>__sys__t19</o><i>enemyHeroArr</i><i>i</i></o>
+<o n="=" r="24"><o>enemyHero</o><i>__sys__t19</i></o>
+<v t="s" n="__sys__t22">.heroID.</v>
+<o n="." r="25"><o>__sys__t21</o><i>enemyHero</i><i>__sys__t22</i></o>
+<o n="==" r="25"><o>__sys__t24</o><i>__sys__t21</i><i>heroID</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t24</i></o>
+<o n="=="><o>__sys__t26</o><i>__sys__rt</i><i>__sys__t5</i></o>
+<o n="if_goto"><o>__sys__t27</o><i>__sys__t26</i><i>__sys__t30</i></o>
+<o n="return" r="25"><o>__sys__t28</o><i>i</i></o>
+<o n="goto"><o>__sys__t29</o><i>__sys__t31</i></o>
+<o n="++" r="26"><o>i</o><i>i</i></o>
+<o n="goto"><o>__sys__t33</o><i>__sys__t14</i></o>
+<o n=" -" r="28"><o>__sys__t35</o><i>__sys__t6</i></o>
+<o n="return" r="28"><o>__sys__t36</o><i>__sys__t35</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t12" />
+<v n="__sys__t15" />
+<v n="__sys__t17" />
+<v n="__sys__t18" />
+<v n="__sys__t19" />
+<v n="__sys__t21" />
+<v n="__sys__t24" />
+<v n="__sys__t26" />
+<v n="__sys__t27" />
+<v n="__sys__t28" />
+<v n="__sys__t29" />
+<v n="__sys__t33" />
+<v n="__sys__t35" />
+<v n="__sys__t36" />
+<v n="__sys__t7" />
+<v n="__sys__t9" />
+<v n="c" />
+<v n="enemyHero" />
+<v n="enemyHeroArr" />
+<v n="heroID" />
+<v n="i" />
+</script>

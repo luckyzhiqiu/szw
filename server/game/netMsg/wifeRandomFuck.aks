@@ -1,0 +1,236 @@
+//红颜随机宠幸
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID;
+		json=json_decode(user.json);
+		wifeDict=json.wife;
+		wifeC=size(wifeDict);
+		if(wifeC==0)//没有红颜
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//修改
+		}
+		
+		//是否有轮数
+		beginTime=json.wifeRandomFuck.beginTime;//红颜随机宠幸开始时间
+		nowTime=time_milli();//现在的时间
+		tableData=game.table;
+		row=tableData.level.getRowFromColName("level",user.level);
+		wifeCount=number(row.getValFromColName("wife"));//官位等级红颜次数
+		
+		rowVip=tableData.vip.getRowFromColName("level",user.vip);
+		if(!empty(rowVip))//是否为vip
+		{
+			randomFuck=number(rowVip.getValFromColName("randomFuck"));
+			wifeCount+=randomFuck;//VIP等级红颜次数（上限加成）
+		}
+
+		num=floor((nowTime-beginTime)/1000/1800);
+		num=limit(num,0,wifeCount);//是否有轮数
+		if(num>=1)//有轮数
+		{
+			--num;
+			remain=nowTime-beginTime;//经过多长时间
+			maxTime=wifeCount*1000*1800;//最大保存时间
+			remain=limit(remain,0,maxTime);//时间范围
+			min=1000*1800;//一轮时间
+			newBeginTime=nowTime-remain+min;//新的时间
+			
+			//红颜ID数组
+			wifeIDArr=arr();
+			it=dictIt();
+			dictItBegin(wifeDict,it);
+			while(!dictItEmpty(it))
+			{
+				push(wifeIDArr,dictItKey(it));
+				dictItNext(it);
+			}
+			wifeIDCount=size(wifeIDArr);
+			
+			//随机选择红颜
+			wifeID=wifeIDArr[rand()%wifeIDCount];//随机红颜ID
+			wife=wifeDict[wifeID];
+			
+			intimate=wife.intimate;//红颜亲密度
+			exp=wife.exp;//红颜经验
+			
+			//增加经验
+			beauty=wife.beauty;
+			addExp=3*beauty;
+			exp+=addExp;
+			
+			vip=json.vip;
+			fuckCount=vip.fuckCount;//已获取红颜赐福每日次数
+			//红颜赐福每日次数（红颜宠幸概率5触发5倍经验）
+			quintuple=0;multiple=1;
+			rowVip=tableData.vip.getRowFromColName("level",user.vip);//角色VIP等级
+			if(!empty(rowVip))//返回行数据
+			{
+				miricle5=number(rowVip.getValFromColName("miricle5"));//红颜赐福每日次数（红颜宠幸概率5触发5倍经验）
+				if(fuckCount<miricle5)//未满红颜赐福每日次数
+				{
+					rate5=number(rowVip.getValFromColName("rate5"));//5倍经验概率
+					num = rand()%10000;//随机数
+					if(rate5>num)
+					{
+						multiple=5;
+						quintuple=addExp*4;
+						fuckCount+=1;
+						vip.fuckCount=fuckCount;
+					}
+				}
+			}
+			
+			achievement=json.achievement;
+			//成就
+			randomFuckCountAchievement=ref(achievement.randomFuckCount);
+			randomFuckCountAchievement+=1;//成就累计//随机宠幸次数
+			
+			oldPower=number(user.power);
+			
+			//生孩子
+			childSys=json.childSys;
+			childrenArr=childSys.children;
+			childrenArrCount=size(childrenArr);
+			childMaxCount=childSys.childMaxCount;
+			if(childrenArrCount<childMaxCount)//可以生
+			{
+				brith=number(rowVip.getValFromColName("brith"));//红颜生娃概率
+				numB=rand()%10000;
+				if(randomFuckCountAchievement==3)
+				{
+					numB=0;
+				}
+				if(numB<brith)//生了
+				{
+					game.childMgr.createChild(childSys,wife,user);
+					//成就子女数+1
+					achievement.childrenCount+=1;
+				}
+			}
+
+			//保存
+			wife.exp=exp+quintuple;
+			json.wifeRandomFuck.beginTime=newBeginTime;//更新时间
+			
+			randomFuckCount=ref(json.dailyTask.randomFuckCount);
+			randomFuckCount+=1;//日常任务累计次数
+			
+			user.json=json_encode(json);
+			game.numMgr.computeUserWifeProperty(user,wifeDict);//计算user红颜数值
+			
+			//数据同步
+			userArr=arr();
+			power=number(user.power);
+			strength=number(user.strength);
+			wisdom=number(user.wisdom);
+			charm=number(user.charm);
+			politics=number(user.politics);
+			userStrengthAdd3=number(user.strengthAdd3);
+			userWisdomAdd3=number(user.wisdomAdd3);
+			userCharmAdd3=number(user.charmAdd3);
+			userPoliticsAdd3=number(user.politicsAdd3);
+			
+			push(userArr,power,strength,wisdom,charm,politics,userStrengthAdd3,userWisdomAdd3,userCharmAdd3,userPoliticsAdd3);
+			
+			//刷新召唤冲榜
+			activityMgr=game.activityMgr;
+			activityID=206;//召唤冲榜
+			if(activityMgr.getActivityStatus(activityID)==1)//活动进行中
+			{
+				global_var=game.global_var;
+				rushLoop=global_var.rushLoop;
+				rushLoopBt=rushLoop.bt;//阶段开始时间
+			
+				fuckAddBT=number(user.fuckAddBT);
+				fuckAdd=number(user.fuckAdd);
+				score=1;
+				if(fuckAddBT!=rushLoopBt)//重置活动积分
+				{
+					user.fuckAddBT=rushLoopBt;
+					fuckAdd=score;
+					user.fuckAddReward=0;
+				}
+				else//累计活动积分
+				{
+					fuckAdd+=score;
+				}
+				user.fuckAdd=fuckAdd;
+				//刷新榜
+				score=fuckAdd;
+				rankName=game.gameConfig.name+"_fuckAddRank";//排行榜名称
+				rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+				userID=user.id;
+				redis_zadd(rd,rankName,score,userID);//更新榜单
+				//国子监势力涨幅返回
+				userSessionMap=game.userSessionMap;
+				if(exist(userSessionMap,userID))
+				{
+					session=userSessionMap[userID];
+					msg=arr("fuckAddResult",fuckAdd);
+					game.sendMsg(session.id,msg);
+				}
+			}
+			
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,wifeID,addExp,newBeginTime,randomFuckCount,randomFuckCountAchievement,multiple,childSys,achievement.childrenCount,userArr,wife.childrenNum,fuckCount)
+			);
+			return(1);//修改
+		}
+		else//无轮数
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//修改
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

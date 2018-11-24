@@ -1,0 +1,30 @@
+/*
+mysql数据库连接信息配置文件
+cnn:mysql连接信息
+*/
+{
+	cnn0:
+	{
+		domain:"127.0.0.1",
+		port:3306,
+		user:"root",
+		password:"123456",
+		name:"game_jipin"
+	},
+	cnn_global:
+	{
+		domain:"127.0.0.1",
+		port:3306,
+		user:"root",
+		password:"123456",
+		name:"game_jipin_global"
+	},
+	cnn_account:
+	{
+		domain:"127.0.0.1",
+		port:3306,
+		user:"root",
+		password:"123456",
+		name:"game_jipin_account"
+	}
+}

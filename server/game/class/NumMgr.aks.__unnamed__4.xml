@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t218">121</v>
+<v t="n" n="__sys__t217">121</v>
+<v t="n" n="__sys__t211">118</v>
+<v t="n" n="__sys__t210">118</v>
+<v t="n" n="__sys__t164">85</v>
+<v t="n" n="__sys__t162">84</v>
+<v t="n" n="__sys__t104">49</v>
+<v t="n" n="__sys__t101">47</v>
+<v t="n" n="__sys__t100">47</v>
+<v t="n" n="__sys__t60">20</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="n" n="__sys__t4">1</v>
+<v t="n" n="__sys__t5">1</v>
+<v t="n" n="__sys__t6">0</v>
+<v t="n" n="__sys__t7">0</v>
+<v t="s" n="__sys__t8">.exp.</v>
+<v t="n" n="__sys__t9">0</v>
+<v t="s" n="__sys__t10">.level.</v>
+<v t="s" n="__sys__t11">.memberMax.</v>
+<v t="n" n="__sys__t12">4</v>
+<v t="n" n="__sys__t13">1</v>
+<v t="n" n="__sys__t14">0</v>
+<v t="n" n="__sys__t15">0</v>
+<v t="s" n="__sys__t16">._activityUnionRank.</v>
+<v t="n" n="__sys__t17">0</v>
+<v t="n" n="__sys__t18">10</v>
+<v t="n" n="__sys__t19">0</v>
+<v t="n" n="__sys__t20">0</v>
+<v t="n" n="__sys__t21">0</v>
+<v t="n" n="__sys__t22">0</v>
+<v t="n" n="__sys__t23">0</v>
+<v t="s" n="__sys__t24">.恭喜&lt;font color="#33CC00"&gt;.</v>
+<v t="s" n="__sys__t25">.&lt;/font&gt;在&lt;font color="#33CC00"&gt;联盟冲榜&lt;/font&gt;活动中晋升为第 &lt;font color="#33CC00"&gt;.</v>
+<v t="n" n="__sys__t26">1</v>
+<v t="s" n="__sys__t27">.&lt;/font&gt; 名，希望他能站到最后并拿走丰厚的奖励！.</v>
+<v t="n" n="__sys__t28">0</v>
+<v t="n" n="__sys__t29">4</v>
+<o n="input"><o>__sys__t30</o><i>__sys__t1</i></o>
+<o n="="><o>self</o><i>__sys__t30</i></o>
+<o n="input"><o>__sys__t32</o><i>__sys__t2</i></o>
+<o n="="><o>union</o><i>__sys__t32</i></o>
+<o n="input"><o>__sys__t34</o><i>__sys__t3</i></o>
+<o n="="><o>addExp</o><i>__sys__t34</i></o>
+<v t="s" n="__sys__t37">.game.</v>
+<o n="." r="94"><o>__sys__t36</o><i>self</i><i>__sys__t37</i></o>
+<o n="=" r="94"><o>game</o><i>__sys__t36</i></o>
+<v t="s" n="__sys__t41">.table.</v>
+<o n="." r="95"><o>__sys__t40</o><i>game</i><i>__sys__t41</i></o>
+<v t="s" n="__sys__t44">.alliance.</v>
+<o n="." r="95"><o>__sys__t43</o><i>__sys__t40</i><i>__sys__t44</i></o>
+<o n="=" r="95"><o>allianceTab</o><i>__sys__t43</i></o>
+<v t="s" n="__sys__t48">.exp.</v>
+<o n="." r="96"><o>__sys__t47</o><i>union</i><i>__sys__t48</i></o>
+<o n="number" r="96"><o>__sys__t50</o><i>__sys__t47</i></o>
+<o n="=" r="96"><o>exp</o><i>__sys__t50</i></o>
+<o n="+=" r="97"><o>exp</o><i>addExp</i></o>
+<o n="=" r="98"><o>level</o><i>__sys__t4</i></o>
+<v t="s" n="__sys__t55">.size.</v>
+<o n="." r="99"><o>__sys__t54</o><i>allianceTab</i><i>__sys__t55</i></o>
+<o n="__sys__t54" r="99"><o>__sys__t57</o><i>allianceTab</i></o>
+<o n="-" r="99"><o>__sys__t58</o><i>__sys__t57</i><i>__sys__t5</i></o>
+<o n="=" r="99"><o>i</o><i>__sys__t58</i></o>
+<o n=">=" r="100"><o>__sys__t61</o><i>i</i><i>__sys__t6</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t61</i></o>
+<o n="=="><o>__sys__t63</o><i>__sys__rt</i><i>__sys__t7</i></o>
+<o n="if_goto"><o>__sys__t64</o><i>__sys__t63</i><i>__sys__t104</i></o>
+<v t="s" n="__sys__t66">.getRow.</v>
+<o n="." r="102"><o>__sys__t65</o><i>allianceTab</i><i>__sys__t66</i></o>
+<o n="__sys__t65" r="102"><o>__sys__t68</o><i>allianceTab</i><i>i</i></o>
+<o n="=" r="102"><o>row</o><i>__sys__t68</i></o>
+<v t="s" n="__sys__t71">.getValFromColName.</v>
+<o n="." r="103"><o>__sys__t70</o><i>row</i><i>__sys__t71</i></o>
+<o n="__sys__t70" r="103"><o>__sys__t73</o><i>row</i><i>__sys__t8</i></o>
+<o n="number" r="103"><o>__sys__t74</o><i>__sys__t73</i></o>
+<o n="=" r="103"><o>needExp</o><i>__sys__t74</i></o>
+<o n=">=" r="104"><o>__sys__t76</o><i>exp</i><i>needExp</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t76</i></o>
+<o n="=="><o>__sys__t78</o><i>__sys__rt</i><i>__sys__t9</i></o>
+<o n="if_goto"><o>__sys__t79</o><i>__sys__t78</i><i>__sys__t100</i></o>
+<v t="s" n="__sys__t81">.level.</v>
+<o n="." r="106"><o>__sys__t80</o><i>union</i><i>__sys__t81</i></o>
+<v t="s" n="__sys__t84">.getValFromColName.</v>
+<o n="." r="106"><o>__sys__t83</o><i>row</i><i>__sys__t84</i></o>
+<o n="__sys__t83" r="106"><o>__sys__t86</o><i>row</i><i>__sys__t10</i></o>
+<o n="int" r="106"><o>__sys__t87</o><i>__sys__t86</i></o>
+<o n="=" r="106"><o>__sys__t80</o><i>__sys__t87</i></o>
+<v t="s" n="__sys__t90">.peopleNumMax.</v>
+<o n="." r="107"><o>__sys__t89</o><i>union</i><i>__sys__t90</i></o>
+<v t="s" n="__sys__t93">.getValFromColName.</v>
+<o n="." r="107"><o>__sys__t92</o><i>row</i><i>__sys__t93</i></o>
+<o n="__sys__t92" r="107"><o>__sys__t95</o><i>row</i><i>__sys__t11</i></o>
+<o n="int" r="107"><o>__sys__t96</o><i>__sys__t95</i></o>
+<o n="=" r="107"><o>__sys__t89</o><i>__sys__t96</i></o>
+<o n="goto"><o>__sys__t98</o><i>__sys__t104</i></o>
+<o n="goto"><o>__sys__t99</o><i>__sys__t101</i></o>
+<o n="--" r="110"><o>i</o><i>i</i></o>
+<o n="goto"><o>__sys__t103</o><i>__sys__t60</i></o>
+<v t="s" n="__sys__t106">.activityMgr.</v>
+<o n="." r="113"><o>__sys__t105</o><i>game</i><i>__sys__t106</i></o>
+<o n="=" r="113"><o>activityMgr</o><i>__sys__t105</i></o>
+<o n="=" r="114"><o>activityID</o><i>__sys__t12</i></o>
+<v t="s" n="__sys__t111">.getActivityStatus.</v>
+<o n="." r="115"><o>__sys__t110</o><i>activityMgr</i><i>__sys__t111</i></o>
+<o n="__sys__t110" r="115"><o>__sys__t113</o><i>activityMgr</i><i>activityID</i></o>
+<o n="==" r="115"><o>__sys__t114</o><i>__sys__t113</i><i>__sys__t13</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t114</i></o>
+<o n="=="><o>__sys__t116</o><i>__sys__rt</i><i>__sys__t14</i></o>
+<o n="if_goto"><o>__sys__t117</o><i>__sys__t116</i><i>__sys__t217</i></o>
+<v t="s" n="__sys__t119">.global_var.</v>
+<o n="." r="117"><o>__sys__t118</o><i>game</i><i>__sys__t119</i></o>
+<o n="=" r="117"><o>global_var</o><i>__sys__t118</i></o>
+<v t="s" n="__sys__t123">.rushLoop.</v>
+<o n="." r="118"><o>__sys__t122</o><i>global_var</i><i>__sys__t123</i></o>
+<o n="=" r="118"><o>rushLoop</o><i>__sys__t122</i></o>
+<v t="s" n="__sys__t127">.bt.</v>
+<o n="." r="119"><o>__sys__t126</o><i>rushLoop</i><i>__sys__t127</i></o>
+<o n="=" r="119"><o>rushLoopBt</o><i>__sys__t126</i></o>
+<v t="s" n="__sys__t131">.expAdd.</v>
+<o n="." r="121"><o>__sys__t130</o><i>union</i><i>__sys__t131</i></o>
+<o n="number" r="121"><o>__sys__t133</o><i>__sys__t130</i></o>
+<o n="=" r="121"><o>expAdd</o><i>__sys__t133</i></o>
+<v t="s" n="__sys__t136">.expAddBT.</v>
+<o n="." r="122"><o>__sys__t135</o><i>union</i><i>__sys__t136</i></o>
+<o n="!=" r="122"><o>__sys__t138</o><i>__sys__t135</i><i>rushLoopBt</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t138</i></o>
+<o n="=="><o>__sys__t140</o><i>__sys__rt</i><i>__sys__t15</i></o>
+<o n="if_goto"><o>__sys__t141</o><i>__sys__t140</i><i>__sys__t162</i></o>
+<v t="s" n="__sys__t143">.expAddBT.</v>
+<o n="." r="124"><o>__sys__t142</o><i>union</i><i>__sys__t143</i></o>
+<o n="=" r="124"><o>__sys__t142</o><i>rushLoopBt</i></o>
+<o n="=" r="125"><o>expAdd</o><i>addExp</i></o>
+<v t="s" n="__sys__t148">.json.</v>
+<o n="." r="126"><o>__sys__t147</o><i>union</i><i>__sys__t148</i></o>
+<o n="json_decode" r="126"><o>__sys__t150</o><i>__sys__t147</i></o>
+<o n="=" r="126"><o>unionJson</o><i>__sys__t150</i></o>
+<v t="s" n="__sys__t153">.rewardUserIDMap.</v>
+<o n="." r="127"><o>__sys__t152</o><i>unionJson</i><i>__sys__t153</i></o>
+<o n="clean" r="127"><o>__sys__t155</o><i>__sys__t152</i></o>
+<v t="s" n="__sys__t157">.json.</v>
+<o n="." r="128"><o>__sys__t156</o><i>union</i><i>__sys__t157</i></o>
+<o n="json_encode" r="128"><o>__sys__t159</o><i>unionJson</i></o>
+<o n="=" r="128"><o>__sys__t156</o><i>__sys__t159</i></o>
+<o n="goto"><o>__sys__t161</o><i>__sys__t164</i></o>
+<o n="+=" r="132"><o>expAdd</o><i>addExp</i></o>
+<o n="=" r="135"><o>score</o><i>expAdd</i></o>
+<v t="s" n="__sys__t167">.gameConfig.</v>
+<o n="." r="136"><o>__sys__t166</o><i>game</i><i>__sys__t167</i></o>
+<v t="s" n="__sys__t170">.name.</v>
+<o n="." r="136"><o>__sys__t169</o><i>__sys__t166</i><i>__sys__t170</i></o>
+<o n="+" r="136"><o>__sys__t172</o><i>__sys__t169</i><i>__sys__t16</i></o>
+<o n="=" r="136"><o>rankName</o><i>__sys__t172</i></o>
+<v t="s" n="__sys__t175">.rd.</v>
+<o n="." r="137"><o>__sys__t174</o><i>game</i><i>__sys__t175</i></o>
+<v t="s" n="__sys__t178">.getRedisObj.</v>
+<o n="." r="137"><o>__sys__t177</o><i>__sys__t174</i><i>__sys__t178</i></o>
+<o n="__sys__t177" r="137"><o>__sys__t180</o><i>__sys__t174</i><i>rankName</i></o>
+<o n="=" r="137"><o>rd</o><i>__sys__t180</i></o>
+<v t="s" n="__sys__t183">.id.</v>
+<o n="." r="138"><o>__sys__t182</o><i>union</i><i>__sys__t183</i></o>
+<o n="=" r="138"><o>unionID</o><i>__sys__t182</i></o>
+<o n="redis_zrevrank" r="139"><o>__sys__t186</o><i>rd</i><i>rankName</i><i>unionID</i></o>
+<o n="=" r="139"><o>oldRankID</o><i>__sys__t186</i></o>
+<o n="redis_zadd" r="140"><o>__sys__t188</o><i>rd</i><i>rankName</i><i>score</i><i>unionID</i></o>
+<o n="redis_zrevrank" r="141"><o>__sys__t189</o><i>rd</i><i>rankName</i><i>unionID</i></o>
+<o n="=" r="141"><o>newRankID</o><i>__sys__t189</i></o>
+<o n=">=" r="142"><o>__sys__t191</o><i>newRankID</i><i>__sys__t17</i></o>
+<o n="&lt;" r="142"><o>__sys__t192</o><i>newRankID</i><i>__sys__t18</i></o>
+<o n="&lt;" r="142"><o>__sys__t193</o><i>newRankID</i><i>oldRankID</i></o>
+<o n="&&" r="142"><o>__sys__t194</o><i>__sys__t191</i><i>__sys__t192</i></o>
+<o n="&&" r="142"><o>__sys__t195</o><i>__sys__t194</i><i>__sys__t193</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t195</i></o>
+<o n="=="><o>__sys__t197</o><i>__sys__rt</i><i>__sys__t19</i></o>
+<o n="if_goto"><o>__sys__t198</o><i>__sys__t197</i><i>__sys__t210</i></o>
+<v t="s" n="__sys__t200">.name.</v>
+<o n="." r="145"><o>__sys__t199</o><i>union</i><i>__sys__t200</i></o>
+<o n="=" r="145"><o>name</o><i>__sys__t199</i></o>
+<o n="+" r="146"><o>__sys__t203</o><i>__sys__t24</i><i>name</i></o>
+<o n="+" r="146"><o>__sys__t204</o><i>__sys__t203</i><i>__sys__t25</i></o>
+<o n="+" r="146"><o>__sys__t205</o><i>newRankID</i><i>__sys__t26</i></o>
+<o n="+" r="146"><o>__sys__t206</o><i>__sys__t204</i><i>__sys__t205</i></o>
+<o n="+" r="146"><o>__sys__t207</o><i>__sys__t206</i><i>__sys__t27</i></o>
+<o n="worldSendMsg" r="146"><o>__sys__t208</o><i>game</i><i>__sys__t20</i><i>name</i><i>__sys__t21</i><i>__sys__t22</i><i>__sys__t23</i><i>__sys__t207</i><i>__sys__t28</i><i>__sys__t29</i></o>
+<o n="goto"><o>__sys__t209</o><i>__sys__t211</i></o>
+<v t="s" n="__sys__t213">.expAdd.</v>
+<o n="." r="149"><o>__sys__t212</o><i>union</i><i>__sys__t213</i></o>
+<o n="=" r="149"><o>__sys__t212</o><i>expAdd</i></o>
+<o n="goto"><o>__sys__t216</o><i>__sys__t218</i></o>
+<v t="s" n="__sys__t220">.exp.</v>
+<o n="." r="152"><o>__sys__t219</o><i>union</i><i>__sys__t220</i></o>
+<o n="=" r="152"><o>__sys__t219</o><i>exp</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t103" />
+<v n="__sys__t105" />
+<v n="__sys__t110" />
+<v n="__sys__t113" />
+<v n="__sys__t114" />
+<v n="__sys__t116" />
+<v n="__sys__t117" />
+<v n="__sys__t118" />
+<v n="__sys__t122" />
+<v n="__sys__t126" />
+<v n="__sys__t130" />
+<v n="__sys__t133" />
+<v n="__sys__t135" />
+<v n="__sys__t138" />
+<v n="__sys__t140" />
+<v n="__sys__t141" />
+<v n="__sys__t142" />
+<v n="__sys__t147" />
+<v n="__sys__t150" />
+<v n="__sys__t152" />
+<v n="__sys__t155" />
+<v n="__sys__t156" />
+<v n="__sys__t159" />
+<v n="__sys__t161" />
+<v n="__sys__t166" />
+<v n="__sys__t169" />
+<v n="__sys__t172" />
+<v n="__sys__t174" />
+<v n="__sys__t177" />
+<v n="__sys__t180" />
+<v n="__sys__t182" />
+<v n="__sys__t186" />
+<v n="__sys__t188" />
+<v n="__sys__t189" />
+<v n="__sys__t191" />
+<v n="__sys__t192" />
+<v n="__sys__t193" />
+<v n="__sys__t194" />
+<v n="__sys__t195" />
+<v n="__sys__t197" />
+<v n="__sys__t198" />
+<v n="__sys__t199" />
+<v n="__sys__t203" />
+<v n="__sys__t204" />
+<v n="__sys__t205" />
+<v n="__sys__t206" />
+<v n="__sys__t207" />
+<v n="__sys__t208" />
+<v n="__sys__t209" />
+<v n="__sys__t212" />
+<v n="__sys__t216" />
+<v n="__sys__t219" />
+<v n="__sys__t30" />
+<v n="__sys__t32" />
+<v n="__sys__t34" />
+<v n="__sys__t36" />
+<v n="__sys__t40" />
+<v n="__sys__t43" />
+<v n="__sys__t47" />
+<v n="__sys__t50" />
+<v n="__sys__t54" />
+<v n="__sys__t57" />
+<v n="__sys__t58" />
+<v n="__sys__t61" />
+<v n="__sys__t63" />
+<v n="__sys__t64" />
+<v n="__sys__t65" />
+<v n="__sys__t68" />
+<v n="__sys__t70" />
+<v n="__sys__t73" />
+<v n="__sys__t74" />
+<v n="__sys__t76" />
+<v n="__sys__t78" />
+<v n="__sys__t79" />
+<v n="__sys__t80" />
+<v n="__sys__t83" />
+<v n="__sys__t86" />
+<v n="__sys__t87" />
+<v n="__sys__t89" />
+<v n="__sys__t92" />
+<v n="__sys__t95" />
+<v n="__sys__t96" />
+<v n="__sys__t98" />
+<v n="__sys__t99" />
+<v n="activityID" />
+<v n="activityMgr" />
+<v n="addExp" />
+<v n="allianceTab" />
+<v n="exp" />
+<v n="expAdd" />
+<v n="game" />
+<v n="global_var" />
+<v n="i" />
+<v n="level" />
+<v n="name" />
+<v n="needExp" />
+<v n="newRankID" />
+<v n="oldRankID" />
+<v n="rankName" />
+<v n="rd" />
+<v n="row" />
+<v n="rushLoop" />
+<v n="rushLoopBt" />
+<v n="score" />
+<v n="self" />
+<v n="union" />
+<v n="unionID" />
+<v n="unionJson" />
+</script>

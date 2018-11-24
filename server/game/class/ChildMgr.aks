@@ -1,0 +1,311 @@
+//子嗣管理器
+@class ChildMgr<game>
+	self.game=game;
+	
+	//创建孩子
+	@member createChild<childSys,wife,user>
+		game=self.game;
+		++childSys.childID;
+		child=structMgr_upgradeObj(game.structMgr,"Child",dict());
+		child.id=childSys.childID;//孩子ID
+		//填写属性
+		wifeID=wife.wifeID;
+		intimate=wife.intimate;
+		wife.childrenNum+=1;//增加一个子嗣
+		table=game.table;
+		childBirthTable=table.childBirth;
+		num=childBirthTable.size();
+		while(num!=0)
+		{
+			row=childBirthTable.getRow(num-1);
+			intimateT=number(row.getValFromColName("intimate"));
+			if(intimate>=intimateT)
+			{
+				numArr=arr();
+				i=1;
+				while(i<7)
+				{
+					push(numArr,number(row.getValFromColName("rate"+i)));
+					++i;
+				}
+				talent=randSelect(numArr)+1;
+				child.grows=talent;//资质等级
+				childConfigure=table.childConfigure;
+				rowC=childConfigure.getRow(0);
+				child.skin=number(rowC.getValFromColName("pic1"));//形象ID
+				childGrow=table.childGrow;
+				growsRow=childGrow.getRowFromColName("talent",talent);
+				strengthGrowsMix=number(growsRow.getValFromColName("strengthGrowsMix"));
+				strengthGrowsMax=number(growsRow.getValFromColName("strengthGrowsMax"));
+				wisdomGrowsMin=number(growsRow.getValFromColName("wisdomGrowsMin"));
+				wisdomGrowsMax=number(growsRow.getValFromColName("wisdomGrowsMax"));
+				charmGrowsMin=number(growsRow.getValFromColName("charmGrowsMin"));
+				charmGrowsMax=number(growsRow.getValFromColName("charmGrowsMax"));
+				politicsGrowsMin=number(growsRow.getValFromColName("politicsGrowsMin"));
+				politicsGrowsMax=number(growsRow.getValFromColName("politicsGrowsMax"));
+				strengthTotal=rand()%(strengthGrowsMax-strengthGrowsMix)+strengthGrowsMix;//武力
+				wisdomTotal=rand()%(wisdomGrowsMax-wisdomGrowsMin)+wisdomGrowsMin;//智力
+				charmTotal=rand()%(charmGrowsMax-charmGrowsMin)+charmGrowsMin;//魅力
+				politicsTotal=rand()%(politicsGrowsMax-politicsGrowsMin)+politicsGrowsMin;//政治
+				
+				//加到主角属性里
+				child.strengthTotal=strengthTotal;
+				child.wisdomTotal=wisdomTotal;
+				child.charmTotal=charmTotal;
+				child.politicsTotal=politicsTotal;
+				user.strengthAdd3=number(user.strengthAdd3)+strengthTotal;
+				user.wisdomAdd3=number(user.wisdomAdd3)+wisdomTotal;
+				user.charmAdd3=number(user.charmAdd3)+charmTotal;
+				user.politicsAdd3=number(user.politicsAdd3)+politicsTotal;
+				
+				//属性加成
+				json=json_decode(user.json);
+				game.numMgr.computeUser(user,json);
+
+				child.wifeID=wifeID;//红颜ID（母亲）
+				child.sex=rand()%2;
+				
+				//增加分数和刷新子嗣冲榜
+				dPower=strengthTotal+wisdomTotal+charmTotal+politicsTotal;//势力涨幅
+				addAndUpdateChildAddRank(game,user,dPower);
+				
+				break;
+			}
+			--num;
+		}
+		//加入子嗣数组
+		push(childSys.children,child);
+		return(child);
+	@member.
+	
+	//孩子培养（一键培养）
+	@member childFoster<childID,json,user,once>
+		game=self.game;
+		fosterArr=arr();
+		
+		attAdd=0;
+	
+		childSys=json.childSys;
+		childrenArr=childSys.children;
+		childrenCount=size(childrenArr);
+		i=0;
+		while(i<childrenCount)
+		{
+			child=childrenArr[i];
+			cID=child.id;
+			if(cID==childID)
+			{
+				grows=child.grows;//资质
+				level=child.level;//等级
+				tableData=game.table;
+				rowC=tableData.childConfigure.getRow(0);
+				talentLevel=number(rowC.getValFromColName("talentLevel"+grows));//资质N科举等级
+				if(level>=talentLevel)//当前资质最大等级
+				{
+					push(fosterArr,-4);
+					return(fosterArr);
+				}
+				
+				vip=number(user.vip);
+				rowVip=tableData.vip.getRowFromColName("level",vip);
+				teach=number(rowVip.getValFromColName("teach"));//子嗣培养活力上限
+
+				childBt=ref(child.bt);//元气恢复开始时间（秒）
+				nowTime=time();//现在时间
+				min=3600;//必须经过时间
+				num=floor((nowTime-childBt)/min);
+				num=limit(num,0,teach);//是否有元气
+				numArr=arr();
+				
+				strengthTotalAll=0;
+				wisdomTotalAll=0;
+				charmTotalAll=0;
+				politicsTotalAll=0;
+				if(num==0)//无轮数
+				{
+					push(fosterArr,-2);
+					return(fosterArr);
+				}
+				
+				while(num>=1)//有轮数
+				{
+					--num;
+					remain=nowTime-childBt;//经过多长时间
+					maxTime=teach*min;//最大保存时间
+					remain=limit(remain,0,maxTime);//时间范围
+					newBeginTime=nowTime-remain+min;
+					childBt=newBeginTime;///////////////////////////////////////新的时间
+				
+					expGet=number(rowC.getValFromColName("expGet"));//每次培养经验获得
+					level+=1;//下一等级
+					rowEXP=tableData.childEXP.getRowFromColName("level",level);
+					if(empty(rowEXP))//爆级
+					{
+						push(fosterArr,-3);
+						return(fosterArr);
+					}
+					
+					userStrengthAdd3=number(user.strengthAdd3);
+					userWisdomAdd3=number(user.wisdomAdd3);
+					userCharmAdd3=number(user.charmAdd3);
+					userPoliticsAdd3=number(user.politicsAdd3);
+					
+					exp=number(rowEXP.getValFromColName("exp"+grows));//资质所需经验
+					expC=ref(child.exp);//经验值
+					
+					miracle=0;
+					//天资聪慧
+					jsonVip=json.vip;
+					childCount=jsonVip.childCount;
+					miricle3=number(rowVip.getValFromColName("miricle3"));//天资聪慧每日次数（概率3触发子嗣培养3倍经验）
+					if(childCount<miricle3)
+					{
+						rate3=number(rowVip.getValFromColName("rate3"));//概率3
+						random=rand()%10000;
+						if(random<rate3)//中奖
+						{
+							expGet*=3;
+							
+							miracle=1;
+							childCount+=1;
+							jsonVip.childCount=childCount;
+						}
+					}
+					
+					expAll=expGet+expC;
+					if(expAll>=exp)//升级
+					{
+						expAll-=exp;
+						levelC=ref(child.level);
+						levelC+=1;
+						if(levelC==4)
+						{
+							sex=child.sex;//性别
+							if(sex==0)
+							{
+								picStr=rowC.getValFromColName("pic3");//女童形象id（3级以上，科举前）
+							}
+							else if(sex==1)
+							{
+								picStr=rowC.getValFromColName("pic2");//男童形象id（3级以上，科举前）
+							}
+							
+							picArr=split(arr(),picStr,",");
+							randPic=rand()%5;
+							child.skin=picArr[randPic];//形象ID
+						}
+						
+						//所得资质
+						childGrow=tableData.childGrow;
+						growsRow=childGrow.getRowFromColName("talent",grows);
+						strengthGrowsMix=number(growsRow.getValFromColName("strengthGrowsMix"));
+						strengthGrowsMax=number(growsRow.getValFromColName("strengthGrowsMax"));
+						wisdomGrowsMin=number(growsRow.getValFromColName("wisdomGrowsMin"));
+						wisdomGrowsMax=number(growsRow.getValFromColName("wisdomGrowsMax"));
+						charmGrowsMin=number(growsRow.getValFromColName("charmGrowsMin"));
+						charmGrowsMax=number(growsRow.getValFromColName("charmGrowsMax"));
+						politicsGrowsMin=number(growsRow.getValFromColName("politicsGrowsMin"));
+						politicsGrowsMax=number(growsRow.getValFromColName("politicsGrowsMax"));
+						
+						strengthTotal=rand()%(strengthGrowsMax-strengthGrowsMix)+strengthGrowsMix;//武力
+						wisdomTotal=rand()%(wisdomGrowsMax-wisdomGrowsMin)+wisdomGrowsMin;//智力
+						charmTotal=rand()%(charmGrowsMax-charmGrowsMin)+charmGrowsMin;//魅力
+						politicsTotal=rand()%(politicsGrowsMax-politicsGrowsMin)+politicsGrowsMin;//政治
+						
+						//神迹
+						if(miracle==1)
+						{
+							if(expAll>=exp)//天资聪慧增加经验另在升级
+							{
+								expAll-=exp;
+								levelC+=1;
+								if(levelC==4)
+								{
+									sex=child.sex;//性别
+									if(sex==0)
+									{
+										picStr=rowC.getValFromColName("pic3");//女童形象id（3级以上，科举前）
+									}
+									else if(sex==1)
+									{
+										picStr=rowC.getValFromColName("pic2");//男童形象id（3级以上，科举前）
+									}
+									
+									picArr=split(arr(),picStr,",");
+									randPic=rand()%5;
+									child.skin=picArr[randPic];//形象ID
+								}
+								if(levelC>talentLevel)//已超过科举等级
+								{
+									levelC=talentLevel;
+								}
+								else
+								{
+									strengthTotal*=2;
+									wisdomTotal*=2;
+									charmTotal*=2;
+									politicsTotal*=2;
+								}
+							}
+						}
+						levelC=limit(levelC,1,talentLevel);
+						if(levelC>=talentLevel)
+						{
+							expAll=0;
+						}
+						
+						//保存子嗣属性
+						child.strengthTotal+=strengthTotal;
+						child.wisdomTotal+=wisdomTotal;
+						child.charmTotal+=charmTotal;
+						child.politicsTotal+=politicsTotal;
+
+						userStrengthAdd3+=strengthTotal;
+						userWisdomAdd3+=wisdomTotal;
+						userCharmAdd3+=charmTotal;
+						userPoliticsAdd3+=politicsTotal;
+						
+						user.strengthAdd3=userStrengthAdd3;
+						user.wisdomAdd3=userWisdomAdd3;
+						user.charmAdd3=userCharmAdd3;
+						user.politicsAdd3=userPoliticsAdd3;
+						
+						//属性加成更新
+						game.numMgr.computeUser(user,json);
+						
+						strengthTotalAll+=strengthTotal;
+						wisdomTotalAll+=wisdomTotal;
+						charmTotalAll+=charmTotal;
+						politicsTotalAll+=politicsTotal;
+						
+						attAdd+=strengthTotal+wisdomTotal+charmTotal+politicsTotal;
+					}
+					//保存
+					expC=expAll;
+					
+					json.dailyTask.upChild+=1;//日常任务//培养子女次数
+					json.achievement.upChild+=1;//成就//培养子女次数
+					
+					if(once==1)//培养一次
+					{
+						break;
+					}
+				}
+				
+				push(fosterArr,1,strengthTotalAll,wisdomTotalAll,charmTotalAll,politicsTotalAll,miracle);
+				
+				if(attAdd>0)
+				{
+					//增加分数和刷新子嗣冲榜
+					addAndUpdateChildAddRank(game,user,attAdd);
+				}
+				
+				return(fosterArr);
+			}
+			++i;
+		}
+	
+		//return();
+	@member.
+	
+@class.

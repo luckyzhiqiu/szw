@@ -1,0 +1,23 @@
+//帐号信息表
+mysqlCol("key","id");
+mysqlCol("datetime","genTime");//生成时间
+// mysqlCol("varchar","index");//索引，格式：uid@platformID
+mysqlCol("varchar","uid");//平台帐号uid
+mysqlCol("int","platformID",0);//平台ID
+mysqlCol("varchar","name");//身份证姓名
+mysqlCol("varchar","idCard");//身份证
+mysqlCol("int","firstServerID",0);//首推游戏服ID（与首次创角服ID无关）
+mysqlCol("blob","serverIDMap");//创建过角色的游戏服ID字典，格式：{serverID1:nickname1,serverID2:nickname1,serverID2:nickname1,...}
+mysqlCol("int","lastServerID",0);//最后一次登录的游戏服ID
+mysqlCol("datetime","lastLoginTime");//最后登录时间
+mysqlCol("int","firstPay",1);//首次支付标记：0=否；1=是；
+mysqlCol("datetime","firstPayTime");//首次支付时间
+mysqlCol("datetime","endPayTime");//最后支付时间
+mysqlCol("int","hasRole",0);//创角标记：0=否；1=是；
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+mysqlCol("varchar","ostype");//账号创建时的操作系统
+mysqlCol("varchar","platform");//第三方平台标识
+mysqlCol("varchar","ip");//账号创建时的IP
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+mysqlCol("int","type",0);//帐号类型：0=普通用户；1=测试用户（可进维护中的游戏服）；
+mysqlCol("int","ban",0);//封禁：0=否；1=否；

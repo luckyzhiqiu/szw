@@ -1,0 +1,167 @@
+//发现阶段
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+index=netMsg[3];//点击位置
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,index;
+		jsonExt=json_decode(user.jsonExt);
+		worldBoss=jsonExt.worldBoss;
+		
+		tableData=game.table;
+		worldBossTable=tableData.worldBoss;
+		rowWB=worldBossTable.getRow(0);
+		dayBt=strtotime(split(arr(),now()," ")[0]);//今天的开始时间（秒）
+		btDay=rowWB.getValFromColName("bt");
+		dtDay=rowWB.getValFromColName("dt");
+		bt=dateStrToSeconds(btDay);//开放时间
+		dt=dateStrToSeconds(dtDay);//结束时间
+		ct=time();
+		if(ct<(dayBt+bt) || ct>(dayBt+dt))//不在侦查探案时间
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		
+		findArr=worldBoss.findArr;//发现状态数组（元素数量3，定义：0=未发现；1=已发现）
+		whether=findArr[index];
+		if(whether==1)//已发现
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		status=ref(worldBoss.status);//阶段0=初始阶段；1=选择发现阶段；2=发现小怪阶段；3=犒赏完成阶段（犒赏之后日场结束）
+		if(status!=1)//状态错误
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+		
+		//发现信息
+		findArr[index]=1;
+		findTypeArr=worldBoss.findTypeArr;//发现类型数组（元素数量3，定义：1=发现线索；2=发现小怪）
+		type=findTypeArr[index];
+		numMgr=game.numMgr;
+		worldBossDetectAffairTable=tableData.worldBossDetectAffair;
+		wBDACount=worldBossDetectAffairTable.size();
+		wBDAIndexMap=dict();
+		wBDARateArr=arr();
+		i=0;j=0;
+		while(i<wBDACount)
+		{
+			rowWBDA=worldBossDetectAffairTable.getRow(i);
+			typeWBDA=number(rowWBDA.getValFromColName("type"));
+			rateWBDA=number(rowWBDA.getValFromColName("rate"));
+			if(typeWBDA==type)
+			{
+				wBDAIndexMap[string(type)+string(j)]=i;
+				push(wBDARateArr,rateWBDA);
+				++j;
+			}
+			++i;
+		}
+		
+		wBDAIndex=randSelect(wBDARateArr);
+		wBDAIndex=wBDAIndexMap[string(type)+string(wBDAIndex)];
+		rowWBDA=worldBossDetectAffairTable.getRow(wBDAIndex);
+		typeWBDA=number(rowWBDA.getValFromColName("type"));//类型（1=普通线索，2=关键人士）
+		picWBDA=number(rowWBDA.getValFromColName("pic"));//图片
+		descriptionWBDA=rowWBDA.getValFromColName("description");//线索描述
+		pointWBDA=number(rowWBDA.getValFromColName("point"));//获得积分
+		worldBossScoreTotal=number(user.worldBossScoreTotal);
+		worldBossScore=number(user.worldBossScore);
+		worldBossScoreTotal+=pointWBDA;
+		worldBossScore+=pointWBDA;
+
+		monHP=ref(worldBoss.monHP);//小怪血量
+		scene=-1;
+		if(typeWBDA==2)
+		{
+			worldBossDetectTable=tableData.worldBossDetect;
+			wBDCount=worldBossDetectTable.size();
+			i=0;
+			while(i<wBDCount)
+			{
+				rowWBD=worldBossDetectTable.getRow(i);
+				stageWBD=number(rowWBD.getValFromColName("stage"));//阶段
+				barrierWBD=number(rowWBD.getValFromColName("barrier"));//关卡
+				
+				stage=worldBoss.stage;
+				monCount=worldBoss.monCount;
+				if(stage==stageWBD && monCount==barrierWBD)
+				{
+					lifeWBD=number(rowWBD.getValFromColName("life"));//血量
+					sceneWBD=number(rowWBD.getValFromColName("scene"));//场景（对应控制器编号
+					monHP=lifeWBD;
+					scene=sceneWBD;
+					break;
+				}			
+				++i;
+			}
+			
+			status=2;//变更状态
+		}
+		
+		//保存
+		user.worldBossScoreTotal=worldBossScoreTotal;
+		user.worldBossScore=worldBossScore;
+		user.jsonExt=json_encode(jsonExt);
+		
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,worldBossScoreTotal,worldBossScore,findArr,status,type,picWBDA,descriptionWBDA,pointWBDA,monHP,scene)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

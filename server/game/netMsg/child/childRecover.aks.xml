@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t106">60</v>
+<v t="n" n="__sys__t105">60</v>
+<v t="n" n="__sys__t78">42</v>
+<v t="n" n="__sys__t77">42</v>
+<v t="n" n="__sys__t61">29</v>
+<v t="n" n="__sys__t60">29</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="n" n="__sys__t4">3</v>
+<v t="n" n="__sys__t5">0</v>
+<v t="n" n="__sys__t6">1</v>
+<v t="n" n="__sys__t7">2</v>
+<v t="n" n="__sys__t8">3</v>
+<v t="n" n="__sys__t9">0</v>
+<v t="s" n="__sys__t10">.Result.</v>
+<v t="n" n="__sys__t11">0</v>
+<v t="n" n="__sys__t12">1</v>
+<v t="n" n="__sys__t13">2</v>
+<v t="n" n="__sys__t14">0</v>
+<v t="s" n="__sys__t15">.Result.</v>
+<v t="n" n="__sys__t16">2</v>
+<v t="s" n="__sys__t17">.user.</v>
+<v t="s" n="__sys__t18">.id.</v>
+<v t="s" n="__sys__t19">.*.</v>
+<v t="s" n="__sys__t20">.@__unnamed__0.</v>
+<v t="s" n="__sys__t21">.@__unnamed__1.</v>
+<v t="s" n="__sys__t22">.@__unnamed__2.</v>
+<v t="n" n="__sys__t23">1000</v>
+<v t="n" n="__sys__t24">0</v>
+<v t="s" n="__sys__t25">.Result.</v>
+<v t="n" n="__sys__t26">1</v>
+<o n="input"><o>__sys__t27</o><i>__sys__t1</i></o>
+<o n="="><o>server</o><i>__sys__t27</i></o>
+<o n="input"><o>__sys__t29</o><i>__sys__t2</i></o>
+<o n="="><o>sessionID</o><i>__sys__t29</i></o>
+<o n="input"><o>__sys__t31</o><i>__sys__t3</i></o>
+<o n="="><o>game</o><i>__sys__t31</i></o>
+<o n="input"><o>__sys__t33</o><i>__sys__t4</i></o>
+<o n="="><o>netMsg</o><i>__sys__t33</i></o>
+<o n="[]" r="3"><o>__sys__t35</o><i>netMsg</i><i>__sys__t5</i></o>
+<o n="=" r="3"><o>methodName</o><i>__sys__t35</i></o>
+<o n="[]" r="4"><o>__sys__t37</o><i>netMsg</i><i>__sys__t6</i></o>
+<o n="=" r="4"><o>userID</o><i>__sys__t37</i></o>
+<o n="[]" r="5"><o>__sys__t39</o><i>netMsg</i><i>__sys__t7</i></o>
+<o n="=" r="5"><o>tick</o><i>__sys__t39</i></o>
+<o n="[]" r="6"><o>__sys__t41</o><i>netMsg</i><i>__sys__t8</i></o>
+<o n="int" r="6"><o>__sys__t42</o><i>__sys__t41</i></o>
+<o n="=" r="6"><o>type</o><i>__sys__t42</i></o>
+<v t="s" n="__sys__t45">.checkTick.</v>
+<o n="." r="8"><o>__sys__t44</o><i>game</i><i>__sys__t45</i></o>
+<o n="__sys__t44" r="8"><o>__sys__t47</o><i>game</i><i>userID</i><i>tick</i></o>
+<o n="!" r="8"><o>__sys__t48</o><i>__sys__t47</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t48</i></o>
+<o n="=="><o>__sys__t50</o><i>__sys__rt</i><i>__sys__t9</i></o>
+<o n="if_goto"><o>__sys__t51</o><i>__sys__t50</i><i>__sys__t60</i></o>
+<v t="s" n="__sys__t53">.sendMsg.</v>
+<o n="." r="11"><o>__sys__t52</o><i>game</i><i>__sys__t53</i></o>
+<o n="+" r="14"><o>__sys__t55</o><i>methodName</i><i>__sys__t10</i></o>
+<o n="arr" r="14"><o>__sys__t56</o><i>__sys__t55</i><i>__sys__t11</i></o>
+<o n="__sys__t52" r="11"><o>__sys__t57</o><i>game</i><i>sessionID</i><i>__sys__t56</i></o>
+<o n="exit" r="16"><o>__sys__t58</o></o>
+<o n="goto"><o>__sys__t59</o><i>__sys__t61</i></o>
+<o n="!=" r="19"><o>__sys__t62</o><i>type</i><i>__sys__t12</i></o>
+<o n="!=" r="19"><o>__sys__t63</o><i>type</i><i>__sys__t13</i></o>
+<o n="&&" r="19"><o>__sys__t64</o><i>__sys__t62</i><i>__sys__t63</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t64</i></o>
+<o n="=="><o>__sys__t66</o><i>__sys__rt</i><i>__sys__t14</i></o>
+<o n="if_goto"><o>__sys__t67</o><i>__sys__t66</i><i>__sys__t77</i></o>
+<v t="s" n="__sys__t69">.sendMsg.</v>
+<o n="." r="22"><o>__sys__t68</o><i>game</i><i>__sys__t69</i></o>
+<o n="+" r="25"><o>__sys__t71</o><i>methodName</i><i>__sys__t15</i></o>
+<o n=" -" r="25"><o>__sys__t72</o><i>__sys__t16</i></o>
+<o n="arr" r="25"><o>__sys__t73</o><i>__sys__t71</i><i>__sys__t72</i></o>
+<o n="__sys__t68" r="22"><o>__sys__t74</o><i>game</i><i>sessionID</i><i>__sys__t73</i></o>
+<o n="exit" r="27"><o>__sys__t75</o></o>
+<o n="goto"><o>__sys__t76</o><i>__sys__t78</i></o>
+<v t="s" n="__sys__t80">.rd.</v>
+<o n="." r="31"><o>__sys__t79</o><i>game</i><i>__sys__t80</i></o>
+<v t="s" n="__sys__t83">.updateRow.</v>
+<o n="." r="31"><o>__sys__t82</o><i>__sys__t79</i><i>__sys__t83</i></o>
+<v t="s" n="__sys__t86">.cnn.</v>
+<o n="." r="33"><o>__sys__t85</o><i>game</i><i>__sys__t86</i></o>
+<o n="full"><o>__sys__t88</o><i>__sys__t20</i></o>
+<o n="full"><o>__sys__t89</o><i>__sys__t21</i></o>
+<o n="full"><o>__sys__t90</o><i>__sys__t22</i></o>
+<o n="__sys__t82" r="31"><o>__sys__t91</o><i>__sys__t79</i><i>__sys__t85</i><i>__sys__t17</i><i>__sys__t18</i><i>userID</i><i>__sys__t19</i><i>__sys__t88</i><i>__sys__t89</i><i>__sys__t90</i><i>game</i><i>__sys__t23</i></o>
+<o n="=" r="31"><o>user</o><i>__sys__t91</i></o>
+<o n="empty" r="163"><o>__sys__t93</o><i>user</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t93</i></o>
+<o n="=="><o>__sys__t95</o><i>__sys__rt</i><i>__sys__t24</i></o>
+<o n="if_goto"><o>__sys__t96</o><i>__sys__t95</i><i>__sys__t105</i></o>
+<v t="s" n="__sys__t98">.sendMsg.</v>
+<o n="." r="166"><o>__sys__t97</o><i>game</i><i>__sys__t98</i></o>
+<o n="+" r="169"><o>__sys__t100</o><i>methodName</i><i>__sys__t25</i></o>
+<o n=" -" r="169"><o>__sys__t101</o><i>__sys__t26</i></o>
+<o n="arr" r="169"><o>__sys__t102</o><i>__sys__t100</i><i>__sys__t101</i></o>
+<o n="__sys__t97" r="166"><o>__sys__t103</o><i>game</i><i>sessionID</i><i>__sys__t102</i></o>
+<o n="goto"><o>__sys__t104</o><i>__sys__t106</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t100" />
+<v n="__sys__t101" />
+<v n="__sys__t102" />
+<v n="__sys__t103" />
+<v n="__sys__t104" />
+<v n="__sys__t27" />
+<v n="__sys__t29" />
+<v n="__sys__t31" />
+<v n="__sys__t33" />
+<v n="__sys__t35" />
+<v n="__sys__t37" />
+<v n="__sys__t39" />
+<v n="__sys__t41" />
+<v n="__sys__t42" />
+<v n="__sys__t44" />
+<v n="__sys__t47" />
+<v n="__sys__t48" />
+<v n="__sys__t50" />
+<v n="__sys__t51" />
+<v n="__sys__t52" />
+<v n="__sys__t55" />
+<v n="__sys__t56" />
+<v n="__sys__t57" />
+<v n="__sys__t58" />
+<v n="__sys__t59" />
+<v n="__sys__t62" />
+<v n="__sys__t63" />
+<v n="__sys__t64" />
+<v n="__sys__t66" />
+<v n="__sys__t67" />
+<v n="__sys__t68" />
+<v n="__sys__t71" />
+<v n="__sys__t72" />
+<v n="__sys__t73" />
+<v n="__sys__t74" />
+<v n="__sys__t75" />
+<v n="__sys__t76" />
+<v n="__sys__t79" />
+<v n="__sys__t82" />
+<v n="__sys__t85" />
+<v n="__sys__t88" />
+<v n="__sys__t89" />
+<v n="__sys__t90" />
+<v n="__sys__t91" />
+<v n="__sys__t93" />
+<v n="__sys__t95" />
+<v n="__sys__t96" />
+<v n="__sys__t97" />
+<v n="game" />
+<v n="methodName" />
+<v n="netMsg" />
+<v n="server" />
+<v n="sessionID" />
+<v n="tick" />
+<v n="type" />
+<v n="user" />
+<v n="userID" />
+</script>

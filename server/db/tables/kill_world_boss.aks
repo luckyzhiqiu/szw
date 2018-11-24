@@ -1,0 +1,5 @@
+//击杀世界BOSS榜表
+mysqlCol("key","id");
+mysqlCol("datetime","genTime");//创建时间
+mysqlCol("int","userID",0);//击杀用户ID
+mysqlCol("varchar","nickname");//玩家昵称

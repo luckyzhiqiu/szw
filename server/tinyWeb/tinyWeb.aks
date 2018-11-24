@@ -1,0 +1,42 @@
+//web服务端
+"api/init.aks"();
+"?HubClient.aks"();
+
+tinyWebConfig=json(file_get_contents("config/tinyWeb.json"));
+userData=dict
+(
+);
+web_s2
+(
+	"",//绑定域名或IP
+	tinyWebConfig.port,//端口
+	1024*10,//最大接收字节数
+	1024*100,//最大发送字节数
+	5000,//超时毫秒（每个会话能使用的最大有效时间，超时自动断线）
+	//userData
+	userData,
+	//onInit
+	##<userData>
+		userData.hubClient=HubClient();
+		userData.hubClient.initHubClient();
+	##.,
+	//onUrl
+	##<userData,url,postForm>
+		trace(url);
+		// trace(postForm);
+		//userData.hubClient.sendMsgToHub(arr("notifyPay",1,2,3));
+		log("web.log",url+"\r\n");
+		//notifyPay?game_order=03777dcbf769448b998a9ef5a9178513&userID=10004
+		order=parseUrl(url);
+		orderName=order[0];
+		if(orderName=="notifyPay")//支付完成通知
+		{
+			userData.hubClient.sendMsgToHub(order);
+		}
+		return("ok");
+	##.,
+	//onUpdate
+	##<userData>
+		userData.hubClient.updateHubClient();
+	##.,
+);

@@ -1,0 +1,48 @@
+//获取权贵加成
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+unionID=int(user.unionID);
+if(unionID==0)//未入盟
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+numMgr=game.numMgr;
+richmanIDArr=numMgr.getRichmanIDArr(unionID);//已拉拢权贵ID数组
+percent1=numMgr.getRichmanAddPercent(richmanIDArr,type=1);
+percent2=numMgr.getRichmanAddPercent(richmanIDArr,type=2);
+percent3=numMgr.getRichmanAddPercent(richmanIDArr,type=3);
+percent4=numMgr.getRichmanAddPercent(richmanIDArr,type=4);
+
+percentMap=dict();
+percentMap["moneyPercent"]=percent1;
+percentMap["foodPercent"]=percent2;
+percentMap["soldierPercent"]=percent3;
+percentMap["bossPercent"]=percent4;
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,percentMap)
+);

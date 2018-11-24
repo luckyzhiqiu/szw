@@ -1,0 +1,149 @@
+//
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+id=netMsg[3];//id
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,id,userID;
+		
+		
+		json=json_decode(user.json);
+		vipBuyMap=ref(json.vipBuyMap);
+		dailyTask=ref(json.dailyTask);//日常任务
+		
+		buyCount=ref(dailyTask.buyCount);
+		buyCount=number(buyCount)+1;
+		
+		shopTable=game.table.shop;
+		row=shopTable.getRowFromColName("id",id);
+		
+		if(empty(row))//
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-99)//id不存在
+			);
+			return(0);//不修改
+			
+		}
+		needGold=number(row.getValFromColName("goldPrice"));
+		
+		limited=number(row.getValFromColName("limited"));
+		itemID=number(row.getValFromColName("itemID"));
+		needVip=number(row.getValFromColName("vip"));
+	
+		if(number(needVip)>number(user.vip))
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-7,needVip)//vip不足
+			);
+			return(0);//不修改
+		}
+		
+		itemDict=ref(json.item);
+		game.numMgr.addItem(number(itemID),1,itemDict);
+		
+		count=0;
+		if(exist(vipBuyMap,id))
+		{
+			if(number(vipBuyMap[id])>=limited)
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-6)//購買上限
+				);
+				return(0);//不修改
+			}
+			count=number(vipBuyMap[id]);
+		}
+		vipBuyMap[id]=count+1;
+		
+		gold=ref(user.gold);
+		gold2=ref(user.gold2);
+
+		if(number(gold)+number(gold2)<needGold)
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-5)//gold不足
+			);
+			return(0);//不修改
+			
+		}	
+		
+		if(number(gold)<needGold)
+		{
+			gold2=number(gold2)-(needGold-number(gold));
+			gold=0;
+		}else
+		{
+			gold=number(gold)-needGold;
+		}	
+		
+		if(needGold>0)
+		{
+			allGold=number(gold)+number(gold2);//元宝余额
+			game.saveResIO(userID,49,itemID,0,needGold,allGold);//商城type4-VIP商店(type,itemID,（0=消耗，1=获得）,count,allGold)
+		}
+			
+		//保存
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,user.gold,user.gold2,vipBuyMap,itemDict,itemID,buyCount)
+		);
+		
+		return(1);//修改
+	
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

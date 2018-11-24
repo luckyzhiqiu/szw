@@ -1,0 +1,47 @@
+//追杀查询敌方信息
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+enemyUserID=netMsg[3];//敌方userID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+if(userID==enemyUserID)//不能追杀自己
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+enemyUser=game.rd.getRow(game.cnn,"user","id",enemyUserID,"*",1000);//膜拜对象
+if(empty(enemyUser))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,enemyUser.nickname,enemyUser.level,enemyUser.power,enemyUser.head)
+);

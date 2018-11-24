@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t247">142</v>
+<v t="n" n="__sys__t246">142</v>
+<v t="n" n="__sys__t231">130</v>
+<v t="n" n="__sys__t230">130</v>
+<v t="n" n="__sys__t168">95</v>
+<v t="n" n="__sys__t167">95</v>
+<v t="n" n="__sys__t144">79</v>
+<v t="n" n="__sys__t143">79</v>
+<v t="n" n="__sys__t122">63</v>
+<v t="n" n="__sys__t121">63</v>
+<v t="n" n="__sys__t102">47</v>
+<v t="n" n="__sys__t99">45</v>
+<v t="n" n="__sys__t98">45</v>
+<v t="n" n="__sys__t74">26</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="s" n="__sys__t3">.methodName.</v>
+<v t="s" n="__sys__t4">.sessionID.</v>
+<v t="s" n="__sys__t5">.userID.</v>
+<v t="s" n="__sys__t6">.heroIndex.</v>
+<v t="s" n="__sys__t7">.index.</v>
+<v t="n" n="__sys__t8">0</v>
+<v t="n" n="__sys__t9">0</v>
+<v t="n" n="__sys__t10">0</v>
+<v t="s" n="__sys__t11">.Result.</v>
+<v t="n" n="__sys__t12">4</v>
+<v t="n" n="__sys__t13">0</v>
+<v t="n" n="__sys__t14">0</v>
+<v t="n" n="__sys__t15">0</v>
+<v t="s" n="__sys__t16">.BookHouseHero.</v>
+<v t="s" n="__sys__t17">.heroIndex.</v>
+<v t="n" n="__sys__t18">1</v>
+<v t="s" n="__sys__t19">.bt.</v>
+<v t="n" n="__sys__t20">0</v>
+<v t="n" n="__sys__t21">1</v>
+<v t="n" n="__sys__t22">0</v>
+<v t="s" n="__sys__t23">.Result.</v>
+<v t="n" n="__sys__t24">2</v>
+<v t="n" n="__sys__t25">0</v>
+<v t="n" n="__sys__t26">0</v>
+<v t="n" n="__sys__t27">0</v>
+<v t="n" n="__sys__t28">0</v>
+<v t="s" n="__sys__t29">.maxLearn.</v>
+<v t="n" n="__sys__t30">0</v>
+<v t="n" n="__sys__t31">0</v>
+<v t="n" n="__sys__t32">0</v>
+<v t="s" n="__sys__t33">.Result.</v>
+<v t="n" n="__sys__t34">3</v>
+<v t="n" n="__sys__t35">0</v>
+<v t="n" n="__sys__t36">1</v>
+<v t="s" n="__sys__t37">.Result.</v>
+<v t="n" n="__sys__t38">1</v>
+<v t="n" n="__sys__t39">1</v>
+<o n="input"><o>__sys__t40</o><i>__sys__t1</i></o>
+<o n="="><o>user</o><i>__sys__t40</i></o>
+<o n="input"><o>__sys__t42</o><i>__sys__t2</i></o>
+<o n="="><o>game</o><i>__sys__t42</i></o>
+<o n="link" r="26"><o>__sys__t44</o><i>__sys__t3</i></o>
+<o n="=" r="26"><o>methodName</o><i>__sys__t44</i></o>
+<o n="link" r="26"><o>__sys__t46</o><i>__sys__t4</i></o>
+<o n="=" r="26"><o>sessionID</o><i>__sys__t46</i></o>
+<o n="link" r="26"><o>__sys__t48</o><i>__sys__t5</i></o>
+<o n="=" r="26"><o>userID</o><i>__sys__t48</i></o>
+<o n="link" r="26"><o>__sys__t50</o><i>__sys__t6</i></o>
+<o n="=" r="26"><o>heroIndex</o><i>__sys__t50</i></o>
+<o n="link" r="26"><o>__sys__t52</o><i>__sys__t7</i></o>
+<o n="=" r="26"><o>index</o><i>__sys__t52</i></o>
+<v t="s" n="__sys__t55">.json.</v>
+<o n="." r="27"><o>__sys__t54</o><i>user</i><i>__sys__t55</i></o>
+<o n="json_decode" r="27"><o>__sys__t57</o><i>__sys__t54</i></o>
+<o n="=" r="27"><o>json</o><i>__sys__t57</i></o>
+<v t="s" n="__sys__t60">.bookHouse.</v>
+<o n="." r="28"><o>__sys__t59</o><i>json</i><i>__sys__t60</i></o>
+<o n="=" r="28"><o>bookHouse</o><i>__sys__t59</i></o>
+<v t="s" n="__sys__t64">.seatCount.</v>
+<o n="." r="29"><o>__sys__t63</o><i>bookHouse</i><i>__sys__t64</i></o>
+<o n="=" r="29"><o>seatCount</o><i>__sys__t63</i></o>
+<v t="s" n="__sys__t68">.heroArr.</v>
+<o n="." r="30"><o>__sys__t67</o><i>bookHouse</i><i>__sys__t68</i></o>
+<o n="=" r="30"><o>heroArrB</o><i>__sys__t67</i></o>
+<o n="size" r="31"><o>__sys__t71</o><i>heroArrB</i></o>
+<o n="=" r="31"><o>count</o><i>__sys__t71</i></o>
+<o n="=" r="32"><o>i</o><i>__sys__t8</i></o>
+<o n="&lt;" r="33"><o>__sys__t75</o><i>i</i><i>count</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t75</i></o>
+<o n="=="><o>__sys__t77</o><i>__sys__rt</i><i>__sys__t9</i></o>
+<o n="if_goto"><o>__sys__t78</o><i>__sys__t77</i><i>__sys__t102</i></o>
+<o n="[]" r="35"><o>__sys__t79</o><i>heroArrB</i><i>i</i></o>
+<o n="=" r="35"><o>info</o><i>__sys__t79</i></o>
+<v t="s" n="__sys__t82">.heroIndex.</v>
+<o n="." r="36"><o>__sys__t81</o><i>info</i><i>__sys__t82</i></o>
+<o n="=" r="36"><o>heroIndexS</o><i>__sys__t81</i></o>
+<o n="==" r="37"><o>__sys__t85</o><i>heroIndexS</i><i>heroIndex</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t85</i></o>
+<o n="=="><o>__sys__t87</o><i>__sys__rt</i><i>__sys__t10</i></o>
+<o n="if_goto"><o>__sys__t88</o><i>__sys__t87</i><i>__sys__t98</i></o>
+<v t="s" n="__sys__t90">.sendMsg.</v>
+<o n="." r="39"><o>__sys__t89</o><i>game</i><i>__sys__t90</i></o>
+<o n="+" r="42"><o>__sys__t92</o><i>methodName</i><i>__sys__t11</i></o>
+<o n=" -" r="42"><o>__sys__t93</o><i>__sys__t12</i></o>
+<o n="arr" r="42"><o>__sys__t94</o><i>__sys__t92</i><i>__sys__t93</i></o>
+<o n="__sys__t89" r="39"><o>__sys__t95</o><i>game</i><i>sessionID</i><i>__sys__t94</i></o>
+<o n="return" r="44"><o>__sys__t96</o><i>__sys__t13</i></o>
+<o n="goto"><o>__sys__t97</o><i>__sys__t99</i></o>
+<o n="++" r="46"><o>i</o><i>i</i></o>
+<o n="goto"><o>__sys__t101</o><i>__sys__t74</i></o>
+<v t="s" n="__sys__t104">.structMgr.</v>
+<o n="." r="49"><o>__sys__t103</o><i>game</i><i>__sys__t104</i></o>
+<o n="=" r="49"><o>structMgr</o><i>__sys__t103</i></o>
+<o n="==" r="50"><o>__sys__t107</o><i>count</i><i>__sys__t14</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t107</i></o>
+<o n="=="><o>__sys__t109</o><i>__sys__rt</i><i>__sys__t15</i></o>
+<o n="if_goto"><o>__sys__t110</o><i>__sys__t109</i><i>__sys__t121</i></o>
+<o n="dict" r="52"><o>__sys__t111</o></o>
+<o n="structMgr_upgradeObj" r="52"><o>__sys__t112</o><i>structMgr</i><i>__sys__t16</i><i>__sys__t111</i></o>
+<o n="=" r="52"><o>map</o><i>__sys__t112</i></o>
+<o n="[]" r="53"><o>__sys__t114</o><i>map</i><i>__sys__t17</i></o>
+<o n=" -" r="53"><o>__sys__t115</o><i>__sys__t18</i></o>
+<o n="=" r="53"><o>__sys__t114</o><i>__sys__t115</i></o>
+<o n="[]" r="54"><o>__sys__t117</o><i>map</i><i>__sys__t19</i></o>
+<o n="=" r="54"><o>__sys__t117</o><i>__sys__t20</i></o>
+<o n="push" r="55"><o>__sys__t119</o><i>heroArrB</i><i>map</i></o>
+<o n="goto"><o>__sys__t120</o><i>__sys__t122</i></o>
+<o n="[]" r="58"><o>__sys__t123</o><i>heroArrB</i><i>index</i></o>
+<o n="=" r="58"><o>seatInfo</o><i>__sys__t123</i></o>
+<v t="s" n="__sys__t126">.heroIndex.</v>
+<o n="." r="59"><o>__sys__t125</o><i>seatInfo</i><i>__sys__t126</i></o>
+<o n="=" r="59"><o>heroIndexZ</o><i>__sys__t125</i></o>
+<o n=" -" r="60"><o>__sys__t129</o><i>__sys__t21</i></o>
+<o n="!=" r="60"><o>__sys__t130</o><i>heroIndexZ</i><i>__sys__t129</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t130</i></o>
+<o n="=="><o>__sys__t132</o><i>__sys__rt</i><i>__sys__t22</i></o>
+<o n="if_goto"><o>__sys__t133</o><i>__sys__t132</i><i>__sys__t143</i></o>
+<v t="s" n="__sys__t135">.sendMsg.</v>
+<o n="." r="62"><o>__sys__t134</o><i>game</i><i>__sys__t135</i></o>
+<o n="+" r="65"><o>__sys__t137</o><i>methodName</i><i>__sys__t23</i></o>
+<o n=" -" r="65"><o>__sys__t138</o><i>__sys__t24</i></o>
+<o n="arr" r="65"><o>__sys__t139</o><i>__sys__t137</i><i>__sys__t138</i></o>
+<o n="__sys__t134" r="62"><o>__sys__t140</o><i>game</i><i>sessionID</i><i>__sys__t139</i></o>
+<o n="return" r="67"><o>__sys__t141</o><i>__sys__t25</i></o>
+<o n="goto"><o>__sys__t142</o><i>__sys__t144</i></o>
+<o n="=" r="70"><o>heroIDStudy</o><i>__sys__t26</i></o>
+<v t="s" n="__sys__t147">.heroStudyCountMap.</v>
+<o n="." r="71"><o>__sys__t146</o><i>bookHouse</i><i>__sys__t147</i></o>
+<o n="=" r="71"><o>heroStudyCountMap</o><i>__sys__t146</i></o>
+<v t="s" n="__sys__t151">.hero.</v>
+<o n="." r="72"><o>__sys__t150</o><i>json</i><i>__sys__t151</i></o>
+<o n="=" r="72"><o>heroArr</o><i>__sys__t150</i></o>
+<o n="[]" r="73"><o>__sys__t154</o><i>heroArr</i><i>heroIndex</i></o>
+<o n="=" r="73"><o>hero</o><i>__sys__t154</i></o>
+<v t="s" n="__sys__t157">.heroID.</v>
+<o n="." r="74"><o>__sys__t156</o><i>hero</i><i>__sys__t157</i></o>
+<o n="=" r="74"><o>heroID</o><i>__sys__t156</i></o>
+<o n="exist" r="75"><o>__sys__t160</o><i>heroStudyCountMap</i><i>heroID</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t160</i></o>
+<o n="=="><o>__sys__t162</o><i>__sys__rt</i><i>__sys__t27</i></o>
+<o n="if_goto"><o>__sys__t163</o><i>__sys__t162</i><i>__sys__t167</i></o>
+<o n="[]" r="77"><o>__sys__t164</o><i>heroStudyCountMap</i><i>heroID</i></o>
+<o n="=" r="77"><o>heroIDStudy</o><i>__sys__t164</i></o>
+<o n="goto"><o>__sys__t166</o><i>__sys__t168</i></o>
+<v t="s" n="__sys__t170">.table.</v>
+<o n="." r="80"><o>__sys__t169</o><i>game</i><i>__sys__t170</i></o>
+<o n="=" r="80"><o>table</o><i>__sys__t169</i></o>
+<v t="s" n="__sys__t174">.school.</v>
+<o n="." r="81"><o>__sys__t173</o><i>table</i><i>__sys__t174</i></o>
+<o n="=" r="81"><o>schoolTable</o><i>__sys__t173</i></o>
+<v t="s" n="__sys__t178">.getRow.</v>
+<o n="." r="82"><o>__sys__t177</o><i>schoolTable</i><i>__sys__t178</i></o>
+<o n="__sys__t177" r="82"><o>__sys__t180</o><i>schoolTable</i><i>__sys__t28</i></o>
+<o n="=" r="82"><o>rowS</o><i>__sys__t180</i></o>
+<v t="s" n="__sys__t183">.getValFromColName.</v>
+<o n="." r="83"><o>__sys__t182</o><i>rowS</i><i>__sys__t183</i></o>
+<o n="__sys__t182" r="83"><o>__sys__t185</o><i>rowS</i><i>__sys__t29</i></o>
+<o n="number" r="83"><o>__sys__t186</o><i>__sys__t185</i></o>
+<o n="=" r="83"><o>maxLearn</o><i>__sys__t186</i></o>
+<v t="s" n="__sys__t189">.strengthGrows.</v>
+<o n="." r="85"><o>__sys__t188</o><i>hero</i><i>__sys__t189</i></o>
+<v t="s" n="__sys__t192">.wisdomGrows.</v>
+<o n="." r="85"><o>__sys__t191</o><i>hero</i><i>__sys__t192</i></o>
+<v t="s" n="__sys__t195">.charmGrows.</v>
+<o n="." r="85"><o>__sys__t194</o><i>hero</i><i>__sys__t195</i></o>
+<v t="s" n="__sys__t198">.politicsGrows.</v>
+<o n="." r="85"><o>__sys__t197</o><i>hero</i><i>__sys__t198</i></o>
+<o n="+" r="85"><o>__sys__t200</o><i>__sys__t188</i><i>__sys__t191</i></o>
+<o n="+" r="85"><o>__sys__t201</o><i>__sys__t200</i><i>__sys__t194</i></o>
+<o n="+" r="85"><o>__sys__t202</o><i>__sys__t201</i><i>__sys__t197</i></o>
+<o n="=" r="85"><o>allGrows</o><i>__sys__t202</i></o>
+<o n="==" r="86"><o>__sys__t204</o><i>heroIndex</i><i>__sys__t30</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t204</i></o>
+<o n="=="><o>__sys__t206</o><i>__sys__rt</i><i>__sys__t31</i></o>
+<o n="if_goto"><o>__sys__t207</o><i>__sys__t206</i><i>__sys__t230</i></o>
+<v t="s" n="__sys__t209">.wifePlus.</v>
+<o n="." r="88"><o>__sys__t208</o><i>json</i><i>__sys__t209</i></o>
+<o n="=" r="88"><o>wifePlus</o><i>__sys__t208</i></o>
+<v t="s" n="__sys__t213">.strengthGrows.</v>
+<o n="." r="89"><o>__sys__t212</o><i>wifePlus</i><i>__sys__t213</i></o>
+<v t="s" n="__sys__t216">.wisdomGrows.</v>
+<o n="." r="89"><o>__sys__t215</o><i>wifePlus</i><i>__sys__t216</i></o>
+<v t="s" n="__sys__t219">.charmGrows.</v>
+<o n="." r="89"><o>__sys__t218</o><i>wifePlus</i><i>__sys__t219</i></o>
+<v t="s" n="__sys__t222">.politicsGrows.</v>
+<o n="." r="89"><o>__sys__t221</o><i>wifePlus</i><i>__sys__t222</i></o>
+<o n="+" r="89"><o>__sys__t224</o><i>__sys__t212</i><i>__sys__t215</i></o>
+<o n="+" r="89"><o>__sys__t225</o><i>__sys__t224</i><i>__sys__t218</i></o>
+<o n="+" r="89"><o>__sys__t226</o><i>__sys__t225</i><i>__sys__t221</i></o>
+<o n="=" r="89"><o>allWifePlusGrows</o><i>__sys__t226</i></o>
+<o n="+=" r="90"><o>allGrows</o><i>allWifePlusGrows</i></o>
+<o n="goto"><o>__sys__t229</o><i>__sys__t231</i></o>
+<o n="*=" r="92"><o>allGrows</o><i>maxLearn</i></o>
+<o n=">=" r="94"><o>__sys__t233</o><i>heroIDStudy</i><i>allGrows</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t233</i></o>
+<o n="=="><o>__sys__t235</o><i>__sys__rt</i><i>__sys__t32</i></o>
+<o n="if_goto"><o>__sys__t236</o><i>__sys__t235</i><i>__sys__t246</i></o>
+<v t="s" n="__sys__t238">.sendMsg.</v>
+<o n="." r="96"><o>__sys__t237</o><i>game</i><i>__sys__t238</i></o>
+<o n="+" r="99"><o>__sys__t240</o><i>methodName</i><i>__sys__t33</i></o>
+<o n=" -" r="99"><o>__sys__t241</o><i>__sys__t34</i></o>
+<o n="arr" r="99"><o>__sys__t242</o><i>__sys__t240</i><i>__sys__t241</i></o>
+<o n="__sys__t237" r="96"><o>__sys__t243</o><i>game</i><i>sessionID</i><i>__sys__t242</i></o>
+<o n="return" r="101"><o>__sys__t244</o><i>__sys__t35</i></o>
+<o n="goto"><o>__sys__t245</o><i>__sys__t247</i></o>
+<o n="time" r="105"><o>__sys__t248</o></o>
+<o n="=" r="105"><o>nowTime</o><i>__sys__t248</i></o>
+<v t="s" n="__sys__t251">.heroIndex.</v>
+<o n="." r="106"><o>__sys__t250</o><i>seatInfo</i><i>__sys__t251</i></o>
+<o n="=" r="106"><o>__sys__t250</o><i>heroIndex</i></o>
+<v t="s" n="__sys__t255">.bt.</v>
+<o n="." r="107"><o>__sys__t254</o><i>seatInfo</i><i>__sys__t255</i></o>
+<o n="=" r="107"><o>__sys__t254</o><i>nowTime</i></o>
+<o n="+=" r="110"><o>heroIDStudy</o><i>__sys__t36</i></o>
+<o n="[]" r="111"><o>__sys__t259</o><i>heroStudyCountMap</i><i>heroID</i></o>
+<o n="=" r="111"><o>__sys__t259</o><i>heroIDStudy</i></o>
+<v t="s" n="__sys__t262">.json.</v>
+<o n="." r="112"><o>__sys__t261</o><i>user</i><i>__sys__t262</i></o>
+<o n="json_encode" r="112"><o>__sys__t264</o><i>json</i></o>
+<o n="=" r="112"><o>__sys__t261</o><i>__sys__t264</i></o>
+<v t="s" n="__sys__t267">.sendMsg.</v>
+<o n="." r="115"><o>__sys__t266</o><i>game</i><i>__sys__t267</i></o>
+<o n="+" r="118"><o>__sys__t269</o><i>methodName</i><i>__sys__t37</i></o>
+<o n="arr" r="118"><o>__sys__t270</o><i>__sys__t269</i><i>__sys__t38</i><i>bookHouse</i></o>
+<o n="__sys__t266" r="115"><o>__sys__t271</o><i>game</i><i>sessionID</i><i>__sys__t270</i></o>
+<o n="return" r="121"><o>__sys__t272</o><i>__sys__t39</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t101" />
+<v n="__sys__t103" />
+<v n="__sys__t107" />
+<v n="__sys__t109" />
+<v n="__sys__t110" />
+<v n="__sys__t111" />
+<v n="__sys__t112" />
+<v n="__sys__t114" />
+<v n="__sys__t115" />
+<v n="__sys__t117" />
+<v n="__sys__t119" />
+<v n="__sys__t120" />
+<v n="__sys__t123" />
+<v n="__sys__t125" />
+<v n="__sys__t129" />
+<v n="__sys__t130" />
+<v n="__sys__t132" />
+<v n="__sys__t133" />
+<v n="__sys__t134" />
+<v n="__sys__t137" />
+<v n="__sys__t138" />
+<v n="__sys__t139" />
+<v n="__sys__t140" />
+<v n="__sys__t141" />
+<v n="__sys__t142" />
+<v n="__sys__t146" />
+<v n="__sys__t150" />
+<v n="__sys__t154" />
+<v n="__sys__t156" />
+<v n="__sys__t160" />
+<v n="__sys__t162" />
+<v n="__sys__t163" />
+<v n="__sys__t164" />
+<v n="__sys__t166" />
+<v n="__sys__t169" />
+<v n="__sys__t173" />
+<v n="__sys__t177" />
+<v n="__sys__t180" />
+<v n="__sys__t182" />
+<v n="__sys__t185" />
+<v n="__sys__t186" />
+<v n="__sys__t188" />
+<v n="__sys__t191" />
+<v n="__sys__t194" />
+<v n="__sys__t197" />
+<v n="__sys__t200" />
+<v n="__sys__t201" />
+<v n="__sys__t202" />
+<v n="__sys__t204" />
+<v n="__sys__t206" />
+<v n="__sys__t207" />
+<v n="__sys__t208" />
+<v n="__sys__t212" />
+<v n="__sys__t215" />
+<v n="__sys__t218" />
+<v n="__sys__t221" />
+<v n="__sys__t224" />
+<v n="__sys__t225" />
+<v n="__sys__t226" />
+<v n="__sys__t229" />
+<v n="__sys__t233" />
+<v n="__sys__t235" />
+<v n="__sys__t236" />
+<v n="__sys__t237" />
+<v n="__sys__t240" />
+<v n="__sys__t241" />
+<v n="__sys__t242" />
+<v n="__sys__t243" />
+<v n="__sys__t244" />
+<v n="__sys__t245" />
+<v n="__sys__t248" />
+<v n="__sys__t250" />
+<v n="__sys__t254" />
+<v n="__sys__t259" />
+<v n="__sys__t261" />
+<v n="__sys__t264" />
+<v n="__sys__t266" />
+<v n="__sys__t269" />
+<v n="__sys__t270" />
+<v n="__sys__t271" />
+<v n="__sys__t272" />
+<v n="__sys__t40" />
+<v n="__sys__t42" />
+<v n="__sys__t44" />
+<v n="__sys__t46" />
+<v n="__sys__t48" />
+<v n="__sys__t50" />
+<v n="__sys__t52" />
+<v n="__sys__t54" />
+<v n="__sys__t57" />
+<v n="__sys__t59" />
+<v n="__sys__t63" />
+<v n="__sys__t67" />
+<v n="__sys__t71" />
+<v n="__sys__t75" />
+<v n="__sys__t77" />
+<v n="__sys__t78" />
+<v n="__sys__t79" />
+<v n="__sys__t81" />
+<v n="__sys__t85" />
+<v n="__sys__t87" />
+<v n="__sys__t88" />
+<v n="__sys__t89" />
+<v n="__sys__t92" />
+<v n="__sys__t93" />
+<v n="__sys__t94" />
+<v n="__sys__t95" />
+<v n="__sys__t96" />
+<v n="__sys__t97" />
+<v n="allGrows" />
+<v n="allWifePlusGrows" />
+<v n="bookHouse" />
+<v n="count" />
+<v n="game" />
+<v n="hero" />
+<v n="heroArr" />
+<v n="heroArrB" />
+<v n="heroID" />
+<v n="heroIDStudy" />
+<v n="heroIndex" />
+<v n="heroIndexS" />
+<v n="heroIndexZ" />
+<v n="heroStudyCountMap" />
+<v n="i" />
+<v n="index" />
+<v n="info" />
+<v n="json" />
+<v n="map" />
+<v n="maxLearn" />
+<v n="methodName" />
+<v n="nowTime" />
+<v n="rowS" />
+<v n="schoolTable" />
+<v n="seatCount" />
+<v n="seatInfo" />
+<v n="sessionID" />
+<v n="structMgr" />
+<v n="table" />
+<v n="user" />
+<v n="userID" />
+<v n="wifePlus" />
+</script>

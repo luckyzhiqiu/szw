@@ -1,0 +1,182 @@
+//7天奖励
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+day=netMsg[3];
+
+
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID,day,userID;
+		json=json_decode(user.json);
+		
+		someDayReward=ref(json.someDayReward);//
+		getMap=ref(someDayReward.getMap);
+				
+		
+		if(exist(getMap,day))
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-99)//当天已领取
+			);
+			return(0);//不修改
+		}
+		push(getMap,day,1);
+		
+		addMap=dict();//增加的数据	
+		
+		eventSevenTable=game.table.eventSeven;
+		row=eventSevenTable.getRowFromColName("day",day);
+		if(empty(row))
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-98)//不存在
+			);
+			return(0);//不修改
+		}
+	
+		
+		money=number(row.getValFromColName("money"));
+		newGold=number(user.money)+money;
+		user.money=newGold;
+		push(addMap,"money",money);
+		
+		food=number(row.getValFromColName("food"));
+		newFood=number(user.food)+food;
+		user.food=newFood;
+		push(addMap,"food",food);
+		
+		soldier=number(row.getValFromColName("soldier"));
+		newSoldier=number(user.soldier)+soldier;
+		user.soldier=newSoldier;
+		push(addMap,"soldier",soldier);
+		
+		gold2=number(row.getValFromColName("gold"));
+		newgold2=number(user.gold2)+gold2;
+		if(newgold2!=0)
+		{
+			user.gold2=newgold2;	
+		}
+		
+		push(addMap,"gold2",gold2);
+		if(gold2>0)
+		{
+			allGold=number(user.gold)+newgold2;//元宝余额
+			game.saveResIO(userID,33,0,1,gold2,allGold);//七天签到(type,itemID,（0=消耗，1=获得）,count,allGold)
+		}
+		
+		itemArr=arr();
+		itemStr=row.getValFromColName("item");
+		if(itemStr!="0")
+		{
+			split(itemArr,itemStr,",");
+		}	
+		
+		
+		itemDict=json.item;
+		numMgr=game.numMgr;
+		c=size(itemArr);
+		i=0;while(i<c)
+		{
+			numMgr.addItem(number(itemArr[i]),number(itemArr[i+1]),itemDict);//返回数量
+			i+=2;
+		}
+		
+		
+		heroID=number(row.getValFromColName("hero"));//英雄
+		heroArr=json.hero;
+		if(heroID!=0)
+		{
+			
+			
+			hero=numMgr.createHero(heroID,heroArr,json);
+			
+			//重新计算加成
+			if(!empty(hero))//英雄不存在--添加
+			{
+				numMgr.computeHero(hero,json);
+			}
+				
+		}
+		
+		wifeDict=json.wife;
+		wifeID=number(row.getValFromColName("wife"));//红颜
+		if(wifeID!=0)
+		{
+			numMgr.createWife(wifeID,wifeDict);
+	
+			numMgr.computeHero(json.hero[0],json);
+			//计算user红颜数值
+			numMgr.computeUserWifeProperty(user,wifeDict);
+				
+		}
+		
+			
+		numMgr.computeUser(user,json);
+		
+		wifePlus=json.wifePlus;
+		
+		power=user.power;
+		strength=user.strength;
+		wisdom=user.wisdom;
+		charm=user.charm;
+		politics=user.politics;
+		intimate=user.intimate;
+		beauty=user.beauty;
+		
+		//保存
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,json.hero,heroID,wifeDict,wifeID,addMap,json.item,itemArr,wifePlus,power,strength,wisdom,charm,politics,intimate,beauty,0,getMap,user.money,user.gold2,user.soldier,user.food)
+		);
+		
+		return(1);//修改
+		
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

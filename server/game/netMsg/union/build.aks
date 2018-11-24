@@ -1,0 +1,269 @@
+//建筑®-联萌
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+optionId=netMsg[3];//选择Id
+
+rd=game.rd;
+cnn=game.cnn;
+user=rd.getRow(cnn,"user","id",userID,"*",1000);
+json=json_decode(user.json);
+dailyTask=json.dailyTask;//日常
+unionBuildMap=dailyTask.unionBuildMap;//建设记录
+
+ownUnionID=number(user.unionID);//所属联萌
+debug(ownUnionID);
+ownUnion=rd.getRow(cnn,"union","id",ownUnionID,"*",1000);
+buildCount=number(ownUnion.buildCount);//当日建设次数
+peopleNumMax=number(ownUnion.peopleNumMax);//peopleMax
+userIDMap=dict();
+if(buildCount>=peopleNumMax)
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-8)//超过建设上限
+	);
+	exit();
+}
+unionBuildMapLength=size(unionBuildMap);
+if(unionBuildMapLength!=0)//存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-7)//建过
+	);
+	exit();
+}
+if(ownUnionID==0)
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)//联萌不存在
+	);
+	exit();
+}
+table=game.table;
+buildTable=table.allianceBuild;//建设表
+buildTableLengh=buildTable.size();
+if(optionId>buildTableLengh)
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-3)//找不到表Id
+	);
+	exit();
+}
+buildRow=buildTable.getRow(optionId-1);
+type=buildRow.getValFromColName("type");
+seatCost=0;
+gold=0;
+gold2=0;
+if(type==1)//元宝
+{
+	seatCost=number(buildRow.getValFromColName("cost"));//扩建消耗
+	gold=number(user.gold);//元宝（充值，优先使用）
+	gold2=number(user.gold2);//元宝（赠送）
+	if(seatCost>(gold+gold2))//元宝不足
+	{
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",-4)
+		);
+		exit();//
+	}
+	
+	
+}
+if(type==2)//道具消耗
+{
+	numMgr=game.numMgr;
+	
+	itemId=number(buildRow.getValFromColName("itemID"));//扩建消耗
+	itemDict=json.item;
+	count=numMgr.subItem(itemId,1,itemDict);
+	
+	if(count<0)//物品不存在
+	{
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",-5)
+		);
+		
+		exit();//不修改
+	}
+}
+
+//修改行数据
+unionX=rd.updateRow //修改所属联萌
+(
+	cnn,"union","id",ownUnionID,"*",
+	//修改回调
+	##<unionX,game>
+		@link methodName,sessionID,userID,buildRow,buildCount,userIDMap;
+		numMgr=game.numMgr;
+		
+		addExp=number(buildRow.getValFromColName("exp"));//联萌经验
+		addMoney=number(buildRow.getValFromColName("wealth"));//联萌财产
+		addEffect=number(buildRow.getValFromColName("influence"));//联萌影响力
+		
+		//增加联盟经验
+		numMgr.addUnionExp(unionX,addExp);
+		//增加联盟财富
+		money=number(unionX.money);
+		money+=addMoney;
+		//增加联盟影响力
+		effect=number(unionX.effect);
+		effect+=addEffect;
+		unionXJson=json_decode(unionX.json);
+		userIDMap=unionXJson.userIDMap;//成员
+		unionX.json=json_encode(unionXJson);
+		//keep
+		unionX.buildCount=buildCount+1;
+		unionX.money=money;
+		unionX.effect=effect;
+		//回复
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link sessionID,methodName,buildRow,unionBuildMap,userID,json,optionId,ownUnionID,userIDMap,seatCost,gold,gold2;
+		addDevote=number(buildRow.getValFromColName("devote"));//个人贡献
+		devote=number(user.devote);//联萌贡献
+		devoteTotal=number(user.devoteTotal);//联萌历史贡献
+		devote+=addDevote;
+		devoteTotal+=addDevote;
+		achievement=json.achievement;
+		unionCount=achievement.unionCount;//联萌建设次数
+		//推送
+		nickname=user.nickname;
+		textTable=game.table.text;
+		rowT=textTable.getRowFromColName("id",403);
+		str=rowT.getValFromColName("text");//%0+出了联盟
+		optionText="1";
+		if(optionId==1)
+		{
+			optionText="普通建设";
+		}
+		else if(optionId==2)
+		{
+			optionText="高级建设";
+		}
+		else if(optionId==3)
+		{
+			optionText="道具建设";
+		}
+		else if(optionId==4)
+		{
+			optionText="高级道具建设";
+		}
+		outStr=sprintf(str,nickname,optionText);
+		unionID=number(user.unionID);
+		unionSendMsg(game,0,nickname,outStr,userIDMap,unionID,0);//userIDMap
+		if(optionId==1||optionId==2)
+		{
+			//扣减元宝
+			if(seatCost>gold)
+			{
+				seatCost-=gold;
+				gold=0;
+				gold2-=seatCost;
+			}
+			else
+			{
+				gold-=seatCost;
+			}
+			user.gold=gold;
+			user.gold2=gold2;
+		}
+		unionCountAdd=unionCount+1;
+		
+		//流水
+		if(seatCost!=0)
+		{
+			allGold=gold+gold2;//元宝余额
+			if(optionId==1)
+			{
+				game.saveResIO(userID,17,0,0,seatCost,allGold);//联盟初级建设(type,itemID,（0=消耗，1=获得）,count,allGold)
+			}
+			else if(optionId==2)
+			{
+				game.saveResIO(userID,18,0,0,seatCost,allGold);//联盟高级建设(type,itemID,（0=消耗，1=获得）,count,allGold)
+			}
+		}
+		
+		//keep
+		unionBuildMap[ownUnionID]=optionId;
+		user.devote=devote;
+		user.devoteTotal=devoteTotal;
+		user.unionBuildID=optionId;
+		achievement.unionCount=unionCountAdd;
+		user.json=json_encode(json);
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,devote,devoteTotal,unionBuildMap)
+		);
+		
+		
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(unionX))//工会不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-6)
+	);
+}
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

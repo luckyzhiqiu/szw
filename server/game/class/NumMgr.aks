@@ -1,0 +1,1375 @@
+//数值管理器
+@class NumMgr<game>
+	self.game=game;
+	
+	//添加犯人
+	@member addPrisoner<table,json,prisonerID>
+		game=self.game;
+		prison=json.prison;//牢房
+		prisonerArr=prison.prisonerArr;//犯人数组
+		prisonerArrLength=size(prisonerArr);
+		i=0;
+		while(i<prisonerArrLength)
+		{
+			if(prisonerArr[i].id==prisonerID)
+			{
+				return(handle());
+			}
+			i++;
+		}
+		//
+		prisonerTable=table.prisoner;
+		prisonerTableRow=prisonerTable.getRowFromColName("id",prisonerID);
+		life=number(prisonerTableRow.getValFromColName("life"));//life
+		heart=number(prisonerTableRow.getValFromColName("heart1"));//heart
+		//	
+		structMgr=game.structMgr;
+		curPrison=structMgr_upgradeObj(structMgr,"Prisoner",dict());
+		curPrison.id=prisonerID;
+		curPrison.hp=life;
+		curPrison.hpMax=life;
+		curPrison.def=heart;
+		curPrison.defMax=heart;
+		curPrison.check=0;
+		push(prisonerArr,curPrison);
+		//
+		return(curPrison);
+	@member.
+	
+	//获取联盟已拉拢权贵ID数组
+	@member getRichmanIDArr<unionID>
+		richmanIDArr=arr();
+		if(unionID<=0)return(richmanIDArr);
+		game=self.game;
+		union=game.rd.getRow(game.cnn,"union","id",unionID,"*",1000);
+		if(empty(union))return(richmanIDArr);
+		unionJson=json_decode(union.json);
+		foreach(unionJson.richmanIDMap,##<richmanID>
+			@link richmanIDArr;
+			push(richmanIDArr,richmanID);
+		##.);
+		return(richmanIDArr);
+	@member.
+	
+	//获取多个权贵的加成万分比
+	@member getRichmanAddPercent
+	<
+		richmanIDArr,//联盟ID
+		type//类型：1=势力商业收益万分比提升；2=势力农业收益万分比提升；3=势力征兵收益万分比提升；4=议政伤害增加万分比；
+	>
+		percent=0;
+		if(size(richmanIDArr)>0)
+		{
+			table=self.game.table;
+			allianceNobleTab=table.allianceNoble;
+			i=0;c=size(richmanIDArr);
+			while(i<c)
+			{
+				richmanID=richmanIDArr[i];
+				richmanRow=allianceNobleTab.getRowFromColName("id",richmanID);
+				if(type==1)//势力商业收益万分比提升
+				{
+					percent+=number(richmanRow.getValFromColName("businessPercent"))/10000;
+				}
+				else if(type==2)//势力农业收益万分比提升
+				{
+					percent+=number(richmanRow.getValFromColName("farmPercent"))/10000;
+				}
+				else if(type==3)//势力征兵收益万分比提升
+				{
+					percent+=number(richmanRow.getValFromColName("recruitPercent"))/10000;
+				}
+				else if(type==4)//议政伤害增加万分比
+				{
+					percent+=number(richmanRow.getValFromColName("waterBattleDamage"))/10000;
+				}
+				++i;
+			}
+		}
+		return(percent);
+	@member.
+	
+	//增加联盟经验
+	@member addUnionExp<union,addExp>
+		game=self.game;
+		allianceTab=game.table.alliance;
+		exp=number(union.exp);
+		exp+=addExp;
+		level=1;
+		i=allianceTab.size()-1;
+		while(i>=0)
+		{
+			row=allianceTab.getRow(i);
+			needExp=number(row.getValFromColName("exp"));//达到经验
+			if(exp>=needExp)
+			{
+				union.level=int(row.getValFromColName("level"));//等级
+				union.peopleNumMax=int(row.getValFromColName("memberMax"));//成员上限
+				break;
+			}
+			--i;
+		}
+		//联盟冲榜
+		activityMgr=game.activityMgr;
+		activityID=4;//联盟冲榜（经验涨幅）
+		if(activityMgr.getActivityStatus(activityID)==1)//活动进行中
+		{
+			global_var=game.global_var;
+			rushLoop=global_var.rushLoop;
+			rushLoopBt=rushLoop.bt;//阶段开始时间
+			
+			expAdd=number(union.expAdd);
+			if(union.expAddBT!=rushLoopBt)//重置活动积分
+			{
+				union.expAddBT=rushLoopBt;
+				expAdd=addExp;
+				unionJson=json_decode(union.json);
+				clean(unionJson.rewardUserIDMap);
+				union.json=json_encode(unionJson);
+			}
+			else
+			{
+				expAdd+=addExp;
+			}
+			//刷新榜
+			score=expAdd;
+			rankName=game.gameConfig.name+"_activityUnionRank";//排行榜名称
+			rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+			unionID=union.id;
+			oldRankID=redis_zrevrank(rd,rankName,unionID);//原排名
+			redis_zadd(rd,rankName,score,unionID);
+			newRankID=redis_zrevrank(rd,rankName,unionID);//新排名
+			if(newRankID>=0&&newRankID<10&&newRankID<oldRankID)//排名提升，且为前10名
+			{
+				//公告群发
+				name=union.name;
+				worldSendMsg(game,0,name,0,0,0,"恭喜<font color=\"#33CC00\">"+name+"</font>在<font color=\"#33CC00\">联盟冲榜</font>活动中晋升为第 <font color=\"#33CC00\">"+(newRankID+1)+"</font> 名，希望他能站到最后并拿走丰厚的奖励！",0,4);
+			}
+			//保存
+			union.expAdd=expAdd;
+		}
+		//保存
+		union.exp=exp;
+	@member.
+	
+	//添加物品
+	@member addItem<itemID,count,itemDict>
+		itemID=int(itemID);
+		if(itemID==0)
+		{
+			throw("看到这个异常，请修改错误，item不能为空或为0");
+		}
+		if(exist(itemDict,itemID))
+		{
+			itemCount=ref(itemDict[itemID]);
+			itemCount+=count;
+		}
+		else
+		{
+			itemDict[itemID]=count;
+		}
+	@member.
+	
+	//扣减物品（成功：返回剩余数量；失败：返回-1）
+	@member subItem<itemID,count,itemDict>
+		if(exist(itemDict,itemID))
+		{
+			itemCount=itemDict[itemID];
+			if(count>itemCount)return(-1);
+			itemCount-=count;
+			if(itemCount<=0)
+			{
+				remove(itemDict,itemID);
+			}
+			else
+			{
+				itemDict[itemID]=itemCount;
+			}
+			return(itemCount);
+		}
+		else
+		{
+			return(-1);
+		}
+	@member.
+	
+	//获取物品数量
+	@member getItemCount<itemID,itemDict>
+		if(exist(itemDict,itemID))
+		{
+			return(itemDict[itemID]);
+		}
+		else
+		{
+			return(0);
+		}
+	@member.
+	
+	//创建红颜
+	@member createWife<wifeID,wifeDict>
+		if(exist(wifeDict,wifeID))//红颜已经存在
+		{
+			return(handle());
+		}
+		game=self.game;
+		
+		//读取红颜表
+		info=game.table.wife.getRowFromColName("id",wifeID);
+		skillStr=info.getValFromColName("wifeSkill");//技能数组
+		skillArr=split(arr(),skillStr,",");
+		
+		//创建红颜
+		wife=dict();
+		wife=structMgr_upgradeObj(game.structMgr,"Wife",dict());
+		wife.wifeID=number(info.getValFromColName("id"));//红颜ID
+		wife.beauty=number(info.getValFromColName("beauty"));//魅力
+		wife.intimate=number(info.getValFromColName("intimate"));//亲密度
+		
+		//技能
+		wife.skill=skillArr;
+		
+		//加入红颜对象
+		wifeDict[wifeID]=wife;
+		
+		return(wife);
+	@member.
+	
+	//检查豪杰是否存在
+	@member isHeroExistInHeroArr<heroID,heroArr>
+		i=0;c=size(heroArr);
+		while(i<c)
+		{
+			hero=heroArr[i];
+			if(hero.heroID==heroID)return(1);
+			++i;
+		}
+		return(0);
+	@member.
+	
+	//创建豪杰
+	@member createHero<heroID,heroArr,json>
+		if(self.isHeroExistInHeroArr(heroID,heroArr))//豪杰已经存在
+		{
+			return(handle());
+		}
+		
+		game=self.game;
+		tableData=game.table;
+		
+		//读取技能表
+		info=tableData.hero.getRowFromColName("id",heroID);
+		skillStr=info.getValFromColName("skill");//技能数组
+		skillArr=split(arr(),skillStr,",");
+		
+		heroID=info.getValFromColName("id");//豪杰ID
+		//创建豪杰
+		hero=structMgr_upgradeObj(game.structMgr,"Hero",dict());
+		heroIndex=size(heroArr);
+		hero.heroIndex=heroIndex;//豪杰位置
+		hero.heroID=heroID;
+		hero.useSign=0;//上阵标记
+		hero.name=info.getValFromColName("name");//名称
+		hero.specialty=info.getValFromColName("specialty");//特长
+		hero.head=number(info.getValFromColName("head"));//头像
+		hero.level=number(info.getValFromColName("level"));//等级
+		hero.promotion=number(info.getValFromColName("promotion"));//提拔次数
+		
+		//资质
+		hero.strengthGrows=number(info.getValFromColName("strengthGrows"));//武力资质
+		hero.wisdomGrows=number(info.getValFromColName("wisdomGrows"));//智力资质
+		hero.charmGrows=number(info.getValFromColName("charmGrows"));//魅力资质
+		hero.politicsGrows=number(info.getValFromColName("politicsGrows"));//政治资质
+		
+		//经验
+		// hero.levelExp=0;//等级经验
+		// hero.skillExp=0;//技能经验
+		// hero.growsExp=0;//资质经验
+		
+		//属性
+		hero.strength=number(info.getValFromColName("strength"));//武力
+		hero.wisdom=number(info.getValFromColName("wisdom"));//智力
+		hero.charm=number(info.getValFromColName("charm"));//魅力
+		hero.politics=number(info.getValFromColName("politics"));//政治
+		
+		//技能
+		hero.skill=skillArr;
+		
+		treasureTable=tableData.treasure;
+		treasureTCount=treasureTable.size();
+		i=0;allGemIDMap=dict();
+		while(i<treasureTCount)
+		{
+			rowT=treasureTable.getRow(i);
+			gemID=number(rowT.getValFromColName("id"));//珍宝id
+			heroIDS=number(rowT.getValFromColName("heroID"));//对应豪杰
+			if(heroIDS==heroID)
+			{
+				allGemIDMap[gemID]=heroIDS;
+			}
+			++i;
+		}
+		gemSys=json.gemSys;
+		gemArr=gemSys.gemArr;
+		gemArrCount=size(gemArr);
+		k=0;addHeroGemIndexArr=arr();
+		while(k<gemArrCount)
+		{
+			gemInfo=gemArr[k];
+			gemID=gemInfo.id;
+			if(exist(allGemIDMap,gemID))
+			{
+				push(addHeroGemIndexArr,k);
+			}
+			++k;
+		}
+		hero.gemIndexArr=addHeroGemIndexArr;
+		
+		//加入豪杰数组
+		push(heroArr,hero);
+
+		return(hero);
+	@member.
+	
+	//计算所有豪杰加成
+	@member computeHeroArr<json>
+		heroArr=json.hero;
+		c=size(heroArr);
+		i=0;while(i<c)
+		{
+			hero=heroArr[i];
+			self.computeHero(hero,json);
+			++i;
+		}
+	@member.
+	
+	//计算豪杰加成
+	@member computeHero<hero,json>
+		heroArr=json.hero;
+		skillArr=hero.skill;
+		gemArr=json.gemSys.gemArr;
+		
+		//珍宝加成
+		strengthAdd3=0;
+		wisdomAdd3=0;
+		charmAdd3=0;
+		politicsAdd3=0;
+		
+		strengthPercent3=0;
+		wisdomPercent3=0;
+		charmPercent3=0;
+		politicsPercent3=0;
+		
+		gemIndexArr=hero.gemIndexArr;
+		count=size(gemIndexArr);
+		treasureTable=self.game.table.treasure;
+		treasurePoolTable=self.game.table.treasurePool;
+		i=0;while(i<count)
+		{
+			gemIndex=gemIndexArr[i];
+			gem=gemArr[gemIndex];
+			gemID=gem.id;//珍宝ID
+			//点数加成
+			gemRow=treasureTable.getRowFromColName("id",gemID);
+			strengthAdd3+=number(gemRow.getValFromColName("strength"));//武力提升
+			wisdomAdd3+=number(gemRow.getValFromColName("wisdom"));//智力提升
+			charmAdd3+=number(gemRow.getValFromColName("charm"));//魅力提升
+			politicsAdd3+=number(gemRow.getValFromColName("politics"));//政治提升
+			//比例加成
+			gemAttArr=gem.attArr;//珍宝属性数组
+			j=0;cc=size(gemAttArr);
+			while(j<cc)
+			{
+				gemAtt=gemAttArr[j];//珍宝属性
+				if(gemAtt.open)//属性已解锁
+				{
+					treasurePoolID=gemAtt.id;//珍宝属性ID
+					attRow=treasurePoolTable.getRowFromColName("id",treasurePoolID);
+					strengthPercent3+=number(attRow.getValFromColName("strengthPercent"));
+					wisdomPercent3+=number(attRow.getValFromColName("wisdomPercent"));
+					charmPercent3+=number(attRow.getValFromColName("charmPercent"));
+					politicsPercent3+=number(attRow.getValFromColName("politicsPercent"));
+				}
+				++j;
+			}
+			//
+			++i;
+		}
+		//珍宝点数加成
+		hero.strengthAdd3=floor(strengthAdd3);
+		hero.wisdomAdd3=floor(wisdomAdd3);
+		hero.charmAdd3=floor(charmAdd3);
+		hero.politicsAdd3=floor(politicsAdd3);
+		//珍宝比例加成
+		hero.strengthPercent3=floor(strengthPercent3);
+		hero.wisdomPercent3=floor(wisdomPercent3);
+		hero.charmPercent3=floor(charmPercent3);
+		hero.politicsPercent3=floor(politicsPercent3);
+		
+		//技能加成
+		strengthAdd=0;
+		wisdomAdd=0;
+		charmAdd=0;
+		politicsAdd=0;
+		
+		strengthPercent=0;
+		wisdomPercent=0;
+		charmPercent=0;
+		politicsPercent=0;
+		
+		businessPercent=0;
+		farmPercent=0;
+		recruitPercent=0;
+		
+		strengthAllPercent=0;
+		wisdomAllPercent=0;
+		charmAllPercent=0;
+		politicsAllPercent=0;
+		
+		critRate=0;
+		crit=0;
+		
+		heroIDArr=arr();
+		skillTable=self.game.table.skill;
+		count=size(skillArr);
+		i=0;while(i<count)
+		{
+			//找技能
+			skillData=skillTable.getRowFromColName("id",skillArr[i]);
+			
+			skillAddSign=0;//技能加成标记
+			activate=skillData.getValFromColName("activate");
+			if(activate=="0")//无联动
+			{
+				skillAddSign=1;
+			}
+			else//有联动
+			{
+				split(heroIDArr,activate,",");
+				if(self.isHeroIDExistInHeroArr(heroArr,heroIDArr))
+				{
+					skillAddSign=1;
+				}
+			}
+			
+			if(skillAddSign)//有技能加成
+			{
+				//点数加成[技能]
+				strengthAdd+=number(skillData.getValFromColName("strength"));//武力
+				wisdomAdd+=number(skillData.getValFromColName("wisdom"));//智力
+				charmAdd+=number(skillData.getValFromColName("charm"));//魅力
+				politicsAdd+=number(skillData.getValFromColName("politics"));//政治
+				
+				//比例加成[技能]
+				strengthPercent+=number(skillData.getValFromColName("strengthPercent"));//武力
+				wisdomPercent+=number(skillData.getValFromColName("wisdomPercent"));//智力
+				charmPercent+=number(skillData.getValFromColName("charmPercent"));//魅力
+				politicsPercent+=number(skillData.getValFromColName("politicsPercent"));//政治
+				
+				//BOSS战暴击加成[技能]
+				critRate+=number(skillData.getValFromColName("critRate"));//BOSS战暴击率
+				crit+=number(skillData.getValFromColName("crit"));//BOSS战暴击系数
+				
+				//势力比例加成
+				strengthAllPercent+=number(skillData.getValFromColName("strengthAllPercent"));;//势力武力万分比提升
+				wisdomAllPercent+=number(skillData.getValFromColName("wisdomAllPercent"));;//势力智力万分比提升
+				charmAllPercent+=number(skillData.getValFromColName("charmAllPercent"));;//势力魅力万分比提升
+				politicsAllPercent+=number(skillData.getValFromColName("politicsAllPercent"));;//势力政治万分比提升
+				
+				//势力经营加成
+				businessPercent+=number(skillData.getValFromColName("businessPercent"));;//势力商业收益万分比提升
+				farmPercent+=number(skillData.getValFromColName("farmPercent"));;//势力农业收益万分比提升
+				recruitPercent+=number(skillData.getValFromColName("recruitPercent"));;//势力征兵收益万分比提升
+			}
+
+			++i;
+		}
+		//////////////////////////////////////////////////////////////////////////////
+		//技能加成
+		hero.strengthAdd=floor(strengthAdd);
+		hero.wisdomAdd=floor(wisdomAdd);
+		hero.charmAdd=floor(charmAdd);
+		hero.politicsAdd=floor(politicsAdd);
+		//
+		hero.strengthPercent=floor(strengthPercent);
+		hero.wisdomPercent=floor(wisdomPercent);
+		hero.charmPercent=floor(charmPercent);
+		hero.politicsPercent=floor(politicsPercent);
+		//
+		hero.strengthAllPercent=floor(strengthAllPercent);
+		hero.wisdomAllPercent=floor(wisdomAllPercent);
+		hero.charmAllPercent=floor(charmAllPercent);
+		hero.politicsAllPercent=floor(politicsAllPercent);
+		//
+		hero.businessPercent=floor(businessPercent);
+		hero.farmPercent=floor(farmPercent);
+		hero.recruitPercent=floor(recruitPercent);
+		//
+		hero.critRate=floor(critRate);
+		hero.crit=floor(crit);
+		//////////////////////////////////////////////////////////////////////////////
+		//红颜加成
+		heroIndex=hero.heroIndex;
+		if(heroIndex==0)//主角
+		{
+			//红颜属性加成
+			strength=0;//主角武力提升
+			wisdom=0;//主角智力提升
+			charm=0;//主角魅力提升
+			politics=0;//主角政治提升
+			//红颜属性资质加成
+			strengthGrows=0;//主角武力资质提升
+			wisdomGrows=0;//主角智力资质提升
+			charmGrows=0;//主角魅力资质提升
+			politicsGrows=0;//主角政治资质提升
+			//势力比例加成
+			strengthPercent=0;//势力武力万分比提升
+			wisdomPercent=0;//势力智力万分比提升
+			charmPercent=0;//势力魅力万分比提升
+			politicsPercent=0;//势力政治万分比提升
+			//经营加成
+			businessPercent=0;//势力商业收益万分比提升
+			farmPercent=0;//势力农业收益万分比提升
+			recruitPercent=0;//势力征兵收益万分比提升
+			//
+			skillTable=self.game.table.wifeSkill;
+			wifeArr=json.wife;
+			it=dictIt();
+			dictItBegin(wifeArr,it);
+			
+			while(!dictItEmpty(it))
+			{
+				curWife=dictItVal(it);
+				skillArr=curWife.skill;//技能数组
+				intimate=curWife.intimate;//亲密度
+				wifeIDArr=arr();
+				c=size(skillArr);
+				i=0;while(i<c)
+				{
+					//找技能
+					skillData=skillTable.getRowFromColName("id",number(skillArr[i]));
+					intimateSkill=number(skillData.getValFromColName("intimate"));//技能亲密度条件
+					if(intimate>=intimateSkill)
+					{
+						skillAddSign=0;//技能加成标记
+						activate=skillData.getValFromColName("activate");
+						if(activate=="0")//无联动
+						{
+							skillAddSign=1;
+						}
+						else//有联动
+						{
+							split(wifeIDArr,activate,",");
+							if(self.isWifeIDExistInWifeArr(wifeArr,wifeIDArr))
+							{
+								skillAddSign=1;
+							}
+						}
+						
+						if(skillAddSign)//有技能加成
+						{
+							//红颜属性加成
+							strength+=number(skillData.getValFromColName("strength"));//主角武力提升
+							wisdom+=number(skillData.getValFromColName("wisdom"));//主角智力提升
+							charm+=number(skillData.getValFromColName("charm"));//主角魅力提升
+							politics+=number(skillData.getValFromColName("politics"));//主角政治提升
+							
+							//红颜属性资质加成
+							strengthGrows+=number(skillData.getValFromColName("strengthGrows"));;//主角武力资质提升
+							wisdomGrows+=number(skillData.getValFromColName("wisdomGrows"));;//主角智力资质提升
+							charmGrows+=number(skillData.getValFromColName("charmGrows"));;//主角魅力资质提升
+							politicsGrows+=number(skillData.getValFromColName("politicsGrows"));;//主角政治资质提升
+							
+							//势力比例加成
+							strengthPercent+=number(skillData.getValFromColName("strengthPercent"));;//势力武力万分比提升
+							wisdomPercent+=number(skillData.getValFromColName("wisdomPercent"));;//势力智力万分比提升
+							charmPercent+=number(skillData.getValFromColName("charmPercent"));;//势力魅力万分比提升
+							politicsPercent+=number(skillData.getValFromColName("politicsPercent"));;//势力政治万分比提升
+							
+							//经营加成
+							businessPercent+=number(skillData.getValFromColName("businessPercent"));;//势力商业收益万分比提升
+							farmPercent+=number(skillData.getValFromColName("farmPercent"));;//势力农业收益万分比提升
+							recruitPercent+=number(skillData.getValFromColName("recruitPercent"));;//势力征兵收益万分比提升
+						}
+					}
+
+					++i;
+				}
+				dictItNext(it);
+			}
+			//保存
+			wifePlus=json.wifePlus;
+			//红颜属性加成
+			wifePlus.strength=floor(strength);//主角武力提升
+			wifePlus.wisdom=floor(wisdom);//主角智力提升
+			wifePlus.charm=floor(charm);//主角魅力提升
+			wifePlus.politics=floor(politics);//主角政治提升
+			//红颜属性资质加成
+			wifePlus.strengthGrows=floor(strengthGrows);//主角武力资质提升
+			wifePlus.wisdomGrows=floor(wisdomGrows);//主角智力资质提升
+			wifePlus.charmGrows=floor(charmGrows);//主角魅力资质提升
+			wifePlus.politicsGrows=floor(politicsGrows);//主角政治资质提升
+			//势力比例加成
+			wifePlus.strengthPercent=floor(strengthPercent);//势力武力万分比提升
+			wifePlus.wisdomPercent=floor(wisdomPercent);//势力智力万分比提升
+			wifePlus.charmPercent=floor(charmPercent);//势力魅力万分比提升
+			wifePlus.politicsPercent=floor(politicsPercent);//势力政治万分比提升
+			//势力经营加成
+			wifePlus.businessPercent=floor(businessPercent);//势力商业收益万分比提升
+			wifePlus.farmPercent=floor(farmPercent);//势力农业收益万分比提升
+			wifePlus.recruitPercent=floor(recruitPercent);//势力征兵收益万分比提升
+		}
+		//////////////////////////////////////////////////////////////////////////////
+		//属性总和
+		hero.strengthTotal=self.getHeroStrength(hero,json);
+		hero.wisdomTotal=self.getHeroWisdom(hero,json);
+		hero.charmTotal=self.getHeroCharm(hero,json);
+		hero.politicsTotal=self.getHeroPolitics(hero,json);
+		
+		return(hero);
+	@member.
+	
+	//查找指定的红颜ID是否均存在于红颜列表
+	@member isWifeIDExistInWifeArr<wifeDict,wifeIDArr>
+		needCount=size(wifeIDArr);
+		realCount=0;
+		i=0;while(i<needCount)
+		{
+			wifeID=wifeIDArr[i];
+			if(exist(wifeDict,wifeID))
+			{
+				++realCount;
+				if(realCount>=needCount)
+				{
+					return(1);
+				}
+			}
+			++i;
+		}
+		return(0);
+	@member.
+	
+	//查找指定的豪杰ID是否均存在于豪杰列表
+	@member isHeroIDExistInHeroArr<heroArr,heroIDArr>
+		needCount=size(heroIDArr);
+		realCount=0;
+		c=size(heroArr);
+		i=0;while(i<c)
+		{
+			hero=heroArr[i];
+			if(inArr(heroIDArr,hero.heroID))
+			{
+				++realCount;
+				if(realCount>=needCount)
+				{
+					return(1);
+				}
+			}
+			++i;
+		}
+		return(0);
+	@member.
+	
+	//重新计算用户属性
+	@member computeUser<user,json>
+		strength=self.getTotalStrength(json,user);//总武力
+		wisdom=self.getTotalWisdom(json,user);//总智力
+		charm=self.getTotalCharm(json,user);//总魅力
+		politics=self.getTotalPolitics(json,user);//总政治
+		power=strength+wisdom+charm+politics;//势力
+		//保存
+		user.strength=strength;
+		user.wisdom=wisdom;
+		user.charm=charm;
+		user.politics=politics;
+		user.power=power;
+	@member.
+	
+	//获取全部豪杰商业收益万分比
+	@member getHeroBusinessPercent<heroArr>
+		percent=0;
+		heroArrCount=size(heroArr);
+		i=0;while(i<heroArrCount)
+		{
+			hero=heroArr[i];
+			percent+=hero.businessPercent/10000;
+			++i;
+		}
+		return(percent);
+	@member.
+	
+	//获取全部豪杰农业收益万分比
+	@member getHeroFarmPercent<heroArr>
+		percent=0;
+		heroArrCount=size(heroArr);
+		i=0;while(i<heroArrCount)
+		{
+			hero=heroArr[i];
+			percent+=hero.farmPercent/10000;
+			++i;
+		}
+		return(percent);
+	@member.
+	
+	//获取全部豪杰士兵收益万分比
+	@member getHeroRecruitPercent<heroArr>
+		percent=0;
+		heroArrCount=size(heroArr);
+		i=0;while(i<heroArrCount)
+		{
+			hero=heroArr[i];
+			percent+=hero.recruitPercent/10000;
+			++i;
+		}
+		return(percent);
+	@member.
+	
+	//获取全部豪杰势力武力万分比
+	@member getHeroStrengthAllPercent<heroArr>
+		percent=0;
+		heroArrCount=size(heroArr);
+		i=0;while(i<heroArrCount)
+		{
+			hero=heroArr[i];
+			percent+=hero.strengthAllPercent/10000;
+			++i;
+		}
+		return(percent);
+	@member.
+	
+	//获取全部豪杰势力智力万分比
+	@member getHeroWisdomAllPercent<heroArr>
+		percent=0;
+		heroArrCount=size(heroArr);
+		i=0;while(i<heroArrCount)
+		{
+			hero=heroArr[i];
+			percent+=hero.wisdomAllPercent/10000;
+			++i;
+		}
+		return(percent);
+	@member.
+	
+	//获取全部豪杰势力魅力万分比
+	@member getHeroCharmAllPercent<heroArr>
+		percent=0;
+		heroArrCount=size(heroArr);
+		i=0;while(i<heroArrCount)
+		{
+			hero=heroArr[i];
+			percent+=hero.charmAllPercent/10000;
+			++i;
+		}
+		return(percent);
+	@member.
+	
+	//获取全部豪杰势力政治万分比
+	@member getHeroPoliticsAllPercent<heroArr>
+		percent=0;
+		heroArrCount=size(heroArr);
+		i=0;while(i<heroArrCount)
+		{
+			hero=heroArr[i];
+			percent+=hero.politicsAllPercent/10000;
+			++i;
+		}
+		return(percent);
+	@member.
+	
+	//获取势力武力
+	@member getTotalStrength<json,user>
+		//势力武力=（所有豪杰武力之和+主角武力+子嗣附加武力）*（1+妻妾技能势力百分比加成+豪杰技能势力百分比加成）
+		heroArr=json.hero;
+		point=0;
+		percent=1;
+		heroArrCount=size(heroArr);
+		i=0;while(i<heroArrCount)
+		{
+			hero=heroArr[i];
+			point+=hero.strengthTotal;
+			percent+=hero.strengthAllPercent/10000;
+			++i;
+		}
+		percent+=json.wifePlus.strengthPercent/10000;
+		if(!empty(user))point+=number(user.strengthAdd3);
+		return(floor(point*percent));
+	@member.
+	
+	//获取势力智力
+	@member getTotalWisdom<json,user>
+		//势力智力=（所有豪杰智力之和+主角智力+子嗣附加智力）*（1+妻妾技能势力百分比加成+豪杰技能势力百分比加成）
+		heroArr=json.hero;
+		point=0;
+		percent=1;
+		heroArrCount=size(heroArr);
+		i=0;while(i<heroArrCount)
+		{
+			hero=heroArr[i];
+			point+=hero.wisdomTotal;
+			percent+=hero.wisdomAllPercent/10000;
+			++i;
+		}
+		percent+=json.wifePlus.wisdomPercent/10000;
+		if(!empty(user))point+=number(user.wisdomAdd3);
+		return(floor(point*percent));
+	@member.
+	
+	//获取势力魅力
+	@member getTotalCharm<json,user>
+		//势力魅力=（所有豪杰魅力之和+主角魅力+子嗣附加魅力）*（1+妻妾技能势力百分比加成+豪杰技能势力百分比加成）
+		heroArr=json.hero;
+		point=0;
+		percent=1;
+		heroArrCount=size(heroArr);
+		i=0;while(i<heroArrCount)
+		{
+			hero=heroArr[i];
+			point+=hero.charmTotal;
+			percent+=hero.charmAllPercent/10000;
+			++i;
+		}
+		percent+=json.wifePlus.charmPercent/10000;
+		if(!empty(user))point+=number(user.charmAdd3);
+		return(floor(point*percent));
+	@member.
+	
+	//获取势力政治
+	@member getTotalPolitics<json,user>
+		//势力政治=（所有豪杰政治之和+主角政治+子嗣附加政治）*（1+妻妾技能势力百分比加成+豪杰技能势力百分比加成）
+		heroArr=json.hero;
+		point=0;
+		percent=1;
+		heroArrCount=size(heroArr);
+		i=0;while(i<heroArrCount)
+		{
+			hero=heroArr[i];
+			point+=hero.politicsTotal;
+			percent+=hero.politicsAllPercent/10000;
+			++i;
+		}
+		percent+=json.wifePlus.politicsPercent/10000;
+		if(!empty(user))point+=number(user.politicsAdd3);
+		return(floor(point*percent));
+	@member.
+	
+	//获取势力
+	@member getTotalPower<heroArr,user>
+		point=self.getTotalStrength(heroArr,user)
+			+self.getTotalWisdom(heroArr,user)
+			+self.getTotalCharm(heroArr,user)
+			+self.getTotalPolitics(heroArr,user);
+		return(point);
+	@member.
+	
+	//获取豪杰武力
+	@member getHeroStrength<hero,json>
+		percent=1;//倍数
+		
+		strength=number(hero.strength);//初始武力属性
+		strengthAdd=number(hero.strengthAdd);//技能点数加成
+		strengthAdd2=number(hero.strengthAdd2);//丹药点数加成
+		strengthAdd3=number(hero.strengthAdd3);//珍宝点数加成
+		percent+=number(hero.strengthPercent)/10000;//技能比例加成
+		percent+=number(hero.strengthPercent3)/10000;//珍宝比例加成
+		
+		//武力＝[武力资质×（等级×等级＋等级＋98）÷10+丹药加成+技能加成+初始武力属性]*百分比加成
+		level=number(hero.level);//等级
+		strengthGrows=number(hero.strengthGrows);//武力资质
+		
+		if(hero.heroIndex==0)//主角
+		{
+			wifePlus=json.wifePlus;
+			wifeStrengthGrows=wifePlus.strengthGrows;//红颜武力资质点数加成
+			wifeStrength=wifePlus.strength;//红颜武力点数加成
+			strengthALL=((strengthGrows+wifeStrengthGrows)*(level*level+level+98)/10+wifeStrength+strengthAdd3+strengthAdd2+strengthAdd+strength)*percent;
+		}
+		else//其它豪杰
+		{
+			strengthALL=(strengthGrows*(level*level+level+98)/10+strengthAdd3+strengthAdd2+strengthAdd+strength)*percent;
+		}
+		
+		return(floor(strengthALL));//总武力
+	@member.
+	
+	//获取豪杰智力
+	@member getHeroWisdom<hero,json>
+		percent=1;//倍数
+		
+		wisdom=number(hero.wisdom);//初始智力属性
+		wisdomAdd=number(hero.wisdomAdd);//技能点数加成
+		wisdomAdd2=number(hero.wisdomAdd2);//丹药点数加成
+		wisdomAdd3=number(hero.wisdomAdd3);//珍宝点数加成
+		percent+=number(hero.wisdomPercent)/10000;//技能比例加成
+		percent+=number(hero.wisdomPercent3)/10000;//珍宝比例加成
+		
+		//武力＝[武力资质×（等级×等级＋等级＋98）÷10+丹药加成+技能加成+初始智力属性]*百分比加成
+		level=number(hero.level);//等级
+		wisdomGrows=number(hero.wisdomGrows);//智力资质
+
+		if(hero.heroIndex==0)//主角
+		{
+			wifePlus=json.wifePlus;
+			wifeWisdomGrows=wifePlus.wisdomGrows;//红颜智力资质点数加成
+			wifeWisdom=wifePlus.wisdom;//红颜智力点数加成
+			wisdomALL=((wisdomGrows+wifeWisdomGrows)*(level*level+level+98)/10+wifeWisdom+wisdomAdd3+wisdomAdd2+wisdomAdd+wisdom)*percent;
+		}
+		else//其它豪杰
+		{
+			wisdomALL=(wisdomGrows*(level*level+level+98)/10+wisdomAdd3+wisdomAdd2+wisdomAdd+wisdom)*percent;
+		}
+		
+		return(floor(wisdomALL));//总智力
+	@member.
+	
+	//获取豪杰魅力
+	@member getHeroCharm<hero,json>
+		percent=1;//倍数
+		
+		charm=number(hero.charm);//初始魅力属性
+		charmAdd=number(hero.charmAdd);//技能点数加成
+		charmAdd2=number(hero.charmAdd2);//丹药点数加成
+		charmAdd3=number(hero.charmAdd3);//珍宝点数加成
+		percent+=number(hero.charmPercent)/10000;//技能比例加成
+		percent+=number(hero.charmPercent3)/10000;//珍宝比例加成
+		
+		//魅力＝[魅力资质×（等级×等级＋等级＋98）÷10+丹药加成+技能加成+初始魅力属性]*百分比加成
+		level=number(hero.level);//等级
+		charmGrows=number(hero.charmGrows);//魅力资质
+
+		if(hero.heroIndex==0)//主角
+		{
+			wifePlus=json.wifePlus;
+			wifeCharmGrows=wifePlus.charmGrows;//红颜魅力资质点数加成
+			wifeCharm=wifePlus.charm;//红颜魅力点数加成
+			charmALL=((charmGrows+wifeCharmGrows)*(level*level+level+98)/10+wifeCharm+charmAdd3+charmAdd2+charmAdd+charm)*percent;
+		}
+		else//其它豪杰
+		{
+			charmALL=(charmGrows*(level*level+level+98)/10+charmAdd3+charmAdd2+charmAdd+charm)*percent;
+		}
+		
+		return(floor(charmALL));//总魅力
+	@member.
+	
+	//获取豪杰政治
+	@member getHeroPolitics<hero,json>
+		percent=1;//倍数
+		
+		politics=number(hero.politics);//初始政治属性
+		politicsAdd=number(hero.politicsAdd);//技能点数加成
+		politicsAdd2=number(hero.politicsAdd2);//丹药点数加成
+		politicsAdd3=number(hero.politicsAdd3);//珍宝点数加成
+		percent+=number(hero.politicsPercent)/10000;//技能比例加成
+		percent+=number(hero.politicsPercent3)/10000;//珍宝比例加成
+		
+		//政治[政治资质×（等级×等级＋等级＋98）÷10+丹药加成+技能加成+初始政治属性]*百分比加成
+		level=number(hero.level);//等级
+		politicsGrows=number(hero.politicsGrows);//政治资质
+
+		if(hero.heroIndex==0)//主角
+		{
+			wifePlus=json.wifePlus;
+			wifePoliticsGrows=wifePlus.politicsGrows;//红颜政治资质点数加成
+			wifePolitics=wifePlus.politics;//红颜政治点数加成
+			politicsALL=((politicsGrows+wifePoliticsGrows)*(level*level+level+98)/10+wifePolitics+politicsAdd3+politicsAdd2+politicsAdd+politics)*percent;
+		}
+		else//其它豪杰
+		{
+			politicsALL=(politicsGrows*(level*level+level+98)/10+politicsAdd3+politicsAdd2+politicsAdd+politics)*percent;
+		}
+		
+		return(floor(politicsALL));//总政治
+	@member.
+	
+	//返回豪杰数组（按武力排序）
+	@member sortHeroByStrength<heroArr>
+		arr=arr();
+		i=0;c=size(heroArr);
+		while(i<c)
+		{
+			push(arr,heroArr[i]);
+			++i;
+		}
+		i=0;while(i<c)
+		{
+			j=i+1;
+			while(j<c)
+			{
+				hero1=arr[i];
+				hero2=arr[j];
+				if(hero2.strengthTotal>hero1.strengthTotal)
+				{
+					arr[i]=hero2;
+					arr[j]=hero1;
+				}
+				++j;
+			}
+			++i;
+		}
+		return(arr);
+	@member.
+	
+	//返回豪杰数组（按智力排序）
+	@member sortHeroByWisdom<heroArr>
+		arr=arr();
+		i=0;c=size(heroArr);
+		while(i<c)
+		{
+			push(arr,heroArr[i]);
+			++i;
+		}
+		i=0;while(i<c)
+		{
+			j=i+1;
+			while(j<c)
+			{
+				hero1=arr[i];
+				hero2=arr[j];
+				if(hero2.wisdomTotal>hero1.wisdomTotal)
+				{
+					arr[i]=hero2;
+					arr[j]=hero1;
+				}
+				++j;
+			}
+			++i;
+		}
+		return(arr);
+	@member.
+	
+	//返回豪杰数组（按魅力排序）
+	@member sortHeroByCharm<heroArr>
+		arr=arr();
+		i=0;c=size(heroArr);
+		while(i<c)
+		{
+			push(arr,heroArr[i]);
+			++i;
+		}
+		i=0;while(i<c)
+		{
+			j=i+1;
+			while(j<c)
+			{
+				hero1=arr[i];
+				hero2=arr[j];
+				if(hero2.charmTotal>hero1.charmTotal)
+				{
+					arr[i]=hero2;
+					arr[j]=hero1;
+				}
+				++j;
+			}
+			++i;
+		}
+		return(arr);
+	@member.
+	
+	//返回豪杰数组（按政治排序）
+	@member sortHeroByPolitics<heroArr>
+		arr=arr();
+		i=0;c=size(heroArr);
+		while(i<c)
+		{
+			push(arr,heroArr[i]);
+			++i;
+		}
+		i=0;while(i<c)
+		{
+			j=i+1;
+			while(j<c)
+			{
+				hero1=arr[i];
+				hero2=arr[j];
+				if(hero2.politicsTotal>hero1.politicsTotal)
+				{
+					arr[i]=hero2;
+					arr[j]=hero1;
+				}
+				++j;
+			}
+			++i;
+		}
+		return(arr);
+	@member.
+	
+	//获取空闲豪杰位置
+	@member getFreeHero<heroArr>
+		i=0;c=size(heroArr);
+		while(i<c)
+		{
+			hero=heroArr[i];
+			if(hero.useSign==0)return(hero);
+			++i;
+		}
+		return(handle());
+	@member.
+	
+	//计算user红颜数值
+	@member computeUserWifeProperty<user,wifeDict>
+		userIntimate=0;
+		userBeauty=0;
+		it=dictIt();
+		dictItBegin(wifeDict,it);
+		while(!dictItEmpty(it))
+		{
+			wife=dictItVal(it);
+			userIntimate+=wife.intimate;
+			userBeauty+=wife.beauty;
+			dictItNext(it);
+		}
+		//保存
+		user.intimate=userIntimate;
+		user.beauty=userBeauty;
+	@member.
+	
+	//充值金额转VIP等级
+	@member computeVip<rmb,srcVip>
+		vipTable=self.game.table.vip;//读取vip
+		num=vipTable.size();//size(vipTable.json.data);//vip等级
+		while(num!=0)
+		{
+			row=vipTable.getRow(num-1);
+			pay=number(row.getValFromColName("pay"));//累积充值金额
+			if(rmb>=pay)
+			{
+				level=number(row.getValFromColName("level"));
+				return(max(level,srcVip));//返回达到的VIP等级
+			}
+			--num;
+		}
+		return(max(0,srcVip));
+	@member.
+	
+	//获取论战可购买buffID数组
+	@member getWaterBattleBuffArr<battleCount,buffArr>
+		clean(buffArr);
+		waterBattleBuffTable=self.game.table.waterBattleBuff;
+		if(number(battleCount)==0)
+		{
+			rows=waterBattleBuffTable.getRowsFromColName("level",0);
+			len=size(rows);
+			if(len>3)
+			{	
+				c=3;
+				i=0;while(i<c)
+				{
+					num = rand()%len;//随机数
+					push(buffArr,number(rows[num].getValFromColName("id")));
+					remove(rows,num);			
+					i++;
+				}
+			}else
+			{
+				c=len;
+				i=0;while(i<c)
+				{
+					push(buffArr,number(rows[i].getValFromColName("id")));
+					i++;
+				}			
+			}				
+		}else
+		{
+			c=3;
+			i=0;while(i<c)
+			{
+				i++;
+				rows=waterBattleBuffTable.getRowsFromColName("level",i);
+				len=size(rows);
+				num = rand()%len;//随机数
+				push(buffArr,number(rows[num].getValFromColName("id")));					
+			}
+			
+		}	
+		return(buffArr);
+		//...
+	@member.
+	
+	//创建论战豪杰信息
+	@member computeWaterBattleHero<hero,wifePlus>
+		heroBattle=dict();
+		strengthGrows=hero.strengthGrows;//武力资质
+		wisdomGrows=hero.wisdomGrows;//智力资质
+		charmGrows=hero.charmGrows;//魅力资质
+		politicsGrows=hero.politicsGrows;//政治资质
+		intelligence=strengthGrows+wisdomGrows+charmGrows+politicsGrows;//豪杰资质
+		heroIndex=hero.heroIndex;
+		if(heroIndex==0)//红颜加成
+		{
+			wStrengthGrows=wifePlus.strengthGrows;
+			wWisdomGrows=wifePlus.wisdomGrows;
+			wCharmGrows=wifePlus.charmGrows;
+			wPoliticsGrows=wifePlus.politicsGrows;
+			
+			intelligence+=wStrengthGrows+wWisdomGrows+wCharmGrows+wPoliticsGrows;
+			strengthGrows+=wStrengthGrows;//武力资质
+			wisdomGrows+=wWisdomGrows;//智力资质
+			charmGrows+=wCharmGrows;//魅力资质
+			politicsGrows+=wPoliticsGrows;//政治资质
+		}
+		
+		heroBattle.hp=hero.strengthTotal+hero.wisdomTotal+hero.charmTotal+hero.politicsTotal;//血量上限
+		heroBattle.attack=intelligence*100;//攻击力=资质*100//战斗时：+(rand()%201)-100
+		heroBattle.attackC=10000;//攻击力倍数
+		heroBattle.critRate=hero.critRate;//爆击率
+		heroBattle.crit=hero.crit;//爆击系数
+		heroBattle.heroID=hero.heroID;//豪杰ID
+		heroBattle.level=hero.level;//豪杰等级
+		heroBattle.promotion=hero.promotion;//提拔等级（爵位）
+		heroBattle.strengthGrows=strengthGrows;//武力资质
+		heroBattle.wisdomGrows=wisdomGrows;//智力资质
+		heroBattle.charmGrows=charmGrows;//魅力资质
+		heroBattle.politicsGrows=politicsGrows;//政治资质
+		
+		return(heroBattle);
+	@member.
+	
+	//获取最强的豪杰若干个，并返回数组
+	@member getStrongestHeroArr<heroArr,count,normalUseHeroIndexMap>
+		map=dict();
+		i=0;c=size(heroArr);
+		while(i<c)
+		{
+			hero=heroArr[i];
+			heroIndex=hero.heroIndex;
+			num=hero.strengthTotal+hero.wisdomTotal+hero.charmTotal+hero.politicsTotal;
+			map[num]=hero;
+
+			++i;
+		}
+		
+		arr=arr();
+		foreach(map,##<num,hero>
+			@link arr;
+			push(arr,hero);
+		##.);
+		
+		while(size(arr)>count)
+		{
+			remove(arr,0);
+		}
+		
+		i=0;
+		while(i<size(arr))
+		{
+			hero=arr[i];
+			heroIndex=hero.heroIndex;
+			if(exist(normalUseHeroIndexMap,heroIndex))
+			{
+				remove(arr,i);
+			}
+			else
+			{
+				++i;
+			}
+		}
+
+		return(arr);
+	@member.
+	
+	//删除指定豪杰并随机三个敌方豪杰
+	@member getThreeenemyHeroIDArr
+	<
+		enemyHeroArr,
+		enemyheroID,//需要删除的豪杰ID
+		waterBattle
+	>
+		enemyHeroArrCount=size(enemyHeroArr);
+		selectEnemyHeroIndexArr=arr();
+		i=0;
+		while(i<enemyHeroArrCount)
+		{
+			heroID=enemyHeroArr[i].heroID;
+			if(heroID==enemyheroID)
+			{
+				remove(enemyHeroArr,i);//删除敌方战败豪杰
+				--enemyHeroArrCount;
+			}
+			else
+			{
+				push(selectEnemyHeroIndexArr,enemyHeroArr[i].heroID);
+				++i;
+			}
+		}
+		
+		enemyHeroPromotionArr=waterBattle.enemyHeroPromotionArr;
+		clean(enemyHeroPromotionArr);
+		enemyHeroIDArr=arr();//选中的论战豪杰ID
+		indexCount=size(selectEnemyHeroIndexArr);
+		if(indexCount<4)//少于4个论战豪杰信息数组ID
+		{
+			k=0;
+			while(k<indexCount)
+			{
+				push(enemyHeroIDArr,selectEnemyHeroIndexArr[k]);//最多保存3个敌方豪杰ID
+				
+				//保存提拔等级（爵位）
+				a=0;b=size(enemyHeroArr);
+				while(a<b)
+				{
+					heroID=enemyHeroArr[a].heroID;
+					if(selectEnemyHeroIndexArr[k]==heroID)
+					{
+						promotion=enemyHeroArr[a].promotion;
+						push(enemyHeroPromotionArr,promotion);
+					}
+					++a;
+				}
+				++k;
+			}
+		}
+		else//大于3个豪杰
+		{
+			j=0;
+			while(j<3)
+			{
+				indexCount=size(selectEnemyHeroIndexArr);
+				selectEnemyHeroIndex=rand()%indexCount;
+				push(enemyHeroIDArr,selectEnemyHeroIndexArr[selectEnemyHeroIndex]);//随机3个敌方豪杰ID
+				
+				//保存提拔等级（爵位）
+				c=0;d=size(enemyHeroArr);
+				while(c<d)
+				{
+					heroID=enemyHeroArr[c].heroID;
+					if(selectEnemyHeroIndexArr[selectEnemyHeroIndex]==heroID)
+					{
+						promotion=enemyHeroArr[c].promotion;
+						push(enemyHeroPromotionArr,promotion);
+					}
+					++c;
+				}
+				
+				remove(selectEnemyHeroIndexArr,selectEnemyHeroIndex);
+				++j;
+			}
+		}
+		
+		return(enemyHeroIDArr);
+	@member.
+	
+	//豪杰战斗力
+	@member getHeroAttack<hero,json>
+		wifePlus=json.wifePlus;
+		wifeSG=wifePlus.strengthGrows;
+		heroSG=hero.strengthGrows;
+		heroIndex=hero.heroIndex;
+		attack=0;
+		if(heroIndex==0)
+		{
+			attack=(wifeSG+heroSG)*5000*hero.level+hero.strengthTotal;
+		}
+		else
+		{
+			attack=heroSG*5000*hero.level+hero.strengthTotal;
+		}
+
+		return(attack);
+	@member.
+	
+	//升级豪杰数据结构
+	@member upgradeHero<hero>
+		//...
+		
+	@member.
+@class.
+

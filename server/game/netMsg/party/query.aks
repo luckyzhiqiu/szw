@@ -1,0 +1,73 @@
+//查询玩家宴会信息
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+selectUserID=netMsg[3];//其他用户userID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.getRow(game.cnn,"user","id",selectUserID,"*",1000);
+
+if(empty(user))//用户不存在
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}
+
+partyBt=number(user.partyBt);//宴会开始时间
+if(partyBt==0)//宴会未开始
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+jsonExt=json_decode(user.jsonExt);
+
+//数据
+nickname=user.nickname;
+partyType=user.partyType;
+partyNum=user.partyNum;
+level=user.level;
+head=user.head;
+partyBt=user.partyBt;//宴会开始时间
+
+party=jsonExt.party;//宴会信息
+seatArr=party.seatArr;
+seatArrCount=size(seatArr);
+i=0;num=0;
+while(i<seatArrCount)
+{
+	partySeat=seatArr[i];
+	userIDS=partySeat.userID;
+	if(userIDS!=0)
+	{
+		num+=1;
+	}
+	++i;
+}
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,nickname,num,partyNum,partyBt,level,head,partyType,time())
+);
+

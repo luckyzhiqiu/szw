@@ -1,0 +1,90 @@
+//好感排行榜
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+richmanID=netMsg[3];//权贵ID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+richmanInfoDict=dict();
+
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+myUnionID=number(user.unionID);
+if(myUnionID==0)//未入盟
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+//获取
+richman=game.rd.getRow(game.cnn,"union_richman","id",richmanID,"*",1000);
+richmanJson=json_decode(richman.json);
+unionFriendMap=richmanJson.unionFriendMap;
+
+if(size(unionFriendMap)==0)//没有联盟拉拢
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-3)
+	);
+	exit();
+}
+
+map=dict();
+foreach(unionFriendMap,##<unionID,friendVal>
+	@link map;
+	map[friendVal]=unionID;
+##.);
+
+unionInfoArr=arr();
+unionIDArr=arr();
+i=0;
+foreach_rev(map,##<friendVal,unionID>
+	@link i,myUnionID,unionInfoArr,unionIDArr,richmanInfoDict;
+	++i;
+	if(i<=10)
+	{
+		push(unionInfoArr,unionID,friendVal);
+		push(unionIDArr,unionID);
+	}
+	if(myUnionID==unionID)
+	{
+		richmanInfoDict["myRank"]=i;//我方联盟排名
+		richmanInfoDict["myFriendVal"]=friendVal;//权贵对我方好感度
+	}
+##.);
+
+unionNameMap=dict();
+sql="select id,name from `union` where id in ("+join(unionIDArr,",")+") limit 10";
+rs=mysqlCreateRs(game.cnn,sql);
+while(mysqlNextRow(rs))
+{
+	curUnionID=int(mysqlGetColVal(rs,0));
+	curUnionName=mysqlGetColVal(rs,1);
+	unionNameMap[curUnionID]=curUnionName;
+}
+mysqlDestroyRs(rs);
+
+richmanInfoDict["unionInfoArr"]=unionInfoArr;//前十名联盟好感度
+richmanInfoDict["unionNameMap"]=unionNameMap;//前十名联盟名称
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,richmanInfoDict)
+);

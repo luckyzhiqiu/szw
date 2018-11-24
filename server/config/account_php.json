@@ -1,0 +1,7 @@
+/*
+帐号php接口
+*/
+{
+	domain:"jipin",
+	port:80
+}

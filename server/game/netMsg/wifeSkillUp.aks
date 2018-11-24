@@ -1,0 +1,163 @@
+//红颜技能升级
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+wifeID=int(netMsg[3]);//红颜ID
+skillIndex=int(netMsg[4]);//技能位置
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,wifeID,skillIndex;
+		json=json_decode(user.json);
+		wifeDict=json.wife;
+		numMgr=game.numMgr;
+		hero=json.hero[0];
+		if(exist(wifeDict,wifeID))//红颜ID有效
+		{
+			wife=wifeDict[wifeID];
+			skillID=ref(wife.skill[skillIndex]);//技能ID
+			
+			//读取技能表
+			wifeSkillTable=game.table.wifeSkill;
+			row=wifeSkillTable.getRowFromColName("id",skillID);
+			nextLevel=number(row.getValFromColName("nextLevel"));//技能升级后ID
+			
+			if(nextLevel==0)//爆级
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)
+				);
+				return(0);//不修改
+			}
+			
+			nextLevelRow=wifeSkillTable.getRowFromColName("id",nextLevel);
+			intimate=number(nextLevelRow.getValFromColName("intimate"));//下一等级技能亲密度条件
+			if(intimate>wife.intimate)//亲密度不足
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-5)
+				);
+				return(0);//不修改
+			}
+			
+			exp=ref(wife.exp);//经验
+			cost=number(row.getValFromColName("cost"));//技能升级需消耗
+			if(exp>=cost)//技能经验满足
+			{
+				strengthGrows=number(nextLevelRow.getValFromColName("strengthGrows"));//主角武力资质提升
+				wisdomGrows=number(nextLevelRow.getValFromColName("wisdomGrows"));//主角智力资质提升
+				charmGrows=number(nextLevelRow.getValFromColName("charmGrows"));//主角魅力资质提升
+				politicsGrows=number(nextLevelRow.getValFromColName("politicsGrows"));//主角政治资质提升
+				if(strengthGrows!=0 || wisdomGrows!=0 || charmGrows!=0 || politicsGrows!=0)
+				{
+					wifePlusS=json.wifePlus;
+					growsAll=0;
+					if(strengthGrows!=0)
+					{
+						growsAll=hero.strengthGrows+wifePlusS.strengthGrows;
+					}
+					else if(wisdomGrows!=0)
+					{
+						growsAll=hero.wisdomGrows+wifePlusS.wisdomGrows;
+					}
+					else if(charmGrows!=0)
+					{
+						growsAll=hero.charmGrows+wifePlusS.charmGrows;
+					}
+					else if(politicsGrows!=0)
+					{
+						growsAll=hero.politicsGrows+wifePlusS.politicsGrows;
+					}
+					
+					if(growsAll>=500)//单项资质总和已超过500
+					{
+						game.sendMsg
+						(
+							sessionID,
+							arr(methodName+"Result",-6)
+						);
+						return(0);//不修改
+					}
+				}
+				
+				exp-=cost;//扣除经验
+				skillID=nextLevel;//变为下一技能等级
+			}
+			else//经验不足
+			{
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-2)
+				);
+				return(0);//不修改
+			}
+		}
+		else//红颜ID无效
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+
+		//保存
+		
+		numMgr.computeHero(hero,json);
+		numMgr.computeUser(user,json);
+		
+		wifePlus=json.wifePlus;
+
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,wifeID,exp,wife.skill,hero,user.power,user.strength,user.wisdom,user.charm,user.politics,wifePlus)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

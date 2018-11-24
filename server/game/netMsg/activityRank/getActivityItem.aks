@@ -1,0 +1,407 @@
+//活动排行榜-获取物品®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+rankId=netMsg[3];//榜ID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+if((rankId<1&&rankId>208)&&(rankId<200&&rankId>4))//非法参数
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+activityMgr=game.activityMgr;
+activityStatus=activityMgr.getActivityStatus(rankId);
+if(activityStatus!=2)//不在活动领取状态
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-3)
+	);
+	exit();			
+}
+num=0;
+unionID=0;
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID,rankId,num,unionID;
+		isGet=0;
+		leaderUserID="";
+		//获取
+		if(rankId==1)
+		{
+			rankName=game.gameConfig.name+"_activityPowerRank";//排行榜名称
+			isGet=number(user.powerReward);
+		}
+		else if(rankId==2)
+		{
+			rankName=game.gameConfig.name+"_activityIntimateRank";//排行榜名称
+			isGet=number(user.intimateReward);
+		}
+		else if(rankId==3)
+		{
+			rankName=game.gameConfig.name+"_activityWaterRank";//排行榜名称
+			isGet=number(user.waterBattleScoreReward);
+		}
+		else if(rankId==4)
+		{
+			rankName=game.gameConfig.name+"_activityUnionRank";//排行榜名称
+			unionID=number(user.unionID);//联萌ID
+			if(unionID!=0)
+			{
+				unionX=game.rd.getRow(game.cnn,"union","id",unionID,"*",1000);
+				unionXjson=json_decode(unionX.json);
+				leaderUserID=unionX.leaderUserID;
+				rewardUserIDMap=unionXjson.rewardUserIDMap;
+				if(exist(rewardUserIDMap,userID))//以领取
+				{
+					isGet=1;
+				}
+				else
+				{
+					isGet=0;
+				}
+				unionX.json=json_encode(unionXjson);
+			}
+			else
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-7)//没联萌
+				);
+				num=-1;
+				return(0);
+			}
+			
+		}
+		else if(rankId==201)//银两
+		{
+			rankName=game.gameConfig.name+"_moneySubRank";//排行榜名称
+			isGet=number(user.moneySubReward);
+		}
+		else if(rankId==202)//士兵
+		{
+			rankName=game.gameConfig.name+"_soldierSubRank";//排行榜名称
+			isGet=number(user.soldierSubReward);
+		}
+		else if(rankId==203)//关卡
+		{
+			rankName=game.gameConfig.name+"_barrierAddRank";//排行榜名称
+			isGet=number(user.barrierAddReward);
+		}
+		else if(rankId==204)//国子监
+		{
+			rankName=game.gameConfig.name+"_bookHouseAddRank";//排行榜名称
+			isGet=number(user.bookHouseAddReward);
+		}
+		else if(rankId==205)//子嗣
+		{
+			rankName=game.gameConfig.name+"_childAddRank";//排行榜名称
+			isGet=number(user.childAddReward);
+		}
+		else if(rankId==206)//召唤
+		{
+			rankName=game.gameConfig.name+"_fuckAddRank";//排行榜名称
+			isGet=number(user.fuckAddReward);
+		}
+		else if(rankId==207)//联姻
+		{
+			rankName=game.gameConfig.name+"_marryAddRank";//排行榜名称
+			isGet=number(user.marryAddReward);
+		}
+		else if(rankId==208)//寻访
+		{
+			rankName=game.gameConfig.name+"_searchAddRank";//排行榜名称
+			isGet=number(user.searchAddReward);
+		}
+		
+		
+		rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+		//自己的排名0开始
+		rankID=-1;
+		if(rankId!=4)
+		{
+			@try
+				rankID=redis_zrevrank(rd,rankName,userID);
+			@catch
+				rankID=-1;//未上榜
+			@catch.
+		}
+		else
+		{
+			@try
+				rankID=redis_zrevrank(rd,rankName,unionID);
+			@catch
+				rankID=-1;//未上榜
+			@catch.
+		}
+		if(rankID<0) 
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)//没上榜-排名
+			);
+			num=-1;
+			return(0);
+		}
+		//自己排名
+		myRankId=rankID+1; 
+		if(myRankId<1 && myRankId>200) 
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-5)//没在领取物品排名之内
+			);
+			num=-1;
+			return(0);
+		}
+		if(isGet!=0)
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-6)//以领取
+			);
+			num=-1;
+			return(0);
+		}
+		eventXTable=game.table["event"+rankId];//rankId;
+		// eventXArr=arr();//排名数组
+		tableSize=eventXTable.size();
+		eventXID=0;
+		i=0;while(i<tableSize)
+		{
+			row=eventXTable.getRow(i);
+			beginRank=number(row.getValFromColName("beginRank"));//开始名次
+			endRank=number(row.getValFromColName("endRank"));//结束名次
+			if(beginRank<=myRankId && myRankId<=endRank)
+			{
+				eventXID=i+1;
+			}
+			++i;
+		}
+		eventXrow=eventXTable.getRowFromColName("id",eventXID);
+		getMoney=0;getFood=0;getSoldier=0;getGold=0;item="";playerTitle=0;
+		if(rankId==4)//联萌
+		{
+			if(leaderUserID==userID)
+			{
+				getMoney=number(eventXrow.getValFromColName("money"));//银两
+				getFood=number(eventXrow.getValFromColName("food"));//粮草
+				getSoldier=number(eventXrow.getValFromColName("soldier"));//士兵
+				getGold=number(eventXrow.getValFromColName("gold"));//元宝
+				item=eventXrow.getValFromColName("item");//物品
+				playerTitle=int(eventXrow.getValFromColName("title"));//称号
+			}
+			else
+			{
+				getMoney=number(eventXrow.getValFromColName("money2"));//银两
+				getFood=number(eventXrow.getValFromColName("food2"));//粮草
+				getSoldier=number(eventXrow.getValFromColName("soldier2"));//士兵
+				getGold=number(eventXrow.getValFromColName("gold2"));//元宝
+				item=eventXrow.getValFromColName("item2");//物品
+			}
+		}
+		else//其他榜
+		{
+			getMoney=number(eventXrow.getValFromColName("money"));//银两
+			getFood=number(eventXrow.getValFromColName("food"));//粮草
+			getSoldier=number(eventXrow.getValFromColName("soldier"));//士兵
+			getGold=number(eventXrow.getValFromColName("gold"));//元宝
+			item=eventXrow.getValFromColName("item");//物品
+			playerTitle=int(eventXrow.getValFromColName("title"));//称号
+		}
+		arr=split(arr(),item,",");
+		getItem=size(arr);//物品
+		money=number(user.money);//银两
+		food=number(user.food);//粮草
+		soldier=number(user.soldier);//兵力
+		gold2=number(user.gold2);//元宝（赠送）
+		json=json_decode(user.json);
+		itemDict=json.item;
+		
+		//保存
+		if(getMoney!=0)
+		{
+			money+=getMoney;
+			user.money=money;
+		}
+		if(getFood!=0)
+		{
+			food+=getFood;
+			user.food=food;
+		}
+		if(getSoldier!=0)
+		{
+			soldier+=getSoldier;
+			user.soldier=soldier;
+		}
+		if(getGold!=0)
+		{
+			gold2+=getGold;
+			if(gold2!=0)
+			{
+				user.gold2=gold2;
+			}
+			
+		}
+		if(getItem!=0)
+		{
+			i=0;
+			numMgr=game.numMgr;
+			while(i<getItem)
+			{
+				itemID=arr[i];
+				itemCount=number(arr[i+1]);
+				numMgr.addItem(itemID,itemCount,itemDict);
+				i+=2;
+			}
+		}
+		if(playerTitle!=0)
+		{
+			titleMap=json.titleMap;
+			titleMap[playerTitle]=0;
+		}
+		if(rankId==1)
+		{
+			
+			user.powerReward=1;
+		}
+		else if(rankId==2)
+		{
+			
+			user.intimateReward=1;
+		}
+		else if(rankId==3)
+		{
+			
+			user.waterBattleScoreReward=1;
+		}
+		else if(rankId==201)
+		{
+			
+			user.moneySubReward=1;
+		}
+		else if(rankId==202)
+		{
+			
+			user.soldierSubReward=1;
+		}
+		else if(rankId==203)
+		{
+			
+			user.barrierAddReward=1;
+		}
+		else if(rankId==204)
+		{
+			
+			user.bookHouseAddReward=1;
+		}
+		else if(rankId==205)
+		{
+			
+			user.childAddReward=1;
+		}
+		else if(rankId==206)
+		{
+			
+			user.fuckAddReward=1;
+		}
+		else if(rankId==207)
+		{
+			
+			user.marryAddReward=1;
+		}
+		else if(rankId==208)
+		{
+			
+			user.searchAddReward=1;
+		}
+		user.json=json_encode(json);
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,eventXID,getMoney,getFood,getSoldier,getGold,item,playerTitle)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(num<0)
+{
+	exit();	
+}
+
+if(rankId==4)
+{
+	game.rd.updateRow//修改
+	(
+		game.cnn,"union","id",unionID,"*",
+		//修改回调
+		##<unknownUnion,game>
+			@link userID;
+			unknownUnionJson=json_decode(unknownUnion.json);
+			unknownUnionJson.rewardUserIDMap[userID]=0;
+			unknownUnion.json=json_encode(unknownUnionJson);
+			return(1);//修改
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+}
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

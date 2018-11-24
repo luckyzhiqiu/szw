@@ -1,0 +1,16 @@
+//游戏服表
+mysqlCol("key","id");
+mysqlCol("datetime","genTime");//生成时间
+mysqlCol("datetime","openTime");//开服时间
+mysqlCol("int","status",0);//状态：0=待开；1=新服；2=火爆；
+mysqlCol("varchar","serverName");//游戏服名称
+/////////////////////////////////////////////////////
+mysqlCol("varchar","gameServerIP");//游戏服IP
+mysqlCol("int","gameServerPort",0);//游戏服port
+/////////////////////////////////////////////////////
+mysqlCol("varchar","dbIP");//数据库IP
+mysqlCol("int","dbPort",0);//数据库port
+mysqlCol("varchar","dbName");//数据库名称
+mysqlCol("varchar","dbUser");//数据库帐号
+mysqlCol("varchar","dbPassword");//数据库密码
+/////////////////////////////////////////////////////

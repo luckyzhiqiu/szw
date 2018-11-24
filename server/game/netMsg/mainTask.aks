@@ -1,0 +1,345 @@
+//主线任务
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID;
+		json=json_decode(user.json);
+		mainTask=json.mainTask;
+		mainTaskID=mainTask.id;//主线任务ID
+		mainTaskID+=1;
+		row=game.table.mainTask.getRowFromColName("id",mainTaskID);//下一任务数据
+		if(empty(row))//主线任务已全部完成
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		
+		heroArr=json.hero;
+		achievement=json.achievement;
+		numMgr=game.numMgr;
+		type=number(row.getValFromColName("type"));//升级类型
+		num=number(row.getValFromColName("num"));//目标数值
+		recvSign=1;
+		heroID=0;//奖励豪杰
+		if(type==1)//豪杰升级
+		{
+			//num(豪杰目标数量)
+			num2=number(row.getValFromColName("num2"));//(豪杰目标等级)
+			heroArrCount=size(heroArr);
+			meet=arr();
+			i=0;
+			while(i<heroArrCount)
+			{
+				heroLevel=heroArr[i].level;//豪杰等级
+				if(heroLevel>=num2)
+				{
+					push(meet,heroLevel);
+				}
+				++i;
+			}
+			
+			meetCount=size(meet);//豪杰数量
+			if(meetCount<num)
+			{
+				recvSign=0;
+			}
+		}
+		else if(type==2)//拥有子女
+		{
+			count=achievement.childrenCount;
+			if(count<num)
+			{
+				recvSign=0;
+			}
+		}
+		else if(type==3)//通过关卡
+		{
+			count=number(user.chapterID)*7+number(user.barrierID);
+			if(count<num)
+			{
+				recvSign=0;
+			}
+		}
+		else if(type==4)//征收粮草
+		{
+			count=achievement.makeFood;
+			if(count<num)
+			{
+				recvSign=0;
+			}
+		}
+		else if(type==5)//征收士兵
+		{
+			count=achievement.makeSoldier;
+			if(count<num)
+			{
+				recvSign=0;
+			}
+		}
+		else if(type==6)//征收银两
+		{
+			count=achievement.makeMoney;
+			if(count<num)
+			{
+				recvSign=0;
+			}
+		}
+		else if(type==7)//完成寻访
+		{
+			count=achievement.visitCount;
+			if(count<num)
+			{
+				recvSign=0;
+			}
+		}
+		else if(type==8)//翻牌次数
+		{
+			count=achievement.randomFuckCount;
+			if(count<num)
+			{
+				recvSign=0;
+			}
+		}
+		else if(type==9)//议政次数
+		{
+			count=achievement.waterCount;
+			if(count<num)
+			{
+				recvSign=0;
+			}
+		}
+		else if(type==10)//膜拜次数
+		{
+			count=achievement.kneeCount;
+			if(count<num)
+			{
+				recvSign=0;
+			}
+		}
+		else if(type==11)//请安次数
+		{
+			count=achievement.helloCount;
+			if(count<num)
+			{
+				recvSign=0;
+			}
+		}
+		else if(type==12)//使用道具
+		{
+			itemIDS=number(row.getValFromColName("itemID"));//道具ID
+			useItemMap=achievement.useItemMap;
+			count=0;
+			if(exist(useItemMap,itemIDS))
+			{
+				count=useItemMap[itemIDS];
+			}
+			
+			if(count<num)
+			{
+				recvSign=0;
+			}
+		}
+		else if(type==13)//玩家等级
+		{
+			level=number(user.level);
+			if(level<num)
+			{
+				recvSign=0;
+			}
+		}
+		else if(type==14)//惩罚犯人
+		{
+			count=achievement.hitPrisonerCount;
+			if(count<num)
+			{
+				recvSign=0;
+			}
+		}
+		else if(type==15)//处理政务
+		{
+			count=achievement.workCount;
+			if(count<num)
+			{
+				recvSign=0;
+			}
+		}
+		else if(type==16)//宠幸红颜
+		{
+			count=achievement.goldFuckCount;
+			if(count<num)
+			{
+				recvSign=0;
+			}
+		}
+		else if(type==17)//培养子女
+		{
+			count=achievement.upChild;
+			if(count<num)
+			{
+				recvSign=0;
+			}
+		}
+		else if(type==18)//势不可挡
+		{
+			count=number(user.power);
+			if(count<num)
+			{
+				recvSign=0;
+			}
+			
+			//赠送豪杰
+			heroID=number(row.getValFromColName("heroID"));//豪杰ID
+			if(heroID!=0)
+			{
+				numMgr.createHero(heroID,heroArr,json);
+			
+				numMgr.computeHeroArr(json);
+				numMgr.computeUser(user,json);
+			}
+		}
+		else if(type==19)//指定豪杰升级
+		{
+			//num目标豪杰ID
+			num2=number(row.getValFromColName("num2"));//目标豪杰需求提升等级数值
+			heroCount=size(heroArr);
+			i=0;
+			while(i<heroCount)
+			{
+				hero=heroArr[i];
+				heroID=hero.heroID;
+				if(heroID==num)
+				{
+					heroLevel=hero.level;
+					if(heroLevel<num2)
+					{
+						recvSign=0;
+					}
+					break;
+				}
+				++i;
+			}
+		}
+		
+		if(recvSign)
+		{
+			itemDict=json.item;
+			mtMoney=number(row.getValFromColName("money"));//奖励银两
+			mtFood=number(row.getValFromColName("food"));//奖励粮草
+			mtSoldier=number(row.getValFromColName("soldier"));//奖励士兵
+			mtGold=number(row.getValFromColName("gold"));//奖励元宝
+			mtItem=row.getValFromColName("item");//奖励道具
+			
+			money=number(user.money);
+			food=number(user.food);
+			soldier=number(user.soldier);
+			gold2=number(user.gold2);
+			addItemArr=arr();
+		
+			money+=mtMoney;//奖励银两
+			food+=mtFood;//奖励粮草
+			soldier+=mtSoldier;//奖励士兵
+			gold2+=mtGold;//奖励元宝
+			
+			if(mtGold!=0)
+			{
+				allGold=number(user.gold)+gold2;//元宝余额
+				game.saveResIO(userID,16,0,1,mtGold,allGold);//主线任务(type,itemID,（0=消耗，1=获得）,count,allGold)
+			}
+
+			addItemArr=split(arr(),mtItem,",");
+			addIDCount=size(addItemArr);
+			if(addIDCount>=2)
+			{
+				i=0;j=0;addCount=addIDCount/2;
+				while(i<addCount)
+				{
+					itemID=number(addItemArr[j]);
+					itemCount=number(addItemArr[j+1]);
+					numMgr.addItem(itemID,itemCount,itemDict);//奖励道具
+					j+=2;
+					++i;
+				}
+			}
+				
+			//保存
+			mainTask.id=mainTaskID;//主线任务ID
+			user.money=money;
+			user.food=food;
+			user.soldier=soldier;
+			if(gold2!=0)
+			{
+				user.gold2=gold2;	
+			}
+			
+			user.json=json_encode(json);
+			
+			//属性
+			power=user.power;
+			strength=user.strength;
+			wisdom=user.wisdom;
+			charm=user.charm;
+			politics=user.politics;
+
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,mainTaskID,money,food,soldier,gold2,itemDict,power,strength,wisdom,charm,politics,heroArr,heroID)
+			);
+			return(1);//修改
+		}
+		else//完成任务条件不满足
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

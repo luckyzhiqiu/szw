@@ -1,0 +1,61 @@
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+//回复
+game.sendMsg
+(
+	sessionID,//会话ID
+	arr(methodName+"Result",2,4,6,8)//网络消息
+);
+
+exit();
+
+//获取用户数据
+user=self.rd.getRow(self.cnn,"user","id",userID,"*",1000);
+
+//修改用户数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		money=number(user.money);
+		money+=1;
+		user.money=money;
+		if(rand()%2)
+		{
+			return(1);//修改
+		}
+		else
+		{
+			return(0);//不修改
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}
+
+//获取全局变量
+varName="kingCity";
+var=self.rd.getRow(self.cnn,"global_var","name",varName,"*",1000);
+varJson=json_decode(var.json);
+

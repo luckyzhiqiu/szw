@@ -1,0 +1,1198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t793">470</v>
+<v t="n" n="__sys__t776">460</v>
+<v t="n" n="__sys__t774">459</v>
+<v t="n" n="__sys__t773">459</v>
+<v t="n" n="__sys__t771">458</v>
+<v t="n" n="__sys__t770">458</v>
+<v t="n" n="__sys__t753">444</v>
+<v t="n" n="__sys__t752">444</v>
+<v t="n" n="__sys__t751">444</v>
+<v t="n" n="__sys__t749">443</v>
+<v t="n" n="__sys__t748">443</v>
+<v t="n" n="__sys__t728">428</v>
+<v t="n" n="__sys__t727">428</v>
+<v t="n" n="__sys__t725">427</v>
+<v t="n" n="__sys__t708">413</v>
+<v t="n" n="__sys__t687">397</v>
+<v t="n" n="__sys__t686">397</v>
+<v t="n" n="__sys__t655">377</v>
+<v t="n" n="__sys__t654">377</v>
+<v t="n" n="__sys__t636">362</v>
+<v t="n" n="__sys__t611">346</v>
+<v t="n" n="__sys__t608">343</v>
+<v t="n" n="__sys__t607">343</v>
+<v t="n" n="__sys__t591">330</v>
+<v t="n" n="__sys__t547">301</v>
+<v t="n" n="__sys__t544">299</v>
+<v t="n" n="__sys__t470">252</v>
+<v t="n" n="__sys__t469">252</v>
+<v t="n" n="__sys__t467">251</v>
+<v t="n" n="__sys__t465">250</v>
+<v t="n" n="__sys__t464">250</v>
+<v t="n" n="__sys__t450">237</v>
+<v t="n" n="__sys__t447">235</v>
+<v t="n" n="__sys__t446">235</v>
+<v t="n" n="__sys__t438">228</v>
+<v t="n" n="__sys__t437">228</v>
+<v t="n" n="__sys__t421">213</v>
+<v t="n" n="__sys__t420">213</v>
+<v t="n" n="__sys__t397">191</v>
+<v t="n" n="__sys__t394">188</v>
+<v t="n" n="__sys__t388">183</v>
+<v t="n" n="__sys__t387">183</v>
+<v t="n" n="__sys__t371">168</v>
+<v t="n" n="__sys__t364">162</v>
+<v t="n" n="__sys__t363">162</v>
+<v t="n" n="__sys__t335">135</v>
+<v t="n" n="__sys__t280">99</v>
+<v t="n" n="__sys__t279">99</v>
+<v t="n" n="__sys__t234">71</v>
+<v t="n" n="__sys__t233">71</v>
+<v t="n" n="__sys__t217">58</v>
+<v t="n" n="__sys__t216">58</v>
+<v t="n" n="__sys__t185">38</v>
+<v t="n" n="__sys__t184">38</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="s" n="__sys__t3">.methodName.</v>
+<v t="s" n="__sys__t4">.sessionID.</v>
+<v t="s" n="__sys__t5">.enemyHeroID.</v>
+<v t="s" n="__sys__t6">.getEnemyHeroIndeoutcome.</v>
+<v t="s" n="__sys__t7">.getHp.</v>
+<v t="s" n="__sys__t8">.getFixedHp.</v>
+<v t="s" n="__sys__t9">.userID.</v>
+<v t="n" n="__sys__t10">1</v>
+<v t="n" n="__sys__t11">0</v>
+<v t="s" n="__sys__t12">.Result.</v>
+<v t="n" n="__sys__t13">2</v>
+<v t="n" n="__sys__t14">0</v>
+<v t="n" n="__sys__t15">0</v>
+<v t="n" n="__sys__t16">0</v>
+<v t="s" n="__sys__t17">.Result.</v>
+<v t="n" n="__sys__t18">3</v>
+<v t="n" n="__sys__t19">0</v>
+<v t="n" n="__sys__t20">0</v>
+<v t="n" n="__sys__t21">0</v>
+<v t="s" n="__sys__t22">.Result.</v>
+<v t="n" n="__sys__t23">4</v>
+<v t="n" n="__sys__t24">0</v>
+<v t="n" n="__sys__t25">0</v>
+<v t="n" n="__sys__t26">0</v>
+<v t="s" n="__sys__t27">.Result.</v>
+<v t="n" n="__sys__t28">5</v>
+<v t="n" n="__sys__t29">0</v>
+<v t="n" n="__sys__t30">0</v>
+<v t="n" n="__sys__t31">0</v>
+<v t="n" n="__sys__t32">0</v>
+<v t="n" n="__sys__t33">0</v>
+<v t="n" n="__sys__t34">0</v>
+<v t="n" n="__sys__t35">0</v>
+<v t="n" n="__sys__t36">20</v>
+<v t="n" n="__sys__t37">0</v>
+<v t="n" n="__sys__t38">0</v>
+<v t="n" n="__sys__t39">0</v>
+<v t="n" n="__sys__t40">0</v>
+<v t="n" n="__sys__t41">0</v>
+<v t="n" n="__sys__t42">0</v>
+<v t="n" n="__sys__t43">0</v>
+<v t="n" n="__sys__t44">1</v>
+<v t="n" n="__sys__t45">1</v>
+<v t="n" n="__sys__t46">0</v>
+<v t="n" n="__sys__t47">0</v>
+<v t="n" n="__sys__t48">0</v>
+<v t="n" n="__sys__t49">0</v>
+<v t="n" n="__sys__t50">0</v>
+<v t="n" n="__sys__t51">0</v>
+<v t="n" n="__sys__t52">0</v>
+<v t="n" n="__sys__t53">0</v>
+<v t="n" n="__sys__t54">1</v>
+<v t="n" n="__sys__t55">1</v>
+<v t="n" n="__sys__t56">0</v>
+<v t="n" n="__sys__t57">0</v>
+<v t="n" n="__sys__t58">0</v>
+<v t="n" n="__sys__t59">0</v>
+<v t="n" n="__sys__t60">0</v>
+<v t="n" n="__sys__t61">0</v>
+<v t="n" n="__sys__t62">0</v>
+<v t="n" n="__sys__t63">1</v>
+<v t="n" n="__sys__t64">1</v>
+<v t="n" n="__sys__t65">0</v>
+<v t="n" n="__sys__t66">1</v>
+<v t="n" n="__sys__t67">0</v>
+<v t="n" n="__sys__t68">0</v>
+<v t="n" n="__sys__t69">1</v>
+<v t="n" n="__sys__t70">0</v>
+<v t="n" n="__sys__t71">0</v>
+<v t="n" n="__sys__t72">0</v>
+<v t="n" n="__sys__t73">1</v>
+<v t="n" n="__sys__t74">0</v>
+<v t="n" n="__sys__t75">0</v>
+<v t="n" n="__sys__t76">1</v>
+<v t="n" n="__sys__t77">1</v>
+<v t="n" n="__sys__t78">0</v>
+<v t="s" n="__sys__t79">.winReward.</v>
+<v t="s" n="__sys__t80">.lottery.</v>
+<v t="n" n="__sys__t81">0</v>
+<v t="n" n="__sys__t82">0</v>
+<v t="n" n="__sys__t83">1</v>
+<v t="n" n="__sys__t84">2</v>
+<v t="n" n="__sys__t85">1</v>
+<v t="n" n="__sys__t86">1</v>
+<v t="s" n="__sys__t87">.0.</v>
+<v t="n" n="__sys__t88">1</v>
+<v t="n" n="__sys__t89">0</v>
+<v t="n" n="__sys__t90">0</v>
+<v t="n" n="__sys__t91">0</v>
+<v t="n" n="__sys__t92">0</v>
+<v t="n" n="__sys__t93">0</v>
+<v t="n" n="__sys__t94">0</v>
+<v t="n" n="__sys__t95">0</v>
+<v t="n" n="__sys__t96">1</v>
+<v t="n" n="__sys__t97">0</v>
+<v t="n" n="__sys__t98">0</v>
+<v t="n" n="__sys__t99">1</v>
+<v t="n" n="__sys__t100">0</v>
+<v t="n" n="__sys__t101">0</v>
+<v t="n" n="__sys__t102">1</v>
+<v t="n" n="__sys__t103">1</v>
+<v t="n" n="__sys__t104">0</v>
+<v t="n" n="__sys__t105">0</v>
+<v t="n" n="__sys__t106">0</v>
+<v t="n" n="__sys__t107">0</v>
+<v t="s" n="__sys__t108">.tiny.</v>
+<v t="s" n="__sys__t109">.item.</v>
+<v t="s" n="__sys__t110">.,.</v>
+<v t="n" n="__sys__t111">2</v>
+<v t="n" n="__sys__t112">0</v>
+<v t="n" n="__sys__t113">0</v>
+<v t="n" n="__sys__t114">0</v>
+<v t="n" n="__sys__t115">1</v>
+<v t="n" n="__sys__t116">2</v>
+<v t="n" n="__sys__t117">0</v>
+<v t="n" n="__sys__t118">10</v>
+<v t="n" n="__sys__t119">0</v>
+<v t="n" n="__sys__t120">0</v>
+<v t="n" n="__sys__t121">0</v>
+<v t="n" n="__sys__t122">0</v>
+<v t="n" n="__sys__t123">0</v>
+<v t="n" n="__sys__t124">0</v>
+<v t="n" n="__sys__t125">0</v>
+<v t="n" n="__sys__t126">0</v>
+<v t="n" n="__sys__t127">0</v>
+<v t="n" n="__sys__t128">0</v>
+<v t="n" n="__sys__t129">2</v>
+<v t="n" n="__sys__t130">0</v>
+<v t="n" n="__sys__t131">0</v>
+<v t="n" n="__sys__t132">1</v>
+<v t="n" n="__sys__t133">1</v>
+<v t="n" n="__sys__t134">0</v>
+<v t="s" n="__sys__t135">.Result.</v>
+<v t="n" n="__sys__t136">1</v>
+<v t="n" n="__sys__t137">1</v>
+<o n="input"><o>__sys__t138</o><i>__sys__t1</i></o>
+<o n="="><o>user</o><i>__sys__t138</i></o>
+<o n="input"><o>__sys__t140</o><i>__sys__t2</i></o>
+<o n="="><o>game</o><i>__sys__t140</i></o>
+<o n="link" r="70"><o>__sys__t142</o><i>__sys__t3</i></o>
+<o n="=" r="70"><o>methodName</o><i>__sys__t142</i></o>
+<o n="link" r="70"><o>__sys__t144</o><i>__sys__t4</i></o>
+<o n="=" r="70"><o>sessionID</o><i>__sys__t144</i></o>
+<o n="link" r="70"><o>__sys__t146</o><i>__sys__t5</i></o>
+<o n="=" r="70"><o>enemyHeroID</o><i>__sys__t146</i></o>
+<o n="link" r="70"><o>__sys__t148</o><i>__sys__t6</i></o>
+<o n="=" r="70"><o>getEnemyHeroIndeoutcome</o><i>__sys__t148</i></o>
+<o n="link" r="70"><o>__sys__t150</o><i>__sys__t7</i></o>
+<o n="=" r="70"><o>getHp</o><i>__sys__t150</i></o>
+<o n="link" r="70"><o>__sys__t152</o><i>__sys__t8</i></o>
+<o n="=" r="70"><o>getFixedHp</o><i>__sys__t152</i></o>
+<o n="link" r="70"><o>__sys__t154</o><i>__sys__t9</i></o>
+<o n="=" r="70"><o>userID</o><i>__sys__t154</i></o>
+<v t="s" n="__sys__t157">.json.</v>
+<o n="." r="71"><o>__sys__t156</o><i>user</i><i>__sys__t157</i></o>
+<o n="json_decode" r="71"><o>__sys__t159</o><i>__sys__t156</i></o>
+<o n="=" r="71"><o>json</o><i>__sys__t159</i></o>
+<v t="s" n="__sys__t162">.jsonExt.</v>
+<o n="." r="72"><o>__sys__t161</o><i>user</i><i>__sys__t162</i></o>
+<o n="json_decode" r="72"><o>__sys__t164</o><i>__sys__t161</i></o>
+<o n="=" r="72"><o>jsonExt</o><i>__sys__t164</i></o>
+<v t="s" n="__sys__t167">.towerBattleStep.</v>
+<o n="." r="73"><o>__sys__t166</o><i>user</i><i>__sys__t167</i></o>
+<o n="number" r="73"><o>__sys__t169</o><i>__sys__t166</i></o>
+<o n="=" r="73"><o>isBattle</o><i>__sys__t169</i></o>
+<o n="!=" r="75"><o>__sys__t171</o><i>isBattle</i><i>__sys__t10</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t171</i></o>
+<o n="=="><o>__sys__t173</o><i>__sys__rt</i><i>__sys__t11</i></o>
+<o n="if_goto"><o>__sys__t174</o><i>__sys__t173</i><i>__sys__t184</i></o>
+<v t="s" n="__sys__t176">.sendMsg.</v>
+<o n="." r="78"><o>__sys__t175</o><i>game</i><i>__sys__t176</i></o>
+<o n="+" r="81"><o>__sys__t178</o><i>methodName</i><i>__sys__t12</i></o>
+<o n=" -" r="81"><o>__sys__t179</o><i>__sys__t13</i></o>
+<o n="arr" r="81"><o>__sys__t180</o><i>__sys__t178</i><i>__sys__t179</i></o>
+<o n="__sys__t175" r="78"><o>__sys__t181</o><i>game</i><i>sessionID</i><i>__sys__t180</i></o>
+<o n="return" r="83"><o>__sys__t182</o><i>__sys__t14</i></o>
+<o n="goto"><o>__sys__t183</o><i>__sys__t185</i></o>
+<v t="s" n="__sys__t187">.towerBattle.</v>
+<o n="." r="85"><o>__sys__t186</o><i>json</i><i>__sys__t187</i></o>
+<o n="=" r="85"><o>towerBattle</o><i>__sys__t186</i></o>
+<v t="s" n="__sys__t191">.towerBattleExt.</v>
+<o n="." r="86"><o>__sys__t190</o><i>jsonExt</i><i>__sys__t191</i></o>
+<o n="=" r="86"><o>towerBattleExt</o><i>__sys__t190</i></o>
+<v t="s" n="__sys__t195">.enemyHeroIDArr.</v>
+<o n="." r="87"><o>__sys__t194</o><i>towerBattle</i><i>__sys__t195</i></o>
+<o n="=" r="87"><o>enemyHeroIDArr</o><i>__sys__t194</i></o>
+<v t="s" n="__sys__t199">.enemyHeroArr.</v>
+<o n="." r="88"><o>__sys__t198</o><i>towerBattleExt</i><i>__sys__t199</i></o>
+<o n="=" r="88"><o>enemyHeroArr</o><i>__sys__t198</i></o>
+<o n="arrFindNumberKey" r="89"><o>__sys__t202</o><i>enemyHeroIDArr</i><i>enemyHeroID</i></o>
+<o n="&lt;" r="89"><o>__sys__t203</o><i>__sys__t202</i><i>__sys__t15</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t203</i></o>
+<o n="=="><o>__sys__t205</o><i>__sys__rt</i><i>__sys__t16</i></o>
+<o n="if_goto"><o>__sys__t206</o><i>__sys__t205</i><i>__sys__t216</i></o>
+<v t="s" n="__sys__t208">.sendMsg.</v>
+<o n="." r="92"><o>__sys__t207</o><i>game</i><i>__sys__t208</i></o>
+<o n="+" r="95"><o>__sys__t210</o><i>methodName</i><i>__sys__t17</i></o>
+<o n=" -" r="95"><o>__sys__t211</o><i>__sys__t18</i></o>
+<o n="arr" r="95"><o>__sys__t212</o><i>__sys__t210</i><i>__sys__t211</i></o>
+<o n="__sys__t207" r="92"><o>__sys__t213</o><i>game</i><i>sessionID</i><i>__sys__t212</i></o>
+<o n="return" r="97"><o>__sys__t214</o><i>__sys__t19</i></o>
+<o n="goto"><o>__sys__t215</o><i>__sys__t217</i></o>
+<o n="getEnemyHeroIndeoutcome" r="99"><o>__sys__t218</o><i>enemyHeroArr</i><i>enemyHeroID</i></o>
+<o n="=" r="99"><o>enemyHeroIndeoutcome</o><i>__sys__t218</i></o>
+<o n="&lt;" r="100"><o>__sys__t220</o><i>enemyHeroIndeoutcome</i><i>__sys__t20</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t220</i></o>
+<o n="=="><o>__sys__t222</o><i>__sys__rt</i><i>__sys__t21</i></o>
+<o n="if_goto"><o>__sys__t223</o><i>__sys__t222</i><i>__sys__t233</i></o>
+<v t="s" n="__sys__t225">.sendMsg.</v>
+<o n="." r="103"><o>__sys__t224</o><i>game</i><i>__sys__t225</i></o>
+<o n="+" r="106"><o>__sys__t227</o><i>methodName</i><i>__sys__t22</i></o>
+<o n=" -" r="106"><o>__sys__t228</o><i>__sys__t23</i></o>
+<o n="arr" r="106"><o>__sys__t229</o><i>__sys__t227</i><i>__sys__t228</i></o>
+<o n="__sys__t224" r="103"><o>__sys__t230</o><i>game</i><i>sessionID</i><i>__sys__t229</i></o>
+<o n="return" r="108"><o>__sys__t231</o><i>__sys__t24</i></o>
+<o n="goto"><o>__sys__t232</o><i>__sys__t234</i></o>
+<o n="[]" r="111"><o>__sys__t235</o><i>enemyHeroArr</i><i>enemyHeroIndeoutcome</i></o>
+<o n="=" r="111"><o>enemyHero</o><i>__sys__t235</i></o>
+<v t="s" n="__sys__t238">.hp.</v>
+<o n="." r="112"><o>__sys__t237</o><i>enemyHero</i><i>__sys__t238</i></o>
+<o n="=" r="112"><o>enemyHeroHP</o><i>__sys__t237</i></o>
+<o n="=" r="113"><o>enemyHeroHpAdd</o><i>enemyHeroHP</i></o>
+<v t="s" n="__sys__t243">.critRate.</v>
+<o n="." r="114"><o>__sys__t242</o><i>enemyHero</i><i>__sys__t243</i></o>
+<o n="=" r="114"><o>enemyHeroCritRate</o><i>__sys__t242</i></o>
+<v t="s" n="__sys__t247">.crit.</v>
+<o n="." r="115"><o>__sys__t246</o><i>enemyHero</i><i>__sys__t247</i></o>
+<o n="=" r="115"><o>enemyHeroCrit</o><i>__sys__t246</i></o>
+<v t="s" n="__sys__t251">.attackC.</v>
+<o n="." r="116"><o>__sys__t250</o><i>enemyHero</i><i>__sys__t251</i></o>
+<o n="=" r="116"><o>enemyHeroAttackC</o><i>__sys__t250</i></o>
+<v t="s" n="__sys__t255">.attack.</v>
+<o n="." r="117"><o>__sys__t254</o><i>enemyHero</i><i>__sys__t255</i></o>
+<o n="=" r="117"><o>enemyHeroAttack</o><i>__sys__t254</i></o>
+<v t="s" n="__sys__t259">.me.</v>
+<o n="." r="120"><o>__sys__t258</o><i>towerBattle</i><i>__sys__t259</i></o>
+<o n="=" r="120"><o>myHero</o><i>__sys__t258</i></o>
+<v t="s" n="__sys__t263">.hp.</v>
+<o n="." r="121"><o>__sys__t262</o><i>towerBattle</i><i>__sys__t263</i></o>
+<o n="=" r="121"><o>myHeroHP</o><i>__sys__t262</i></o>
+<o n="==" r="122"><o>__sys__t266</o><i>myHeroHP</i><i>__sys__t25</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t266</i></o>
+<o n="=="><o>__sys__t268</o><i>__sys__rt</i><i>__sys__t26</i></o>
+<o n="if_goto"><o>__sys__t269</o><i>__sys__t268</i><i>__sys__t279</i></o>
+<v t="s" n="__sys__t271">.sendMsg.</v>
+<o n="." r="125"><o>__sys__t270</o><i>game</i><i>__sys__t271</i></o>
+<o n="+" r="128"><o>__sys__t273</o><i>methodName</i><i>__sys__t27</i></o>
+<o n=" -" r="128"><o>__sys__t274</o><i>__sys__t28</i></o>
+<o n="arr" r="128"><o>__sys__t275</o><i>__sys__t273</i><i>__sys__t274</i></o>
+<o n="__sys__t270" r="125"><o>__sys__t276</o><i>game</i><i>sessionID</i><i>__sys__t275</i></o>
+<o n="return" r="130"><o>__sys__t277</o><i>__sys__t29</i></o>
+<o n="goto"><o>__sys__t278</o><i>__sys__t280</i></o>
+<v t="s" n="__sys__t282">.critRate.</v>
+<o n="." r="146"><o>__sys__t281</o><i>myHero</i><i>__sys__t282</i></o>
+<o n="=" r="146"><o>myHeroCritRate</o><i>__sys__t281</i></o>
+<v t="s" n="__sys__t286">.crit.</v>
+<o n="." r="147"><o>__sys__t285</o><i>myHero</i><i>__sys__t286</i></o>
+<o n="=" r="147"><o>myHeroCrit</o><i>__sys__t285</i></o>
+<v t="s" n="__sys__t290">.attackC.</v>
+<o n="." r="148"><o>__sys__t289</o><i>myHero</i><i>__sys__t290</i></o>
+<o n="=" r="148"><o>myHeroAttackC</o><i>__sys__t289</i></o>
+<v t="s" n="__sys__t294">.attack.</v>
+<o n="." r="149"><o>__sys__t293</o><i>myHero</i><i>__sys__t294</i></o>
+<o n="=" r="149"><o>myHeroAttack</o><i>__sys__t293</i></o>
+<v t="s" n="__sys__t298">.attackPlus.</v>
+<o n="." r="150"><o>__sys__t297</o><i>towerBattle</i><i>__sys__t298</i></o>
+<o n="=" r="150"><o>myHeroAttackPlus</o><i>__sys__t297</i></o>
+<v t="s" n="__sys__t302">.skillPlus.</v>
+<o n="." r="151"><o>__sys__t301</o><i>towerBattle</i><i>__sys__t302</i></o>
+<o n="=" r="151"><o>myHeroSkillPlus</o><i>__sys__t301</i></o>
+<v t="s" n="__sys__t306">.numMgr.</v>
+<o n="." r="153"><o>__sys__t305</o><i>game</i><i>__sys__t306</i></o>
+<o n="=" r="153"><o>numMgr</o><i>__sys__t305</i></o>
+<v t="s" n="__sys__t310">.battleCount.</v>
+<o n="." r="156"><o>__sys__t309</o><i>towerBattle</i><i>__sys__t310</i></o>
+<o n="=" r="156"><o>battleCount</o><i>__sys__t309</i></o>
+<v t="s" n="__sys__t314">.winCount.</v>
+<o n="." r="158"><o>__sys__t313</o><i>towerBattle</i><i>__sys__t314</i></o>
+<o n="=" r="158"><o>winCount</o><i>__sys__t313</i></o>
+<o n="=" r="160"><o>isCritSign</o><i>__sys__t30</i></o>
+<o n="arr" r="162"><o>__sys__t318</o></o>
+<o n="=" r="162"><o>battleInfo</o><i>__sys__t318</i></o>
+<o n="=" r="163"><o>outcome</o><i>__sys__t31</i></o>
+<o n="arr" r="164"><o>__sys__t321</o></o>
+<o n="=" r="164"><o>myAttArr</o><i>__sys__t321</i></o>
+<o n="arr" r="165"><o>__sys__t323</o></o>
+<o n="=" r="165"><o>enemyAttArr</o><i>__sys__t323</i></o>
+<o n="arr" r="166"><o>__sys__t325</o></o>
+<o n="=" r="166"><o>myHpArr</o><i>__sys__t325</i></o>
+<o n="arr" r="167"><o>__sys__t327</o></o>
+<o n="=" r="167"><o>meIsCritSignArr</o><i>__sys__t327</i></o>
+<o n="arr" r="168"><o>__sys__t329</o></o>
+<o n="=" r="168"><o>enemyIsCritSignArr</o><i>__sys__t329</i></o>
+<o n="arr" r="169"><o>__sys__t331</o></o>
+<o n="=" r="169"><o>enemyHpArr</o><i>__sys__t331</i></o>
+<o n="=" r="170"><o>i</o><i>__sys__t32</i></o>
+<o n="=" r="171"><o>isWin</o><i>__sys__t33</i></o>
+<o n=">" r="172"><o>__sys__t336</o><i>enemyHeroHP</i><i>__sys__t34</i></o>
+<o n=">" r="172"><o>__sys__t337</o><i>myHeroHP</i><i>__sys__t35</i></o>
+<o n="&&" r="172"><o>__sys__t338</o><i>__sys__t336</i><i>__sys__t337</i></o>
+<o n="&lt;" r="172"><o>__sys__t339</o><i>i</i><i>__sys__t36</i></o>
+<o n="&&" r="172"><o>__sys__t340</o><i>__sys__t338</i><i>__sys__t339</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t340</i></o>
+<o n="=="><o>__sys__t342</o><i>__sys__rt</i><i>__sys__t37</i></o>
+<o n="if_goto"><o>__sys__t343</o><i>__sys__t342</i><i>__sys__t397</i></o>
+<o n="==" r="175"><o>__sys__t344</o><i>outcome</i><i>__sys__t38</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t344</i></o>
+<o n="=="><o>__sys__t346</o><i>__sys__rt</i><i>__sys__t39</i></o>
+<o n="if_goto"><o>__sys__t347</o><i>__sys__t346</i><i>__sys__t371</i></o>
+<o n="getHp" r="177"><o>__sys__t348</o><i>myHeroAttack</i><i>myHeroAttackC</i><i>myHeroCritRate</i><i>myHeroCrit</i><i>isCritSign</i><i>myHeroAttackPlus</i><i>myHeroSkillPlus</i></o>
+<o n="=" r="177"><o>hp</o><i>__sys__t348</i></o>
+<o n="[]" r="183"><o>__sys__t350</o><i>hp</i><i>__sys__t40</i></o>
+<o n="round" r="183"><o>__sys__t351</o><i>__sys__t350</i></o>
+<o n="=" r="183"><o>HP2</o><i>__sys__t351</i></o>
+<o n="-=" r="184"><o>enemyHeroHP</o><i>HP2</i></o>
+<o n="round" r="185"><o>__sys__t354</o><i>enemyHeroHP</i></o>
+<o n="=" r="185"><o>hp2</o><i>__sys__t354</i></o>
+<o n="=" r="186"><o>enemyHeroHP</o><i>hp2</i></o>
+<o n="&lt;=" r="187"><o>__sys__t357</o><i>enemyHeroHP</i><i>__sys__t41</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t357</i></o>
+<o n="=="><o>__sys__t359</o><i>__sys__rt</i><i>__sys__t42</i></o>
+<o n="if_goto"><o>__sys__t360</o><i>__sys__t359</i><i>__sys__t363</i></o>
+<o n="=" r="189"><o>enemyHeroHP</o><i>__sys__t43</i></o>
+<o n="goto"><o>__sys__t362</o><i>__sys__t364</i></o>
+<o n="=" r="191"><o>outcome</o><i>__sys__t44</i></o>
+<o n="push" r="194"><o>__sys__t366</o><i>myHpArr</i><i>HP2</i></o>
+<o n="[]" r="196"><o>__sys__t367</o><i>hp</i><i>__sys__t45</i></o>
+<o n="push" r="196"><o>__sys__t368</o><i>meIsCritSignArr</i><i>__sys__t367</i></o>
+<o n="=" r="197"><o>isWin</o><i>__sys__t46</i></o>
+<o n="goto"><o>__sys__t370</o><i>__sys__t394</i></o>
+<o n="getHp" r="201"><o>__sys__t372</o><i>enemyHeroAttack</i><i>enemyHeroAttackC</i><i>enemyHeroCritRate</i><i>enemyHeroCrit</i><i>isCritSign</i><i>__sys__t47</i><i>__sys__t48</i></o>
+<o n="=" r="201"><o>HP</o><i>__sys__t372</i></o>
+<o n="[]" r="202"><o>__sys__t374</o><i>HP</i><i>__sys__t49</i></o>
+<o n="round" r="202"><o>__sys__t375</o><i>__sys__t374</i></o>
+<o n="=" r="202"><o>HP2</o><i>__sys__t375</i></o>
+<o n="-=" r="203"><o>myHeroHP</o><i>HP2</i></o>
+<o n="round" r="204"><o>__sys__t378</o><i>myHeroHP</i></o>
+<o n="=" r="204"><o>hp2</o><i>__sys__t378</i></o>
+<o n="=" r="205"><o>myHeroHP</o><i>hp2</i></o>
+<o n="&lt;=" r="206"><o>__sys__t381</o><i>myHeroHP</i><i>__sys__t50</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t381</i></o>
+<o n="=="><o>__sys__t383</o><i>__sys__rt</i><i>__sys__t51</i></o>
+<o n="if_goto"><o>__sys__t384</o><i>__sys__t383</i><i>__sys__t387</i></o>
+<o n="=" r="208"><o>myHeroHP</o><i>__sys__t52</i></o>
+<o n="goto"><o>__sys__t386</o><i>__sys__t388</i></o>
+<o n="=" r="210"><o>outcome</o><i>__sys__t53</i></o>
+<o n="push" r="213"><o>__sys__t390</o><i>enemyHpArr</i><i>HP2</i></o>
+<o n="[]" r="215"><o>__sys__t391</o><i>HP</i><i>__sys__t54</i></o>
+<o n="push" r="215"><o>__sys__t392</o><i>enemyIsCritSignArr</i><i>__sys__t391</i></o>
+<o n="=" r="216"><o>isWin</o><i>__sys__t55</i></o>
+<o n="=" r="218"><o>__sys__t395</o><i>i</i></o>
+<o n="++" r="218"><o>i</o><i>i</i></o>
+<o n="goto"><o>__sys__t396</o><i>__sys__t335</i></o>
+<o n=">" r="221"><o>__sys__t398</o><i>enemyHeroHP</i><i>__sys__t56</i></o>
+<o n=">" r="221"><o>__sys__t399</o><i>myHeroHP</i><i>__sys__t57</i></o>
+<o n="&&" r="221"><o>__sys__t400</o><i>__sys__t398</i><i>__sys__t399</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t400</i></o>
+<o n="=="><o>__sys__t402</o><i>__sys__rt</i><i>__sys__t58</i></o>
+<o n="if_goto"><o>__sys__t403</o><i>__sys__t402</i><i>__sys__t469</i></o>
+<o n="getFixedHp" r="223"><o>__sys__t404</o><i>myHeroAttack</i><i>myHeroAttackC</i><i>myHeroCritRate</i><i>myHeroCrit</i><i>myHeroAttackPlus</i><i>myHeroSkillPlus</i></o>
+<o n="=" r="223"><o>meAtt</o><i>__sys__t404</i></o>
+<o n="getFixedHp" r="224"><o>__sys__t406</o><i>enemyHeroAttack</i><i>enemyHeroAttackC</i><i>enemyHeroCritRate</i><i>enemyHeroCrit</i><i>__sys__t59</i><i>__sys__t60</i></o>
+<o n="=" r="224"><o>tagetAtt</o><i>__sys__t406</i></o>
+<o n="/" r="225"><o>__sys__t408</o><i>enemyHeroHP</i><i>meAtt</i></o>
+<o n="ceil" r="225"><o>__sys__t409</o><i>__sys__t408</i></o>
+<o n="=" r="225"><o>meCount</o><i>__sys__t409</i></o>
+<o n="/" r="226"><o>__sys__t411</o><i>myHeroHP</i><i>tagetAtt</i></o>
+<o n="ceil" r="226"><o>__sys__t412</o><i>__sys__t411</i></o>
+<o n="=" r="226"><o>tagetCount</o><i>__sys__t412</i></o>
+<o n="==" r="227"><o>__sys__t414</o><i>meCount</i><i>__sys__t61</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t414</i></o>
+<o n="=="><o>__sys__t416</o><i>__sys__rt</i><i>__sys__t62</i></o>
+<o n="if_goto"><o>__sys__t417</o><i>__sys__t416</i><i>__sys__t420</i></o>
+<o n="=" r="229"><o>meCount</o><i>__sys__t63</i></o>
+<o n="goto"><o>__sys__t419</o><i>__sys__t421</i></o>
+<o n="/" r="231"><o>__sys__t422</o><i>tagetCount</i><i>meCount</i></o>
+<o n=">=" r="231"><o>__sys__t423</o><i>__sys__t422</i><i>__sys__t64</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t423</i></o>
+<o n="=="><o>__sys__t425</o><i>__sys__rt</i><i>__sys__t65</i></o>
+<o n="if_goto"><o>__sys__t426</o><i>__sys__t425</i><i>__sys__t450</i></o>
+<o n="-" r="234"><o>__sys__t427</o><i>meCount</i><i>__sys__t66</i></o>
+<o n="*" r="234"><o>__sys__t428</o><i>__sys__t427</i><i>tagetAtt</i></o>
+<o n="-" r="234"><o>__sys__t429</o><i>myHeroHP</i><i>__sys__t428</i></o>
+<o n="=" r="234"><o>myHeroHP</o><i>__sys__t429</i></o>
+<o n="==" r="235"><o>__sys__t431</o><i>myHeroHP</i><i>__sys__t67</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t431</i></o>
+<o n="=="><o>__sys__t433</o><i>__sys__rt</i><i>__sys__t68</i></o>
+<o n="if_goto"><o>__sys__t434</o><i>__sys__t433</i><i>__sys__t437</i></o>
+<o n="=" r="237"><o>myHeroHP</o><i>__sys__t69</i></o>
+<o n="goto"><o>__sys__t436</o><i>__sys__t438</i></o>
+<o n="&lt;" r="239"><o>__sys__t439</o><i>myHeroHP</i><i>__sys__t70</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t439</i></o>
+<o n="=="><o>__sys__t441</o><i>__sys__rt</i><i>__sys__t71</i></o>
+<o n="if_goto"><o>__sys__t442</o><i>__sys__t441</i><i>__sys__t446</i></o>
+<o n="abs" r="241"><o>__sys__t443</o><i>myHeroHP</i></o>
+<o n="=" r="241"><o>myHeroHP</o><i>__sys__t443</i></o>
+<o n="goto"><o>__sys__t445</o><i>__sys__t447</i></o>
+<o n="=" r="243"><o>isWin</o><i>__sys__t72</i></o>
+<o n="goto"><o>__sys__t449</o><i>__sys__t467</i></o>
+<o n="-" r="247"><o>__sys__t451</o><i>tagetCount</i><i>__sys__t73</i></o>
+<o n="=" r="247"><o>newtagetCount</o><i>__sys__t451</i></o>
+<o n="*" r="248"><o>__sys__t453</o><i>newtagetCount</i><i>meAtt</i></o>
+<o n="=" r="248"><o>newenemyHeroHP</o><i>__sys__t453</i></o>
+<o n="-" r="249"><o>__sys__t455</o><i>enemyHeroHP</i><i>newenemyHeroHP</i></o>
+<o n="round" r="249"><o>__sys__t456</o><i>__sys__t455</i></o>
+<o n="=" r="249"><o>enemyHeroHP</o><i>__sys__t456</i></o>
+<o n="&lt;=" r="250"><o>__sys__t458</o><i>enemyHeroHP</i><i>__sys__t74</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t458</i></o>
+<o n="=="><o>__sys__t460</o><i>__sys__rt</i><i>__sys__t75</i></o>
+<o n="if_goto"><o>__sys__t461</o><i>__sys__t460</i><i>__sys__t464</i></o>
+<o n="=" r="252"><o>enemyHeroHP</o><i>__sys__t76</i></o>
+<o n="goto"><o>__sys__t463</o><i>__sys__t465</i></o>
+<o n="=" r="254"><o>isWin</o><i>__sys__t77</i></o>
+<o n="goto"><o>__sys__t468</o><i>__sys__t470</i></o>
+<o n="push" r="259"><o>__sys__t471</o><i>myAttArr</i><i>myHpArr</i><i>meIsCritSignArr</i></o>
+<o n="push" r="260"><o>__sys__t472</o><i>enemyAttArr</i><i>enemyHpArr</i><i>enemyIsCritSignArr</i></o>
+<o n="push" r="261"><o>__sys__t473</o><i>battleInfo</i><i>myAttArr</i><i>enemyAttArr</i><i>enemyHeroHpAdd</i></o>
+<v t="s" n="__sys__t475">.table.</v>
+<o n="." r="263"><o>__sys__t474</o><i>game</i><i>__sys__t475</i></o>
+<o n="=" r="263"><o>talbeData</o><i>__sys__t474</i></o>
+<v t="s" n="__sys__t479">.towerConfig.</v>
+<o n="." r="264"><o>__sys__t478</o><i>talbeData</i><i>__sys__t479</i></o>
+<v t="s" n="__sys__t482">.getRow.</v>
+<o n="." r="264"><o>__sys__t481</o><i>__sys__t478</i><i>__sys__t482</i></o>
+<o n="__sys__t481" r="264"><o>__sys__t484</o><i>__sys__t478</i><i>__sys__t78</i></o>
+<o n="=" r="264"><o>row</o><i>__sys__t484</i></o>
+<v t="s" n="__sys__t487">.getValFromColName.</v>
+<o n="." r="265"><o>__sys__t486</o><i>row</i><i>__sys__t487</i></o>
+<o n="__sys__t486" r="265"><o>__sys__t489</o><i>row</i><i>__sys__t79</i></o>
+<o n="number" r="265"><o>__sys__t490</o><i>__sys__t489</i></o>
+<o n="=" r="265"><o>winReward</o><i>__sys__t490</i></o>
+<v t="s" n="__sys__t493">.getValFromColName.</v>
+<o n="." r="266"><o>__sys__t492</o><i>row</i><i>__sys__t493</i></o>
+<o n="__sys__t492" r="266"><o>__sys__t495</o><i>row</i><i>__sys__t80</i></o>
+<o n="number" r="266"><o>__sys__t496</o><i>__sys__t495</i></o>
+<o n="=" r="266"><o>lottery</o><i>__sys__t496</i></o>
+<v t="s" n="__sys__t499">.towerMaxID.</v>
+<o n="." r="267"><o>__sys__t498</o><i>user</i><i>__sys__t499</i></o>
+<o n="number" r="267"><o>__sys__t501</o><i>__sys__t498</i></o>
+<o n="=" r="267"><o>towerMaxID</o><i>__sys__t501</i></o>
+<v t="s" n="__sys__t504">.towerID.</v>
+<o n="." r="268"><o>__sys__t503</o><i>user</i><i>__sys__t504</i></o>
+<o n="number" r="268"><o>__sys__t506</o><i>__sys__t503</i></o>
+<o n="=" r="268"><o>towerID</o><i>__sys__t506</i></o>
+<v t="s" n="__sys__t509">.heroIndex.</v>
+<o n="." r="271"><o>__sys__t508</o><i>towerBattle</i><i>__sys__t509</i></o>
+<o n="=" r="271"><o>heroIndex</o><i>__sys__t508</i></o>
+<v t="s" n="__sys__t513">.hero.</v>
+<o n="." r="272"><o>__sys__t512</o><i>json</i><i>__sys__t513</i></o>
+<o n="[]" r="272"><o>__sys__t515</o><i>__sys__t512</i><i>heroIndex</i></o>
+<o n="=" r="272"><o>hero</o><i>__sys__t515</i></o>
+<v t="s" n="__sys__t518">.growsExp.</v>
+<o n="." r="273"><o>__sys__t517</o><i>hero</i><i>__sys__t518</i></o>
+<o n="=" r="273"><o>growsExp</o><i>__sys__t517</i></o>
+<v t="s" n="__sys__t522">.buffArr.</v>
+<o n="." r="274"><o>__sys__t521</o><i>towerBattle</i><i>__sys__t522</i></o>
+<o n="=" r="274"><o>buffArr</o><i>__sys__t521</i></o>
+<o n="=" r="276"><o>buff</o><i>buffArr</i></o>
+<o n="==" r="277"><o>__sys__t526</o><i>isWin</i><i>__sys__t81</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t526</i></o>
+<o n="=="><o>__sys__t528</o><i>__sys__rt</i><i>__sys__t82</i></o>
+<o n="if_goto"><o>__sys__t529</o><i>__sys__t528</i><i>__sys__t544</i></o>
+<o n="+=" r="279"><o>battleCount</o><i>__sys__t83</i></o>
+<v t="s" n="__sys__t532">.numMgr.</v>
+<o n="." r="280"><o>__sys__t531</o><i>game</i><i>__sys__t532</i></o>
+<o n="=" r="280"><o>numMgr</o><i>__sys__t531</i></o>
+<v t="s" n="__sys__t536">.getWaterBattleBuffArr.</v>
+<o n="." r="282"><o>__sys__t535</o><i>numMgr</i><i>__sys__t536</i></o>
+<o n="__sys__t535" r="282"><o>__sys__t538</o><i>numMgr</i><i>battleCount</i><i>buffArr</i></o>
+<o n="=" r="282"><o>buff</o><i>__sys__t538</i></o>
+<o n="+=" r="283"><o>growsExp</o><i>winReward</i></o>
+<o n="=" r="284"><o>outcome</o><i>__sys__t84</i></o>
+<o n="+=" r="285"><o>winCount</o><i>__sys__t85</i></o>
+<o n="goto"><o>__sys__t543</o><i>__sys__t547</i></o>
+<o n=" -" r="289"><o>__sys__t545</o><i>__sys__t86</i></o>
+<o n="=" r="289"><o>outcome</o><i>__sys__t545</i></o>
+<o n="now" r="292"><o>__sys__t548</o></o>
+<o n="=" r="292"><o>nowTime</o><i>__sys__t548</i></o>
+<v t="s" n="__sys__t551">.cnn.</v>
+<o n="." r="294"><o>__sys__t550</o><i>game</i><i>__sys__t551</i></o>
+<o n="=" r="294"><o>cnn</o><i>__sys__t550</i></o>
+<v t="s" n="__sys__t555">.towerBattleExt.</v>
+<o n="." r="295"><o>__sys__t554</o><i>jsonExt</i><i>__sys__t555</i></o>
+<o n="=" r="295"><o>towerBattleExt</o><i>__sys__t554</i></o>
+<v t="s" n="__sys__t559">.towerBattleToken.</v>
+<o n="." r="296"><o>__sys__t558</o><i>user</i><i>__sys__t559</i></o>
+<o n="number" r="296"><o>__sys__t561</o><i>__sys__t558</i></o>
+<o n="=" r="296"><o>towerBattleToken</o><i>__sys__t561</i></o>
+<v t="s" n="__sys__t564">.useHeroIndexMap.</v>
+<o n="." r="297"><o>__sys__t563</o><i>towerBattle</i><i>__sys__t564</i></o>
+<o n="=" r="297"><o>useHeroIndexMap</o><i>__sys__t563</i></o>
+<v t="s" n="__sys__t568">.hp.</v>
+<o n="." r="299"><o>__sys__t567</o><i>towerBattle</i><i>__sys__t568</i></o>
+<o n="round" r="299"><o>__sys__t570</o><i>myHeroHP</i></o>
+<o n="=" r="299"><o>__sys__t567</o><i>__sys__t570</i></o>
+<v t="s" n="__sys__t573">.hp.</v>
+<o n="." r="300"><o>__sys__t572</o><i>towerBattle</i><i>__sys__t573</i></o>
+<o n="round" r="300"><o>__sys__t575</o><i>__sys__t572</i></o>
+<o n="=" r="300"><o>hpEd</o><i>__sys__t575</i></o>
+<o n="=" r="301"><o>item</o><i>__sys__t87</i></o>
+<o n="=" r="302"><o>isBursttable</o><i>__sys__t88</i></o>
+<o n="==" r="303"><o>__sys__t579</o><i>isWin</i><i>__sys__t89</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t579</i></o>
+<o n="=="><o>__sys__t581</o><i>__sys__rt</i><i>__sys__t90</i></o>
+<o n="if_goto"><o>__sys__t582</o><i>__sys__t581</i><i>__sys__t776</i></o>
+<o n="=" r="306"><o>enemyHeroHP</o><i>__sys__t91</i></o>
+<v t="s" n="__sys__t585">.hp.</v>
+<o n="." r="307"><o>__sys__t584</o><i>enemyHero</i><i>__sys__t585</i></o>
+<o n="=" r="307"><o>__sys__t584</o><i>enemyHeroHP</i></o>
+<o n="=" r="308"><o>i</o><i>__sys__t92</i></o>
+<o n="size" r="308"><o>__sys__t589</o><i>enemyHeroArr</i></o>
+<o n="=" r="308"><o>enemyArrLength</o><i>__sys__t589</i></o>
+<o n="&lt;" r="309"><o>__sys__t592</o><i>i</i><i>enemyArrLength</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t592</i></o>
+<o n="=="><o>__sys__t594</o><i>__sys__rt</i><i>__sys__t93</i></o>
+<o n="if_goto"><o>__sys__t595</o><i>__sys__t594</i><i>__sys__t611</i></o>
+<o n="[]" r="311"><o>__sys__t596</o><i>enemyHeroArr</i><i>i</i></o>
+<v t="s" n="__sys__t598">.heroID.</v>
+<o n="." r="311"><o>__sys__t597</o><i>__sys__t596</i><i>__sys__t598</i></o>
+<o n="==" r="311"><o>__sys__t600</o><i>__sys__t597</i><i>enemyHeroID</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t600</i></o>
+<o n="=="><o>__sys__t602</o><i>__sys__rt</i><i>__sys__t94</i></o>
+<o n="if_goto"><o>__sys__t603</o><i>__sys__t602</i><i>__sys__t607</i></o>
+<o n="remove" r="313"><o>__sys__t604</o><i>enemyHeroArr</i><i>i</i></o>
+<o n="goto"><o>__sys__t605</o><i>__sys__t611</i></o>
+<o n="goto"><o>__sys__t606</o><i>__sys__t608</i></o>
+<o n="=" r="316"><o>__sys__t609</o><i>i</i></o>
+<o n="++" r="316"><o>i</o><i>i</i></o>
+<o n="goto"><o>__sys__t610</o><i>__sys__t591</i></o>
+<v t="s" n="__sys__t613">.enemyHeroArr.</v>
+<o n="." r="318"><o>__sys__t612</o><i>towerBattleExt</i><i>__sys__t613</i></o>
+<o n="=" r="318"><o>__sys__t612</o><i>enemyHeroArr</i></o>
+<v t="s" n="__sys__t617">.getThreeenemyHeroIDArr.</v>
+<o n="." r="321"><o>__sys__t616</o><i>numMgr</i><i>__sys__t617</i></o>
+<o n="__sys__t616" r="321"><o>__sys__t619</o><i>numMgr</i><i>enemyHeroArr</i><i>__sys__t95</i><i>towerBattle</i></o>
+<o n="=" r="321"><o>enemyHeroIDArr</o><i>__sys__t619</i></o>
+<v t="s" n="__sys__t622">.enemyHeroIDArr.</v>
+<o n="." r="324"><o>__sys__t621</o><i>towerBattle</i><i>__sys__t622</i></o>
+<o n="=" r="324"><o>__sys__t621</o><i>enemyHeroIDArr</i></o>
+<o n="+=" r="326"><o>towerBattleToken</o><i>__sys__t96</i></o>
+<o n="arrSize" r="331"><o>__sys__t626</o><i>enemyHeroIDArr</i></o>
+<o n="!=" r="331"><o>__sys__t627</o><i>__sys__t626</i><i>__sys__t97</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t627</i></o>
+<o n="=="><o>__sys__t629</o><i>__sys__rt</i><i>__sys__t98</i></o>
+<o n="if_goto"><o>__sys__t630</o><i>__sys__t629</i><i>__sys__t636</i></o>
+<v t="s" n="__sys__t632">.towerBattleStep.</v>
+<o n="." r="333"><o>__sys__t631</o><i>user</i><i>__sys__t632</i></o>
+<o n="=" r="333"><o>__sys__t631</o><i>__sys__t99</i></o>
+<o n="goto"><o>__sys__t635</o><i>__sys__t753</i></o>
+<o n="arrSize" r="335"><o>__sys__t637</o><i>enemyHeroIDArr</i></o>
+<o n="==" r="335"><o>__sys__t638</o><i>__sys__t637</i><i>__sys__t100</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t638</i></o>
+<o n="=="><o>__sys__t640</o><i>__sys__rt</i><i>__sys__t101</i></o>
+<o n="if_goto"><o>__sys__t641</o><i>__sys__t640</i><i>__sys__t751</i></o>
+<v t="s" n="__sys__t643">.towerBattleStep.</v>
+<o n="." r="337"><o>__sys__t642</o><i>user</i><i>__sys__t643</i></o>
+<o n="=" r="337"><o>__sys__t642</o><i>__sys__t102</i></o>
+<o n="+=" r="339"><o>towerID</o><i>__sys__t103</i></o>
+<o n="=" r="340"><o>winCount</o><i>__sys__t104</i></o>
+<o n=">" r="341"><o>__sys__t648</o><i>towerID</i><i>towerMaxID</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t648</i></o>
+<o n="=="><o>__sys__t650</o><i>__sys__rt</i><i>__sys__t105</i></o>
+<o n="if_goto"><o>__sys__t651</o><i>__sys__t650</i><i>__sys__t654</i></o>
+<o n="=" r="343"><o>towerMaxID</o><i>towerID</i></o>
+<o n="goto"><o>__sys__t653</o><i>__sys__t655</i></o>
+<v t="s" n="__sys__t657">.enemyHeroIDArr.</v>
+<o n="." r="347"><o>__sys__t656</o><i>towerBattle</i><i>__sys__t657</i></o>
+<o n="arr" r="347"><o>__sys__t659</o></o>
+<o n="=" r="347"><o>__sys__t656</o><i>__sys__t659</i></o>
+<v t="s" n="__sys__t662">.enemyHeroArr.</v>
+<o n="." r="348"><o>__sys__t661</o><i>towerBattleExt</i><i>__sys__t662</i></o>
+<o n="arr" r="348"><o>__sys__t664</o></o>
+<o n="=" r="348"><o>__sys__t661</o><i>__sys__t664</i></o>
+<v t="s" n="__sys__t667">.item.</v>
+<o n="." r="350"><o>__sys__t666</o><i>json</i><i>__sys__t667</i></o>
+<o n="=" r="350"><o>itemDict</o><i>__sys__t666</i></o>
+<v t="s" n="__sys__t671">.tower.</v>
+<o n="." r="351"><o>__sys__t670</o><i>talbeData</i><i>__sys__t671</i></o>
+<o n="=" r="351"><o>towerTal</o><i>__sys__t670</i></o>
+<v t="s" n="__sys__t675">.size.</v>
+<o n="." r="352"><o>__sys__t674</o><i>towerTal</i><i>__sys__t675</i></o>
+<o n="__sys__t674" r="352"><o>__sys__t677</o><i>towerTal</i></o>
+<o n="=" r="352"><o>towerTalLength</o><i>__sys__t677</i></o>
+<o n=">=" r="353"><o>__sys__t679</o><i>towerID</i><i>towerTalLength</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t679</i></o>
+<o n="=="><o>__sys__t681</o><i>__sys__rt</i><i>__sys__t106</i></o>
+<o n="if_goto"><o>__sys__t682</o><i>__sys__t681</i><i>__sys__t686</i></o>
+<o n="=" r="355"><o>isBursttable</o><i>__sys__t107</i></o>
+<o n="=" r="356"><o>towerID</o><i>towerTalLength</i></o>
+<o n="goto"><o>__sys__t685</o><i>__sys__t687</i></o>
+<v t="s" n="__sys__t689">.getRowFromColName.</v>
+<o n="." r="358"><o>__sys__t688</o><i>towerTal</i><i>__sys__t689</i></o>
+<o n="__sys__t688" r="358"><o>__sys__t691</o><i>towerTal</i><i>__sys__t108</i><i>towerID</i></o>
+<o n="=" r="358"><o>towerRow</o><i>__sys__t691</i></o>
+<v t="s" n="__sys__t694">.getValFromColName.</v>
+<o n="." r="360"><o>__sys__t693</o><i>towerRow</i><i>__sys__t694</i></o>
+<o n="__sys__t693" r="360"><o>__sys__t696</o><i>towerRow</i><i>__sys__t109</i></o>
+<o n="=" r="360"><o>item</o><i>__sys__t696</i></o>
+<o n="arr" r="361"><o>__sys__t698</o></o>
+<o n="split" r="361"><o>__sys__t699</o><i>__sys__t698</i><i>item</i><i>__sys__t110</i></o>
+<o n="=" r="361"><o>arr</o><i>__sys__t699</i></o>
+<o n="size" r="362"><o>__sys__t701</o><i>arr</i></o>
+<o n="=" r="362"><o>getItem</o><i>__sys__t701</i></o>
+<o n=">=" r="363"><o>__sys__t703</o><i>getItem</i><i>__sys__t111</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t703</i></o>
+<o n="=="><o>__sys__t705</o><i>__sys__rt</i><i>__sys__t112</i></o>
+<o n="if_goto"><o>__sys__t706</o><i>__sys__t705</i><i>__sys__t727</i></o>
+<o n="=" r="365"><o>i</o><i>__sys__t113</i></o>
+<o n="&lt;" r="365"><o>__sys__t709</o><i>i</i><i>getItem</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t709</i></o>
+<o n="=="><o>__sys__t711</o><i>__sys__rt</i><i>__sys__t114</i></o>
+<o n="if_goto"><o>__sys__t712</o><i>__sys__t711</i><i>__sys__t725</i></o>
+<o n="[]" r="367"><o>__sys__t713</o><i>arr</i><i>i</i></o>
+<o n="=" r="367"><o>itemID</o><i>__sys__t713</i></o>
+<o n="+" r="368"><o>__sys__t715</o><i>i</i><i>__sys__t115</i></o>
+<o n="[]" r="368"><o>__sys__t716</o><i>arr</i><i>__sys__t715</i></o>
+<o n="number" r="368"><o>__sys__t717</o><i>__sys__t716</i></o>
+<o n="=" r="368"><o>itemCount</o><i>__sys__t717</i></o>
+<v t="s" n="__sys__t720">.addItem.</v>
+<o n="." r="369"><o>__sys__t719</o><i>numMgr</i><i>__sys__t720</i></o>
+<o n="__sys__t719" r="369"><o>__sys__t722</o><i>numMgr</i><i>itemID</i><i>itemCount</i><i>itemDict</i></o>
+<o n="+=" r="370"><o>i</o><i>__sys__t116</i></o>
+<o n="goto"><o>__sys__t724</o><i>__sys__t708</i></o>
+<o n="goto"><o>__sys__t726</o><i>__sys__t728</i></o>
+<o n="%" r="373"><o>__sys__t729</o><i>towerID</i><i>__sys__t118</i></o>
+<o n="!=" r="373"><o>__sys__t730</o><i>towerID</i><i>__sys__t117</i></o>
+<o n="==" r="373"><o>__sys__t731</o><i>__sys__t729</i><i>__sys__t119</i></o>
+<o n="&&" r="373"><o>__sys__t732</o><i>__sys__t730</i><i>__sys__t731</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t732</i></o>
+<o n="=="><o>__sys__t734</o><i>__sys__rt</i><i>__sys__t120</i></o>
+<o n="if_goto"><o>__sys__t735</o><i>__sys__t734</i><i>__sys__t748</i></o>
+<o n="dict" r="375"><o>__sys__t736</o></o>
+<o n="=" r="375"><o>useHeroIndexMap</o><i>__sys__t736</i></o>
+<v t="s" n="__sys__t739">.towerBattleStep.</v>
+<o n="." r="376"><o>__sys__t738</o><i>user</i><i>__sys__t739</i></o>
+<o n="=" r="376"><o>__sys__t738</o><i>__sys__t121</i></o>
+<o n="=" r="377"><o>battleCount</o><i>__sys__t122</i></o>
+<v t="s" n="__sys__t744">.hp.</v>
+<o n="." r="378"><o>__sys__t743</o><i>towerBattle</i><i>__sys__t744</i></o>
+<o n="=" r="378"><o>__sys__t743</o><i>__sys__t123</i></o>
+<o n="goto"><o>__sys__t747</o><i>__sys__t749</i></o>
+<o n="goto"><o>__sys__t750</o><i>__sys__t752</i></o>
+<o n="!=" r="382"><o>__sys__t754</o><i>lottery</i><i>__sys__t124</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t754</i></o>
+<o n="=="><o>__sys__t756</o><i>__sys__rt</i><i>__sys__t125</i></o>
+<o n="if_goto"><o>__sys__t757</o><i>__sys__t756</i><i>__sys__t773</i></o>
+<o n="%" r="384"><o>__sys__t758</o><i>battleCount</i><i>lottery</i></o>
+<o n="!=" r="384"><o>__sys__t759</o><i>battleCount</i><i>__sys__t126</i></o>
+<o n="==" r="384"><o>__sys__t760</o><i>__sys__t758</i><i>__sys__t127</i></o>
+<o n="&&" r="384"><o>__sys__t761</o><i>__sys__t759</i><i>__sys__t760</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t761</i></o>
+<o n="=="><o>__sys__t763</o><i>__sys__rt</i><i>__sys__t128</i></o>
+<o n="if_goto"><o>__sys__t764</o><i>__sys__t763</i><i>__sys__t770</i></o>
+<v t="s" n="__sys__t766">.towerBattleStep.</v>
+<o n="." r="387"><o>__sys__t765</o><i>user</i><i>__sys__t766</i></o>
+<o n="=" r="387"><o>__sys__t765</o><i>__sys__t129</i></o>
+<o n="goto"><o>__sys__t769</o><i>__sys__t771</i></o>
+<o n="goto"><o>__sys__t772</o><i>__sys__t774</i></o>
+<o n="goto"><o>__sys__t775</o><i>__sys__t793</i></o>
+<v t="s" n="__sys__t778">.hp.</v>
+<o n="." r="396"><o>__sys__t777</o><i>towerBattle</i><i>__sys__t778</i></o>
+<o n="=" r="396"><o>__sys__t777</o><i>__sys__t130</i></o>
+<v t="s" n="__sys__t782">.hp.</v>
+<o n="." r="397"><o>__sys__t781</o><i>enemyHero</i><i>__sys__t782</i></o>
+<o n="round" r="397"><o>__sys__t784</o><i>enemyHeroHP</i></o>
+<o n="=" r="397"><o>__sys__t781</o><i>__sys__t784</i></o>
+<o n="=" r="398"><o>battleCount</o><i>__sys__t131</i></o>
+<o n="[]" r="399"><o>__sys__t787</o><i>useHeroIndexMap</i><i>heroIndex</i></o>
+<o n="=" r="399"><o>__sys__t787</o><i>__sys__t132</i></o>
+<v t="s" n="__sys__t790">.towerBattleStep.</v>
+<o n="." r="400"><o>__sys__t789</o><i>user</i><i>__sys__t790</i></o>
+<o n="=" r="400"><o>__sys__t789</o><i>__sys__t133</i></o>
+<v t="s" n="__sys__t795">.winCount.</v>
+<o n="." r="416"><o>__sys__t794</o><i>towerBattle</i><i>__sys__t795</i></o>
+<o n="=" r="416"><o>__sys__t794</o><i>winCount</i></o>
+<v t="s" n="__sys__t799">.useHeroIndexMap.</v>
+<o n="." r="417"><o>__sys__t798</o><i>towerBattle</i><i>__sys__t799</i></o>
+<o n="=" r="417"><o>__sys__t798</o><i>useHeroIndexMap</i></o>
+<v t="s" n="__sys__t803">.towerBattleToken.</v>
+<o n="." r="418"><o>__sys__t802</o><i>user</i><i>__sys__t803</i></o>
+<o n="=" r="418"><o>__sys__t802</o><i>towerBattleToken</i></o>
+<v t="s" n="__sys__t807">.towerID.</v>
+<o n="." r="419"><o>__sys__t806</o><i>user</i><i>__sys__t807</i></o>
+<o n="=" r="419"><o>__sys__t806</o><i>towerID</i></o>
+<v t="s" n="__sys__t811">.towerMaxID.</v>
+<o n="." r="420"><o>__sys__t810</o><i>user</i><i>__sys__t811</i></o>
+<o n="=" r="420"><o>__sys__t810</o><i>towerMaxID</i></o>
+<v t="s" n="__sys__t815">.hero.</v>
+<o n="." r="421"><o>__sys__t814</o><i>json</i><i>__sys__t815</i></o>
+<o n="[]" r="421"><o>__sys__t817</o><i>__sys__t814</i><i>heroIndex</i></o>
+<v t="s" n="__sys__t819">.growsExp.</v>
+<o n="." r="421"><o>__sys__t818</o><i>__sys__t817</i><i>__sys__t819</i></o>
+<o n="=" r="421"><o>__sys__t818</o><i>growsExp</i></o>
+<v t="s" n="__sys__t823">.hero.</v>
+<o n="." r="422"><o>__sys__t822</o><i>json</i><i>__sys__t823</i></o>
+<o n="[]" r="422"><o>__sys__t825</o><i>__sys__t822</i><i>heroIndex</i></o>
+<v t="s" n="__sys__t827">.growsExp.</v>
+<o n="." r="422"><o>__sys__t826</o><i>__sys__t825</i><i>__sys__t827</i></o>
+<o n="=" r="422"><o>heroGrowsExp</o><i>__sys__t826</i></o>
+<v t="s" n="__sys__t831">.buyBuff.</v>
+<o n="." r="423"><o>__sys__t830</o><i>towerBattle</i><i>__sys__t831</i></o>
+<o n="=" r="423"><o>__sys__t830</o><i>__sys__t134</i></o>
+<v t="s" n="__sys__t835">.battleCount.</v>
+<o n="." r="424"><o>__sys__t834</o><i>towerBattle</i><i>__sys__t835</i></o>
+<o n="=" r="424"><o>__sys__t834</o><i>battleCount</i></o>
+<v t="s" n="__sys__t839">.buffArr.</v>
+<o n="." r="425"><o>__sys__t838</o><i>towerBattle</i><i>__sys__t839</i></o>
+<o n="=" r="425"><o>__sys__t838</o><i>buff</i></o>
+<v t="s" n="__sys__t843">.jsonExt.</v>
+<o n="." r="426"><o>__sys__t842</o><i>user</i><i>__sys__t843</i></o>
+<o n="json_encode" r="426"><o>__sys__t845</o><i>jsonExt</i></o>
+<o n="=" r="426"><o>__sys__t842</o><i>__sys__t845</i></o>
+<v t="s" n="__sys__t848">.json.</v>
+<o n="." r="427"><o>__sys__t847</o><i>user</i><i>__sys__t848</i></o>
+<o n="json_encode" r="427"><o>__sys__t850</o><i>json</i></o>
+<o n="=" r="427"><o>__sys__t847</o><i>__sys__t850</i></o>
+<v t="s" n="__sys__t853">.sendMsg.</v>
+<o n="." r="429"><o>__sys__t852</o><i>game</i><i>__sys__t853</i></o>
+<o n="+" r="432"><o>__sys__t855</o><i>methodName</i><i>__sys__t135</i></o>
+<v t="s" n="__sys__t857">.enemyHeroPromotionArr.</v>
+<o n="." r="432"><o>__sys__t856</o><i>towerBattle</i><i>__sys__t857</i></o>
+<v t="s" n="__sys__t860">.hp.</v>
+<o n="." r="432"><o>__sys__t859</o><i>towerBattle</i><i>__sys__t860</i></o>
+<v t="s" n="__sys__t863">.towerBattleStep.</v>
+<o n="." r="432"><o>__sys__t862</o><i>user</i><i>__sys__t863</i></o>
+<o n="arr" r="432"><o>__sys__t865</o><i>__sys__t855</i><i>__sys__t136</i><i>battleInfo</i><i>enemyHeroIDArr</i><i>battleCount</i><i>nowTime</i><i>enemyHero</i><i>winCount</i><i>buff</i><i>__sys__t856</i><i>growsExp</i><i>__sys__t859</i><i>isWin</i><i>enemyHeroHP</i><i>towerMaxID</i><i>towerID</i><i>__sys__t862</i><i>item</i><i>towerBattleToken</i><i>hpEd</i><i>isBursttable</i></o>
+<o n="__sys__t852" r="429"><o>__sys__t866</o><i>game</i><i>sessionID</i><i>__sys__t865</i></o>
+<o n="return" r="435"><o>__sys__t867</o><i>__sys__t137</i></o>
+<v n="HP" />
+<v n="HP2" />
+<v n="__sys__rt" />
+<v n="__sys__t138" />
+<v n="__sys__t140" />
+<v n="__sys__t142" />
+<v n="__sys__t144" />
+<v n="__sys__t146" />
+<v n="__sys__t148" />
+<v n="__sys__t150" />
+<v n="__sys__t152" />
+<v n="__sys__t154" />
+<v n="__sys__t156" />
+<v n="__sys__t159" />
+<v n="__sys__t161" />
+<v n="__sys__t164" />
+<v n="__sys__t166" />
+<v n="__sys__t169" />
+<v n="__sys__t171" />
+<v n="__sys__t173" />
+<v n="__sys__t174" />
+<v n="__sys__t175" />
+<v n="__sys__t178" />
+<v n="__sys__t179" />
+<v n="__sys__t180" />
+<v n="__sys__t181" />
+<v n="__sys__t182" />
+<v n="__sys__t183" />
+<v n="__sys__t186" />
+<v n="__sys__t190" />
+<v n="__sys__t194" />
+<v n="__sys__t198" />
+<v n="__sys__t202" />
+<v n="__sys__t203" />
+<v n="__sys__t205" />
+<v n="__sys__t206" />
+<v n="__sys__t207" />
+<v n="__sys__t210" />
+<v n="__sys__t211" />
+<v n="__sys__t212" />
+<v n="__sys__t213" />
+<v n="__sys__t214" />
+<v n="__sys__t215" />
+<v n="__sys__t218" />
+<v n="__sys__t220" />
+<v n="__sys__t222" />
+<v n="__sys__t223" />
+<v n="__sys__t224" />
+<v n="__sys__t227" />
+<v n="__sys__t228" />
+<v n="__sys__t229" />
+<v n="__sys__t230" />
+<v n="__sys__t231" />
+<v n="__sys__t232" />
+<v n="__sys__t235" />
+<v n="__sys__t237" />
+<v n="__sys__t242" />
+<v n="__sys__t246" />
+<v n="__sys__t250" />
+<v n="__sys__t254" />
+<v n="__sys__t258" />
+<v n="__sys__t262" />
+<v n="__sys__t266" />
+<v n="__sys__t268" />
+<v n="__sys__t269" />
+<v n="__sys__t270" />
+<v n="__sys__t273" />
+<v n="__sys__t274" />
+<v n="__sys__t275" />
+<v n="__sys__t276" />
+<v n="__sys__t277" />
+<v n="__sys__t278" />
+<v n="__sys__t281" />
+<v n="__sys__t285" />
+<v n="__sys__t289" />
+<v n="__sys__t293" />
+<v n="__sys__t297" />
+<v n="__sys__t301" />
+<v n="__sys__t305" />
+<v n="__sys__t309" />
+<v n="__sys__t313" />
+<v n="__sys__t318" />
+<v n="__sys__t321" />
+<v n="__sys__t323" />
+<v n="__sys__t325" />
+<v n="__sys__t327" />
+<v n="__sys__t329" />
+<v n="__sys__t331" />
+<v n="__sys__t336" />
+<v n="__sys__t337" />
+<v n="__sys__t338" />
+<v n="__sys__t339" />
+<v n="__sys__t340" />
+<v n="__sys__t342" />
+<v n="__sys__t343" />
+<v n="__sys__t344" />
+<v n="__sys__t346" />
+<v n="__sys__t347" />
+<v n="__sys__t348" />
+<v n="__sys__t350" />
+<v n="__sys__t351" />
+<v n="__sys__t354" />
+<v n="__sys__t357" />
+<v n="__sys__t359" />
+<v n="__sys__t360" />
+<v n="__sys__t362" />
+<v n="__sys__t366" />
+<v n="__sys__t367" />
+<v n="__sys__t368" />
+<v n="__sys__t370" />
+<v n="__sys__t372" />
+<v n="__sys__t374" />
+<v n="__sys__t375" />
+<v n="__sys__t378" />
+<v n="__sys__t381" />
+<v n="__sys__t383" />
+<v n="__sys__t384" />
+<v n="__sys__t386" />
+<v n="__sys__t390" />
+<v n="__sys__t391" />
+<v n="__sys__t392" />
+<v n="__sys__t395" />
+<v n="__sys__t396" />
+<v n="__sys__t398" />
+<v n="__sys__t399" />
+<v n="__sys__t400" />
+<v n="__sys__t402" />
+<v n="__sys__t403" />
+<v n="__sys__t404" />
+<v n="__sys__t406" />
+<v n="__sys__t408" />
+<v n="__sys__t409" />
+<v n="__sys__t411" />
+<v n="__sys__t412" />
+<v n="__sys__t414" />
+<v n="__sys__t416" />
+<v n="__sys__t417" />
+<v n="__sys__t419" />
+<v n="__sys__t422" />
+<v n="__sys__t423" />
+<v n="__sys__t425" />
+<v n="__sys__t426" />
+<v n="__sys__t427" />
+<v n="__sys__t428" />
+<v n="__sys__t429" />
+<v n="__sys__t431" />
+<v n="__sys__t433" />
+<v n="__sys__t434" />
+<v n="__sys__t436" />
+<v n="__sys__t439" />
+<v n="__sys__t441" />
+<v n="__sys__t442" />
+<v n="__sys__t443" />
+<v n="__sys__t445" />
+<v n="__sys__t449" />
+<v n="__sys__t451" />
+<v n="__sys__t453" />
+<v n="__sys__t455" />
+<v n="__sys__t456" />
+<v n="__sys__t458" />
+<v n="__sys__t460" />
+<v n="__sys__t461" />
+<v n="__sys__t463" />
+<v n="__sys__t468" />
+<v n="__sys__t471" />
+<v n="__sys__t472" />
+<v n="__sys__t473" />
+<v n="__sys__t474" />
+<v n="__sys__t478" />
+<v n="__sys__t481" />
+<v n="__sys__t484" />
+<v n="__sys__t486" />
+<v n="__sys__t489" />
+<v n="__sys__t490" />
+<v n="__sys__t492" />
+<v n="__sys__t495" />
+<v n="__sys__t496" />
+<v n="__sys__t498" />
+<v n="__sys__t501" />
+<v n="__sys__t503" />
+<v n="__sys__t506" />
+<v n="__sys__t508" />
+<v n="__sys__t512" />
+<v n="__sys__t515" />
+<v n="__sys__t517" />
+<v n="__sys__t521" />
+<v n="__sys__t526" />
+<v n="__sys__t528" />
+<v n="__sys__t529" />
+<v n="__sys__t531" />
+<v n="__sys__t535" />
+<v n="__sys__t538" />
+<v n="__sys__t543" />
+<v n="__sys__t545" />
+<v n="__sys__t548" />
+<v n="__sys__t550" />
+<v n="__sys__t554" />
+<v n="__sys__t558" />
+<v n="__sys__t561" />
+<v n="__sys__t563" />
+<v n="__sys__t567" />
+<v n="__sys__t570" />
+<v n="__sys__t572" />
+<v n="__sys__t575" />
+<v n="__sys__t579" />
+<v n="__sys__t581" />
+<v n="__sys__t582" />
+<v n="__sys__t584" />
+<v n="__sys__t589" />
+<v n="__sys__t592" />
+<v n="__sys__t594" />
+<v n="__sys__t595" />
+<v n="__sys__t596" />
+<v n="__sys__t597" />
+<v n="__sys__t600" />
+<v n="__sys__t602" />
+<v n="__sys__t603" />
+<v n="__sys__t604" />
+<v n="__sys__t605" />
+<v n="__sys__t606" />
+<v n="__sys__t609" />
+<v n="__sys__t610" />
+<v n="__sys__t612" />
+<v n="__sys__t616" />
+<v n="__sys__t619" />
+<v n="__sys__t621" />
+<v n="__sys__t626" />
+<v n="__sys__t627" />
+<v n="__sys__t629" />
+<v n="__sys__t630" />
+<v n="__sys__t631" />
+<v n="__sys__t635" />
+<v n="__sys__t637" />
+<v n="__sys__t638" />
+<v n="__sys__t640" />
+<v n="__sys__t641" />
+<v n="__sys__t642" />
+<v n="__sys__t648" />
+<v n="__sys__t650" />
+<v n="__sys__t651" />
+<v n="__sys__t653" />
+<v n="__sys__t656" />
+<v n="__sys__t659" />
+<v n="__sys__t661" />
+<v n="__sys__t664" />
+<v n="__sys__t666" />
+<v n="__sys__t670" />
+<v n="__sys__t674" />
+<v n="__sys__t677" />
+<v n="__sys__t679" />
+<v n="__sys__t681" />
+<v n="__sys__t682" />
+<v n="__sys__t685" />
+<v n="__sys__t688" />
+<v n="__sys__t691" />
+<v n="__sys__t693" />
+<v n="__sys__t696" />
+<v n="__sys__t698" />
+<v n="__sys__t699" />
+<v n="__sys__t701" />
+<v n="__sys__t703" />
+<v n="__sys__t705" />
+<v n="__sys__t706" />
+<v n="__sys__t709" />
+<v n="__sys__t711" />
+<v n="__sys__t712" />
+<v n="__sys__t713" />
+<v n="__sys__t715" />
+<v n="__sys__t716" />
+<v n="__sys__t717" />
+<v n="__sys__t719" />
+<v n="__sys__t722" />
+<v n="__sys__t724" />
+<v n="__sys__t726" />
+<v n="__sys__t729" />
+<v n="__sys__t730" />
+<v n="__sys__t731" />
+<v n="__sys__t732" />
+<v n="__sys__t734" />
+<v n="__sys__t735" />
+<v n="__sys__t736" />
+<v n="__sys__t738" />
+<v n="__sys__t743" />
+<v n="__sys__t747" />
+<v n="__sys__t750" />
+<v n="__sys__t754" />
+<v n="__sys__t756" />
+<v n="__sys__t757" />
+<v n="__sys__t758" />
+<v n="__sys__t759" />
+<v n="__sys__t760" />
+<v n="__sys__t761" />
+<v n="__sys__t763" />
+<v n="__sys__t764" />
+<v n="__sys__t765" />
+<v n="__sys__t769" />
+<v n="__sys__t772" />
+<v n="__sys__t775" />
+<v n="__sys__t777" />
+<v n="__sys__t781" />
+<v n="__sys__t784" />
+<v n="__sys__t787" />
+<v n="__sys__t789" />
+<v n="__sys__t794" />
+<v n="__sys__t798" />
+<v n="__sys__t802" />
+<v n="__sys__t806" />
+<v n="__sys__t810" />
+<v n="__sys__t814" />
+<v n="__sys__t817" />
+<v n="__sys__t818" />
+<v n="__sys__t822" />
+<v n="__sys__t825" />
+<v n="__sys__t826" />
+<v n="__sys__t830" />
+<v n="__sys__t834" />
+<v n="__sys__t838" />
+<v n="__sys__t842" />
+<v n="__sys__t845" />
+<v n="__sys__t847" />
+<v n="__sys__t850" />
+<v n="__sys__t852" />
+<v n="__sys__t855" />
+<v n="__sys__t856" />
+<v n="__sys__t859" />
+<v n="__sys__t862" />
+<v n="__sys__t865" />
+<v n="__sys__t866" />
+<v n="__sys__t867" />
+<v n="arr" />
+<v n="battleCount" />
+<v n="battleInfo" />
+<v n="buff" />
+<v n="buffArr" />
+<v n="cnn" />
+<v n="enemyArrLength" />
+<v n="enemyAttArr" />
+<v n="enemyHero" />
+<v n="enemyHeroArr" />
+<v n="enemyHeroAttack" />
+<v n="enemyHeroAttackC" />
+<v n="enemyHeroCrit" />
+<v n="enemyHeroCritRate" />
+<v n="enemyHeroHP" />
+<v n="enemyHeroHpAdd" />
+<v n="enemyHeroID" />
+<v n="enemyHeroIDArr" />
+<v n="enemyHeroIndeoutcome" />
+<v n="enemyHpArr" />
+<v n="enemyIsCritSignArr" />
+<v n="game" />
+<v n="getEnemyHeroIndeoutcome" />
+<v n="getFixedHp" />
+<v n="getHp" />
+<v n="getItem" />
+<v n="growsExp" />
+<v n="hero" />
+<v n="heroGrowsExp" />
+<v n="heroIndex" />
+<v n="hp" />
+<v n="hp2" />
+<v n="hpEd" />
+<v n="i" />
+<v n="isBattle" />
+<v n="isBursttable" />
+<v n="isCritSign" />
+<v n="isWin" />
+<v n="item" />
+<v n="itemCount" />
+<v n="itemDict" />
+<v n="itemID" />
+<v n="json" />
+<v n="jsonExt" />
+<v n="lottery" />
+<v n="meAtt" />
+<v n="meCount" />
+<v n="meIsCritSignArr" />
+<v n="methodName" />
+<v n="myAttArr" />
+<v n="myHero" />
+<v n="myHeroAttack" />
+<v n="myHeroAttackC" />
+<v n="myHeroAttackPlus" />
+<v n="myHeroCrit" />
+<v n="myHeroCritRate" />
+<v n="myHeroHP" />
+<v n="myHeroSkillPlus" />
+<v n="myHpArr" />
+<v n="newenemyHeroHP" />
+<v n="newtagetCount" />
+<v n="nowTime" />
+<v n="numMgr" />
+<v n="outcome" />
+<v n="row" />
+<v n="sessionID" />
+<v n="tagetAtt" />
+<v n="tagetCount" />
+<v n="talbeData" />
+<v n="towerBattle" />
+<v n="towerBattleExt" />
+<v n="towerBattleToken" />
+<v n="towerID" />
+<v n="towerMaxID" />
+<v n="towerRow" />
+<v n="towerTal" />
+<v n="towerTalLength" />
+<v n="useHeroIndexMap" />
+<v n="user" />
+<v n="userID" />
+<v n="winCount" />
+<v n="winReward" />
+</script>

@@ -1,0 +1,107 @@
+//
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+// page=netMsg[3];
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}
+unionID=user.unionID;
+if(unionID==0)//没有联盟
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-4)
+	);
+	exit();
+}
+
+
+
+
+userInfoArr=arr();
+// countPerPage=10;
+// offset=page*countPerPage;
+
+
+sql="select id,level,online,logoutTime,unionBuildID,nickname,vip,power,devoteTotal from user where unionID="+unionID;//+" order by id desc limit "+offset+","+countPerPage;
+
+
+rs=mysqlCreateRs(game.cnn,sql);
+while(mysqlNextRow(rs))
+{
+	push(
+		userInfoArr,arr
+		(
+			mysqlGetColVal(rs,0),
+			mysqlGetColVal(rs,1),
+			mysqlGetColVal(rs,2),
+			mysqlGetColVal(rs,3),
+			mysqlGetColVal(rs,4),
+			mysqlGetColVal(rs,5),
+			mysqlGetColVal(rs,6),
+			mysqlGetColVal(rs,7),
+			mysqlGetColVal(rs,8),
+		);
+	);	
+}
+mysqlDestroyRs(rs);
+
+
+
+
+
+
+
+
+
+unionRow=game.rd.getRow(game.cnn,"union","id",unionID,"*",1000);
+if(empty(unionRow))
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}
+
+jsonStr=unionRow.json;
+json=json_decode(jsonStr);
+
+
+
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,unionRow.leaderUserID,json.viceLeaderUserIDMap,json.pickUserIDMap,userInfoArr,unionRow.level)
+);
+
+

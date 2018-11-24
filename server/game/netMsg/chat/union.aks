@@ -1,0 +1,119 @@
+//联盟聊天
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+str=netMsg[3];//文本
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}
+unionID=number(user.unionID);
+if(unionID==0)//没有联盟
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-4)
+	);
+	exit();
+}
+limitChat=int(user.limitChat);//禁言开关：0=关闭；1=开启；
+if(limitChat!=0)
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)//沉默状态
+	);
+	exit();
+}
+limitChatEndTime=int(user.limitChatEndTime);//禁言结束时间（秒）
+limitTime=time();//现在时间（秒）
+if(limitChatEndTime>limitTime)
+{
+	endTime=limitChatEndTime-limitTime;
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-3,endTime)//禁言结束时间未过
+	);
+	exit();
+}
+genTime=now();
+level=user.level;//Lv
+vip=user.vip;//Vip
+head=user.head;//head
+nickname=user.nickname;//nickname
+
+titleID=int(user.titleID);
+
+unionRow=game.rd.getRow(game.cnn,"union","id",unionID,"*",1000);
+if(empty(unionRow))
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}				
+
+jsonStr=unionRow.json;
+json=json_decode(jsonStr);
+userIDMap=json.userIDMap;
+
+
+//群发
+rtMsg=arr("chat/unionRt",userID,nickname,vip,level,head,str,genTime,titleID,type=0);
+
+game.sendMsgToAnyUser(rtMsg,userIDMap,userID);
+
+//发给hub
+push(rtMsg,userIDMap,userID);
+game.sendMsgToHub(rtMsg);
+
+cnn=game.cnn;
+
+//记录聊天日志
+tableName=createDayTable(cnn,"chat_union");
+sql="insert into "+tableName+" set genTime='"+genTime+"'";
+sql+=",userID="+userID;
+sql+=",nickname='"+nickname+"'";
+sql+=",vip="+vip;
+sql+=",level="+level;
+sql+=",head="+head;
+sql+=",titleID="+titleID;
+sql+=",unionID="+unionID;
+sql+=",txt='"+str+"'";
+mysqlExec(cnn,sql);
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1)
+);

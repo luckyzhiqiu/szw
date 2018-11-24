@@ -1,0 +1,117 @@
+//获取关卡BOSS战斗信息
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID;
+		json=json_decode(user.json);
+		
+		bossTable=game.table.boss;
+		chapterArr=game.storyMgr.chapterArr;
+		modifSign=0;//修改user数据标记
+		chapterID=number(user.chapterID);//章节ID
+		barrierID=number(user.barrierID);//关卡ID
+		
+		//章节信息
+		chapterInfo=chapterArr[chapterID];
+		//关卡信息
+		barrierArr=chapterInfo.barrierArr;
+		barrier=barrierArr[barrierID];
+		barrierType=number(barrier.row.getValFromColName("type"));//关卡类型
+		if(barrierType!=2)//非BOSS关卡
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		
+		//判断此豪杰当天是否对战过BOSS
+		story=json.story;
+		date=ref(story.date);
+		heroIndexMap=ref(story.heroIndexMap);
+		curDate=split(arr(),now()," ")[0];//当前日期
+		if(date!=curDate)//日期不同
+		{
+			modifSign=1;
+			//更新日期
+			date=curDate;
+			//清空对战列表
+			clean(heroIndexMap);
+		}
+		
+		bossID=number(barrier.row.getValFromColName("bossID"));//bossID
+		boss=bossTable.getRowFromColName("id",bossID);//boss信息
+		
+		//boss生命
+		barrierBossLife=number(user.barrierBossLife);
+		barrierBossMaxLife=number(user.barrierBossMaxLife);
+		if(barrierBossLife==-1)//恢复boss生命
+		{
+			modifSign=1;
+			bossLife=number(boss.getValFromColName("life"));//boss生命值
+			barrierBossLife=bossLife;
+			barrierBossMaxLife=bossLife;
+			
+			//保存
+			user.barrierBossMaxLife=barrierBossMaxLife;
+			user.barrierBossLife=barrierBossLife;
+			user.json=json_encode(json);
+		}
+		
+		//BOSS战信息
+		name=boss.getValFromColName("name");
+		head=number(boss.getValFromColName("head"));
+		background=number(boss.getValFromColName("background"));
+		talk=boss.getValFromColName("talk");
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,story,barrierBossLife,barrierBossMaxLife,name,head,background,talk)
+		);
+		
+		//按modifSign判断是否修改user数据
+		return(modifSign);
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

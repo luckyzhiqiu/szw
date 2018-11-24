@@ -1,0 +1,214 @@
+//清除过期提亲请求
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+
+//对方提亲数组
+updateHisUser=##<game,userID,PairReqMsg>
+
+	returnType=0;
+	//修改行数据
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link methodName,sessionID,PairReqMsg,returnType;
+			
+			jsonExt=json_decode(user.jsonExt);
+			pairSys=ref(jsonExt.pairSys);
+
+			pairReqArr=ref(pairSys.pairReqArr);
+			
+			
+			c=size(pairReqArr);
+			i=0;while(i<c){
+				if(pairReqArr[i].userID==PairReqMsg["userID"] &&pairReqArr[i].childID==PairReqMsg["childID"])
+				{
+					returnType=1;	
+					remove(pairReqArr,i);
+					
+					//保存
+					user.jsonExt=json_encode(jsonExt);		
+					
+					return(1);//修改
+					
+					break;
+				}
+				i++;
+			}
+			
+		
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	if(returnType==1)
+	{
+		return(1);
+	}else
+	{
+		return(3);
+	}
+	
+	
+##.;
+
+
+
+	//修改行数据
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link methodName,sessionID,userID,updateHisUser;
+			
+			json=json_decode(user.json);
+			itemDict=ref(json.item);
+			jsonExt=json_decode(user.jsonExt);
+			pairSys=ref(jsonExt.pairSys);
+			childArr=ref(pairSys.children);
+			returnArr=arr();
+			
+			AgreeArr=ref(pairSys.AgreeArr);
+			sendAgreeArr=clone(AgreeArr);
+			clean(AgreeArr);
+			
+			c=size(childArr);
+			i=0;while(i<c){
+							
+				
+				if(childArr[i].targetUserID!=-1)
+				{
+					currentTime=time();
+					reqTime=childArr[i].genTime;
+					threeDays=3*24*60*60;
+					
+					childConfigureTable=game.table.childConfigure.getRow(0);
+					itemID=childConfigureTable.getValFromColName("talentMarrigeCost"+childArr[i].grows);
+					
+					if(childArr[i].targetUserID==0)//全服
+					{
+						
+						if(currentTime-number(reqTime)>threeDays)
+						{
+							sql="select id from unmarry_child where childID="+childArr[i].id+" and userID="+userID;
+							rs=mysqlCreateRs(game.cnn,sql);
+							existSign=mysqlNextRow(rs);
+							mysqlDestroyRs(rs);
+							if(existSign)
+							{
+								sql="delete from unmarry_child where childID="+childArr[i].id+" and userID= "+userID;
+								mysqlExec(game.cnn,sql);
+							
+								childArr[i].targetUserID=-1;							
+								game.numMgr.addItem(itemID,1,itemDict);
+								
+								push(returnArr,arr(0,itemID));
+							
+							}
+							
+						}
+					}
+					
+					else if(childArr[i].targetUserID==-2)//被拒绝
+					{
+						childArr[i].targetUserID=-1;
+						game.numMgr.addItem(itemID,1,itemDict);		
+						push(returnArr,arr(-2,itemID));
+						
+					}
+					else if(childArr[i].targetUserID>0)//被提新
+					{		
+						if(currentTime-number(reqTime)>threeDays)
+						{
+							PairReqMsg=dict();
+							PairReqMsg["childID"]=childArr[i].id;
+							PairReqMsg["userID"]=userID;					
+						
+							hisUser=updateHisUser(game,childArr[i].targetUserID,PairReqMsg);
+								
+							if(hisUser==1)//
+							{
+								childArr[i].targetUserID=-1;							
+								game.numMgr.addItem(itemID,1,itemDict);
+								
+								push(returnArr,arr(0,itemID));
+							
+							}
+							
+							
+						}
+												
+						
+					}
+					
+						
+					
+					
+					
+				}
+				i++;
+			}
+		
+			//保存
+			user.json=json_encode(json);
+			user.jsonExt=json_encode(jsonExt);
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,json.item,returnArr,sendAgreeArr,json.achievement.marryCount)
+			);
+			
+			return(1);//修改
+		
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	
+
+
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}

@@ -1,0 +1,121 @@
+//生成支付订单
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+type=int(netMsg[3]);//商品类型
+goodsID=int(netMsg[4]);//发货ID（对应类型type）
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+tabelData=game.table;
+pass=1;
+if(type==1)//购买商城rmb商品
+{
+	rowS=tabelData.shop.getRowFromColName("id",goodsID);
+	if(empty(rowS))//没有此项商品
+	{
+		pass=-8;
+	}
+	else
+	{
+		typeS=number(rowS.getValFromColName("type"));
+		money=number(rowS.getValFromColName("payPrice"));
+		if(typeS!=3)//商品类型错误
+		{
+			pass=-3;
+		}
+		if(money==0)//类型3&价格为0
+		{
+			pass=-4;
+		}
+	}
+}
+else if(type==2)//购买元宝
+{
+	rowP=tabelData.pay.getRowFromColName("id",goodsID);
+	if(empty(rowP))//没有此项商品
+	{
+		pass=-5;
+	}
+	else
+	{
+		money=number(rowP.getValFromColName("price"));
+	}
+}
+else if(type==3)//购买月卡
+{
+	monthSpareCount=number(user.monthSpareCount);
+	if(monthSpareCount!=0)//月卡未到期
+	{
+		pass=-6;
+	}
+	else
+	{
+		rowCM=tabelData.cardMonth.getRow(0);
+		money=number(rowCM.getValFromColName("RMB"));
+	}
+}
+else if(type==4)//购买年卡
+{
+	yearSpareCount=number(user.yearSpareCount);
+	if(yearSpareCount!=0)//年卡未到期
+	{
+		pass=-7;
+	}
+	else
+	{
+		rowCY=tabelData.cardYear.getRow(0);
+		money=number(rowCY.getValFromColName("RMB"));
+	}
+}
+else//类型错误
+{
+	pass=-2;
+}	
+
+if(pass==1)
+{
+	//订单号
+	orderNum=uuid();
+	strReplace(orderNum,"-","");
+	
+	sql="insert into `order` set ";
+	sql+="genTime='"+now()+"'";
+	sql+=",num='"+orderNum+"'";
+	sql+=",rmb='"+money+"'";
+	sql+=",uid='"+user.first_uid+"'";
+	sql+=",accountID='"+user.first_account_id+"'";
+	sql+=",userID='"+userID+"'";
+	sql+=",type='"+type+"'";
+	sql+=",goodsID='"+goodsID+"'";
+	//生成订单
+	rs=mysqlCreateRs(game.cnn,sql);
+	mysqlDestroyRs(rs);
+	
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",pass,orderNum,money)
+	);
+}
+else
+{
+	//pass:-2=类型错误;-3=类型错误;-4=类型3&价格为0;-5=没有此项商品;-6月卡未到期;-7年卡未到期;-8没有此项商品
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",pass)
+	);
+	exit();
+}

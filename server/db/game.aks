@@ -1,0 +1,171 @@
+//批量创建数据库和表格
+"api/init.aks"();
+
+//redis连接
+redisConfig=json(file_get_contents("config/redis.json"));
+rd=AKRedis(redisConfig);
+//清理所有redis节点缓存
+rd.clean();
+
+db=readDBConfig("config/db.json","define/db_table.json");//读取数据库配置
+cnnPool=AKMysqlCnnPool();//mysql连接池
+dbMaker=AKDatabaseMaker(cnnPool);//数据库创建器
+dbMaker.make(db.cnn0,db.db0);//创建或升级数据库
+
+//mysql连接
+cnn=dbMaker.new_db_cnn_and_select_db(db.cnn0);
+
+//清理所有玩家的在线状态
+sql="update user set online=0";
+mysqlExec(cnn,sql);
+
+userData=dict();
+
+//升级全局变量表
+global_var_structMgr=structMgr_create();
+structMgr_load(global_var_structMgr,file_get_contents("struct/global_var.h"));
+arr=structMgr_getNameArr(global_var_structMgr,"Var",arr());
+c=size(arr);
+i=0;while(i<c)
+{
+	type=arr[i+1];
+	if(type==50)//对象成员
+	{
+		name=arr[i];
+		typeName=arr[i+2];
+		//trace(typeName);
+		row=rd.updateRow
+		(
+			cnn,"global_var","name",name,"*",
+			//修改回调
+			##<row,userData>
+				@link global_var_structMgr,typeName;
+				jsonStr=row.json;
+				if(jsonStr=="")
+				{
+					json=structMgr_upgradeObj(global_var_structMgr,typeName,dict());
+					row.json=json_encode(json);
+				}
+				else
+				{
+					json=json_decode(jsonStr);
+					structMgr_upgradeObj(global_var_structMgr,typeName,json);
+					row.json=json_encode(json);
+				}
+				return(1);//修改
+			##.,
+			//修改完成回调
+			##<row,userData>
+				//...
+			##.,
+			//解锁后回调
+			##<row,userData>
+				//...
+			##.,
+			userData,//自定义数据userData
+			1000//加锁时间（毫秒），例如：1000
+		);
+		if(empty(row))//数据不存在
+		{
+			jsonStr=json_encode(structMgr_upgradeObj(global_var_structMgr,typeName,dict()));
+			sql="insert into global_var set ";
+			sql+="name=\""+str_c_escape(name)+"\"";
+			sql+=",json=\""+str_c_escape(jsonStr)+"\"";
+			// trace(sql);
+			mysqlExec(cnn,sql);
+		}
+		trace("upgrade global_var "+name+" complete");
+	}
+	i+=3;
+}
+//debug(arr);
+
+//游戏结构体
+structMgr=structMgr_create();
+structMgr_load(structMgr,file_get_contents("struct/struct.h"));
+//升级玩家json
+updateMysqlAndRedisJson(cnn,rd,structMgr,"user","id",arr("json","Json","jsonExt","JsonExt"));
+//升级联盟json
+updateMysqlAndRedisJson(cnn,rd,structMgr,"union","id",arr("json","UnionJson"));
+
+//初始化json表格
+table=dict();//json表格
+map=fileList(dict(),"www/json_table");
+foreach
+(
+	map,
+	##<url,isFile>
+		if(isFile)
+		{
+			@link table;
+			arr=split(arr(),url,"/");
+			fileNameInfo=split(arr(),arr[size(arr)-1],".");
+			fileName=fileNameInfo[0];
+			fileExtName=fileNameInfo[1];
+			if(fileExtName=="json")
+			{
+				txt=file_get_contents(url);
+				table[fileName]=AKJsonTable(txt);
+			}
+		}
+	##.
+);
+
+//升级权贵
+allianceNobleTab=table.allianceNoble;
+c=allianceNobleTab.size();
+i=0;while(i<c)
+{
+	richmanRow=allianceNobleTab.getRow(i);
+	richmanID=int(richmanRow.getValFromColName("id"));
+	trace("upgrade richman id="+richmanID);
+	row=rd.updateRow
+	(
+		cnn,"union_richman","id",richmanID,"*",
+		//修改回调
+		##<row,userData>
+			@link structMgr;
+			jsonStr=row.json;
+			json=json_decode(jsonStr);
+			structMgr_upgradeObj(structMgr,"UnionRichmanJson",json);
+			row.json=json_encode(json);
+			return(1);//修改
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		userData,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	if(empty(row))//数据不存在
+	{
+		unionID=int(richmanRow.getValFromColName("belong"));//初始归属联盟ID
+		favorStr=richmanRow.getValFromColName("favor");//初始归属联盟好感度
+		json=structMgr_upgradeObj(structMgr,"UnionRichmanJson",dict());
+		favorArr=split(arr(),favorStr,",");
+		ii=0;cc=size(favorArr);
+		while(ii<cc)
+		{
+			curUnionID=favorArr[ii];
+			favor=favorArr[ii+1];
+			json.unionFriendMap[curUnionID]=favor;
+			ii+=2;
+		}
+		
+		sql="insert into union_richman set ";
+		sql+="id="+richmanID;
+		sql+=",unionID="+unionID;
+		sql+=",json=\""+str_c_escape(json_encode(json))+"\"";
+		// trace(sql);
+		mysqlExec(cnn,sql);
+	}
+	++i;
+}
+
+trace("ok");
+quitSystem();

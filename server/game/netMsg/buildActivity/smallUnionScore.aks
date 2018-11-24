@@ -1,0 +1,90 @@
+//百废建兴联萌积分排行榜®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+rd=game.rd;
+cnn=game.cnn;
+user=rd.getRow(cnn,"user","id",userID,"*",1000);
+if(empty(user))
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)//用户不存在
+	);
+	exit();
+}
+unionID=user.unionID;
+unknownUnion=rd.getRow(cnn,"union","id",unionID,"*",1000);
+if(empty(unknownUnion))
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)//联萌不存在
+	);
+	exit();
+}
+name=unknownUnion.name;
+buildValTotal=unknownUnion.buildValTotal;
+
+//获取
+rankName=game.gameConfig.name+"_unionBuildActivityRank";//联萌建筑排行榜名称
+rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+redis_zrevrange(rd,rankName,0,9,0,rankUnionIDArr=arr());
+c=size(rankUnionIDArr);
+if(c==0)//排行榜空
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",1,rankUnionIDArr)
+	);
+	exit();
+}
+
+//userID、名字、建筑积分
+unionInfoArr=arr();
+cnn=game.cnn;
+
+
+tt=join(rankUnionIDArr,",");
+sql="select id,name,buildValTotal from `union` where id in("+tt+") limit 10";
+rs=mysqlCreateRs(cnn,sql);
+while(mysqlNextRow(rs))
+{
+	push(unionInfoArr,mysqlGetColVal(rs,0));
+	push(unionInfoArr,mysqlGetColVal(rs,1));
+	push(unionInfoArr,mysqlGetColVal(rs,2));
+}
+mysqlDestroyRs(rs);
+//自己的联萌排名
+rankID=-1;
+@try
+	rankID=redis_zrevrank(rd,rankName,unionID);
+@catch
+	rankID=-1;//未上榜
+@catch.
+
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,rankUnionIDArr,unionInfoArr,rankID,name,buildValTotal)
+);

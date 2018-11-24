@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t29">19</v>
+<v t="n" n="__sys__t16">9</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">0</v>
+<v t="n" n="__sys__t4">0</v>
+<o n="input"><o>__sys__t5</o><i>__sys__t1</i></o>
+<o n="="><o>self</o><i>__sys__t5</i></o>
+<o n="input"><o>__sys__t7</o><i>__sys__t2</i></o>
+<o n="="><o>json</o><i>__sys__t7</i></o>
+<v t="s" n="__sys__t10">.hero.</v>
+<o n="." r="335"><o>__sys__t9</o><i>json</i><i>__sys__t10</i></o>
+<o n="=" r="335"><o>heroArr</o><i>__sys__t9</i></o>
+<o n="size" r="336"><o>__sys__t13</o><i>heroArr</i></o>
+<o n="=" r="336"><o>c</o><i>__sys__t13</i></o>
+<o n="=" r="337"><o>i</o><i>__sys__t3</i></o>
+<o n="&lt;" r="337"><o>__sys__t17</o><i>i</i><i>c</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t17</i></o>
+<o n="=="><o>__sys__t19</o><i>__sys__rt</i><i>__sys__t4</i></o>
+<o n="if_goto"><o>__sys__t20</o><i>__sys__t19</i><i>__sys__t29</i></o>
+<o n="[]" r="339"><o>__sys__t21</o><i>heroArr</i><i>i</i></o>
+<o n="=" r="339"><o>hero</o><i>__sys__t21</i></o>
+<v t="s" n="__sys__t24">.computeHero.</v>
+<o n="." r="340"><o>__sys__t23</o><i>self</i><i>__sys__t24</i></o>
+<o n="__sys__t23" r="340"><o>__sys__t26</o><i>self</i><i>hero</i><i>json</i></o>
+<o n="++" r="341"><o>i</o><i>i</i></o>
+<o n="goto"><o>__sys__t28</o><i>__sys__t16</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t13" />
+<v n="__sys__t17" />
+<v n="__sys__t19" />
+<v n="__sys__t20" />
+<v n="__sys__t21" />
+<v n="__sys__t23" />
+<v n="__sys__t26" />
+<v n="__sys__t28" />
+<v n="__sys__t5" />
+<v n="__sys__t7" />
+<v n="__sys__t9" />
+<v n="c" />
+<v n="hero" />
+<v n="heroArr" />
+<v n="i" />
+<v n="json" />
+<v n="self" />
+</script>

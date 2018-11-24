@@ -1,0 +1,136 @@
+//百废待兴活动信息®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+rd=game.rd;
+//获取全局变量
+varName="buildActivity";
+var=rd.getRow(game.cnn,"global_var","name",varName,"*",1000);
+varJson=json_decode(var.json);
+buildVal=varJson.buildVal;//建设值（每天清0）
+var.json=json_encode(varJson);
+
+rankName=game.gameConfig.name+"_buildActivityRank";//建筑排行榜名称
+rankRd=rd.getRedisObj(rankName);//建筑榜所在的redis对象
+redis_zrevrange(rankRd,rankName,0,9,0,rankUserIDArr=arr());
+c=size(rankUserIDArr);
+if(c==0)//排行榜空
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1,buildVal)
+	);
+	exit();
+}
+
+//userID、名字、建筑积分
+userInfoArr=arr();
+cnn=game.cnn;
+tt+=rankUserIDArr[0];
+i=1;while(i<c)
+{
+	tt+=",";
+	tt+=rankUserIDArr[i];
+	++i;
+}
+sql="select id,nickname,buildActivityScoreTotal from user where id in("+tt+") limit 10";
+rs=mysqlCreateRs(cnn,sql);
+while(mysqlNextRow(rs))
+{
+	push(userInfoArr,mysqlGetColVal(rs,0));
+	push(userInfoArr,mysqlGetColVal(rs,1));
+	push(userInfoArr,mysqlGetColVal(rs,2));
+}
+mysqlDestroyRs(rs);
+
+
+//自己的排名
+rankID=-1;
+@try
+	rankID=redis_zrevrank(rankRd,rankName,userID);
+@catch
+	rankID=-1;//未上榜
+@catch.
+
+//联萌信息
+unionRankID=-1;
+buildValTotal="";
+name="";
+
+
+//获取
+rankName=game.gameConfig.name+"_unionBuildActivityRank";//联萌建筑排行榜名称
+rankRd=rd.getRedisObj(rankName);//排行榜所在的redis对象
+redis_zrevrange(rankRd,rankName,0,9,0,rankUnionIDArr=arr());
+c=size(rankUnionIDArr);
+unionInfoArr=arr();
+if(c==0)//排行榜空
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",1,buildVal,rankUserIDArr,userInfoArr,rankID,rankUnionIDArr,unionInfoArr,unionRankID,buildValTotal,name)
+	);
+	exit();
+}
+//userID、名字、建筑积分
+
+
+tt=join(rankUnionIDArr,",");
+sql="select id,name,buildValTotal from `union` where id in("+tt+") limit 10";
+rs=mysqlCreateRs(cnn,sql);
+while(mysqlNextRow(rs))
+{
+	push(unionInfoArr,mysqlGetColVal(rs,0));
+	push(unionInfoArr,mysqlGetColVal(rs,1));
+	push(unionInfoArr,mysqlGetColVal(rs,2));
+}
+mysqlDestroyRs(rs);
+
+userX=rd.getRow(cnn,"user","id",userID,"*",1000);
+if(empty(userX))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}
+unionID=number(userX.unionID);//联萌id
+//自己的排名
+
+if(unionID!=0)
+{
+	@try
+		unionRankID=redis_zrevrank(rankRd,rankName,unionID);
+	@catch
+		unionRankID=-1;//未上榜
+	@catch.
+	ownUnion=rd.getRow(cnn,"union","id",unionID,"*",1000);
+	buildValTotal=ownUnion.buildValTotal;//百废待兴建设总值
+	name=ownUnion.name;//联萌名称
+	
+}
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,buildVal,rankUserIDArr,userInfoArr,rankID,rankUnionIDArr,unionInfoArr,unionRankID,buildValTotal,name)
+);

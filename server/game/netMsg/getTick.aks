@@ -1,0 +1,65 @@
+//获取通行证
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+platformID=netMsg[1];//第三方平台ID
+/*
+0=自有平台;
+1=...
+*/
+uid=netMsg[2];//第三方平台用户唯一ID
+if(strFind(uid,"'")>=0||strFind(uid,"\"")>=0)//uid不合法
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}
+
+session=game.sessionMap[sessionID];
+session.platformID=platformID;
+
+if(platformID==0)//自有平台
+{
+	sql="select userID from index_my_platform where uid='"+uid+"' limit 1";
+	rs=mysqlCreateRs(game.cnn,sql);//执行
+	
+	hasRow=mysqlNextRow(rs);
+	userID=number(mysqlGetColVal(rs,0));
+	
+	mysqlDestroyRs(rs);//释放
+	
+	if(!hasRow)
+	{
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",-2)
+		);
+		exit();
+	}
+
+	tick=game.getTick(userID);
+	
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",1,userID,tick)
+	);
+	exit();
+}
+// else if(platformID==1)
+// {
+	
+// }
+
+//平台不存在
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",-2)
+);

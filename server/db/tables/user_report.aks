@@ -1,0 +1,5 @@
+//用户举报表
+mysqlCol("key","id");
+mysqlCol("datetime","genTime");//创建时间
+mysqlCol("int","srcUserID",0);//原告userID
+mysqlCol("int","destUserID",0);//被告userID

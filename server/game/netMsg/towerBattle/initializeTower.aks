@@ -1,0 +1,238 @@
+//过关斩将初始化敌人(选豪杰)
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+heroIndex=int(netMsg[3]);//豪杰Index位置
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,heroIndex;
+		json=json_decode(user.json);
+		jsonExt=json_decode(user.jsonExt);
+		towerBattleExt=jsonExt.towerBattleExt;
+		enemyHeroArr=towerBattleExt.enemyHeroArr;
+		
+		towerBattleStep=number(user.towerBattleStep);
+		tableData=game.table;
+		structMgr=game.structMgr;
+		numMgr=game.numMgr;
+		heroArr=json.hero;
+		towerBattle=json.towerBattle;
+		
+		useHeroIndexMap=towerBattle.useHeroIndexMap;
+		if(exist(useHeroIndexMap,heroIndex))//此豪杰已使用
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);
+		}
+	
+		enemyHeroIDMap=dict();//判断heroID是否重复
+		if(towerBattleStep==0)//初始化
+		{
+			// clean(enemyHeroArr);
+			// towerBattle.date=split(arr(),now()," ")[0];//当前关卡开始日期
+			
+			// //敌方豪杰数组信息///////////////////////////////
+			// towerID=number(user.towerID);
+			// towerTable=tableData.tower;
+			// rowT=towerTable.getRowFromColName("tiny",towerID+1);
+			
+			// num1=number(rowT.getValFromColName("num1"));//白色人数
+			// num2=number(rowT.getValFromColName("num2"));//紫色人数
+			// num3=number(rowT.getValFromColName("num3"));//橙色人数
+			
+			// //白色
+			// power1=number(rowT.getValFromColName("power1"));//白色总属性
+			// grow1=number(rowT.getValFromColName("grow1"));//白色资质
+			// monster1=rowT.getValFromColName("monster1");//白色人物数量
+			// monster1Arr=split(arr(),monster1,",");
+			// monster1Count=size(monster1Arr);
+			// i=0;
+			// while(i<monster1Count)
+			// {
+				// towerMonsterID=monster1Arr[i];
+				// waterBattleHero=structMgr_upgradeObj(structMgr,"WaterBattleHero",dict());
+				// waterBattleHero.heroID=towerMonsterID;
+				// waterBattleHero.hp=power1;
+				// waterBattleHero.attack=grow1*100;
+				// waterBattleHero.attackC=10000;
+				// waterBattleHero.promotion=0;
+				// if(!exist(enemyHeroIDMap,towerMonsterID))
+				// {
+					// enemyHeroIDMap[towerMonsterID]=0;
+					// push(enemyHeroArr,waterBattleHero);
+				// }
+				// ++i;
+			// }
+			
+			// //紫色
+			// power2=number(rowT.getValFromColName("power2"));//紫色总属性
+			// grow2=number(rowT.getValFromColName("grow2"));//紫色资质
+			// monster2=rowT.getValFromColName("monster2");//紫色人物数量
+			// monster2Arr=split(arr(),monster2,",");
+			// monster2Count=size(monster2Arr);
+			// i=0;
+			// while(i<monster2Count)
+			// {
+				// towerMonsterID=monster2Arr[i];
+				// waterBattleHero=structMgr_upgradeObj(structMgr,"WaterBattleHero",dict());
+				// waterBattleHero.heroID=towerMonsterID;
+				// waterBattleHero.hp=power2;
+				// waterBattleHero.attack=grow2*100;
+				// waterBattleHero.attackC=10000;
+				// waterBattleHero.promotion=0;
+				// if(!exist(enemyHeroIDMap,towerMonsterID))
+				// {
+					// enemyHeroIDMap[towerMonsterID]=0;
+					// push(enemyHeroArr,waterBattleHero);
+				// }
+				// ++i;
+			// }
+			
+			// //紫色
+			// power3=number(rowT.getValFromColName("power3"));//橙色总属性
+			// grow3=number(rowT.getValFromColName("grow3"));//橙色资质
+			// monster3=rowT.getValFromColName("monster3");//橙色人物数量
+			// monster3Arr=split(arr(),monster3,",");
+			// monster3Count=size(monster3Arr);
+			// i=0;
+			// while(i<monster3Count)
+			// {
+				// towerMonsterID=monster3Arr[i];
+				// waterBattleHero=structMgr_upgradeObj(structMgr,"WaterBattleHero",dict());
+				// waterBattleHero.heroID=towerMonsterID;
+				// waterBattleHero.hp=power3;
+				// waterBattleHero.attack=grow3*100;
+				// waterBattleHero.attackC=10000;
+				// waterBattleHero.promotion=0;
+				// if(!exist(enemyHeroIDMap,towerMonsterID))
+				// {
+					// enemyHeroIDMap[towerMonsterID]=0;
+					// push(enemyHeroArr,waterBattleHero);
+				// }
+				// ++i;
+			// }
+			
+			// //随机3个敌方豪杰ID
+			// enemyHeroIDArr=numMgr.getThreeenemyHeroIDArr(enemyHeroArr,0,towerBattle);
+			// towerBattle.enemyHeroIDArr=enemyHeroIDArr;
+			
+			// //敌方豪杰数组信息///////////////////////////////
+			
+			// //我方豪杰信息
+			// heroArrCount=size(heroArr);
+			// if(heroArrCount<heroIndex)//豪杰Index位置错误
+			// {
+				// game.sendMsg
+				// (
+					// sessionID,
+					// arr(methodName+"Result",-3)
+				// );
+				// return(0);
+			// }
+
+			// heroInfo=heroArr[heroIndex];
+			// fightHero=numMgr.computeWaterBattleHero(heroInfo,json.wifePlus);//获取论战豪杰信息
+			// towerBattle.hp=fightHero.hp;//我方血量
+			// towerBattle.me=fightHero;//我方豪杰数据
+			// towerBattle.winCount=0;//击败敌方豪杰数量
+			// towerBattle.attackPlus=0;//攻击加成
+			// towerBattle.skillPlus=0;//技能加成
+			// //towerBattle.battleCount=0;//对战次数
+			// towerBattle.buyBuff=0;//购买BUFF标记ID
+			// towerBattle.heroIndex=heroIndex;
+			// towerBattle.enemyHeroCount=size(enemyHeroArr);
+			// numMgr.getWaterBattleBuffArr(0,towerBattle.buffArr);//重置可购买BUFF数组
+			
+			// towerBattleStep=1;
+			// user.towerBattleStep=towerBattleStep;
+		}
+		else//进入战斗
+		{
+			//判断血量是否为0重新选择豪杰
+			heroArrCount=size(heroArr);
+			if(heroArrCount<heroIndex)//豪杰Index位置错误
+			{
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)
+				);
+				return(0);
+			}
+
+			towerBattle.heroIndex=heroIndex;
+			heroHP=towerBattle.hp;
+			if(heroHP<=0)
+			{
+				heroInfo=heroArr[heroIndex];
+				fightHero=numMgr.computeWaterBattleHero(heroInfo,json.wifePlus);//获取论战豪杰信息
+				towerBattle.hp=fightHero.hp;//我方血量
+				towerBattle.me=fightHero;//我方豪杰数据
+				
+				towerBattle.attackPlus=0;
+				towerBattle.skillPlus=0;
+			}
+			else//已选豪杰
+			{
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)
+				);
+				return(0);//修改
+			}
+		}
+
+		//保存
+		user.json=json_encode(json);
+		user.jsonExt=json_encode(jsonExt);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,towerBattle)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

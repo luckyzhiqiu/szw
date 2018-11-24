@@ -1,0 +1,7 @@
+/*
+帐号php接口
+*/
+{
+	domain:"test1.aawan.cn",
+	port:80
+}

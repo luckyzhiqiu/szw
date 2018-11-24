@@ -1,0 +1,53 @@
+//活动排行榜（寻访）®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+userInfoArr=arr();
+//获取
+rankName=game.gameConfig.name+"_searchAddRank";//排行榜名称
+rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+redis_zrevrange(rd,rankName,0,99,0,rankUserIDArr=arr());
+c=size(rankUserIDArr);
+if(c==0)//排行榜空
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1,rankUserIDArr,userInfoArr)
+	);
+	exit();
+}
+
+//userID、名字、官阶、势力值
+
+cnn=game.cnn;
+tt=join(rankUserIDArr,",");
+sql="select id,nickname,searchAdd from user where id in("+tt+") limit 100";
+rs=mysqlCreateRs(cnn,sql);
+while(mysqlNextRow(rs))
+{
+	push(userInfoArr,mysqlGetColVal(rs,0));
+	push(userInfoArr,mysqlGetColVal(rs,1));
+	push(userInfoArr,mysqlGetColVal(rs,2));
+}
+mysqlDestroyRs(rs);
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,rankUserIDArr,userInfoArr)
+);

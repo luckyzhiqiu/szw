@@ -1,0 +1,41 @@
+//新手引导日志
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+uid=int(netMsg[3]);//uid
+sysID=int(netMsg[4]);//游戏系统ID
+step=int(netMsg[5]);//引导第几步
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+cnn=game.cnn;
+
+curTime=now();//生成时间
+tt=split(arr(),curTime," ");
+a=split(arr(),tt[0],"-");
+ymd=a[0]+""+a[1]+""+a[2];
+tableName=createIDTable(cnn,"guide",ymd);
+
+sql="create table if not exists `"+tableName+"` like guide";
+mysqlExec(cnn,sql);
+sql="insert into "+tableName+" set genTime='"+curTime+"'";
+sql+=",uid='"+uid+"'";
+sql+=",userID='"+userID+"'";
+sql+=",sysID="+sysID;
+sql+=",step="+step;
+mysqlExec(cnn,sql);
+
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1)
+);

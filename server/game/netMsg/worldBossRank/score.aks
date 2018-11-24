@@ -1,0 +1,89 @@
+//白夜缉凶[世界Boss]-积分排行榜®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//获取
+rankName=game.gameConfig.name+"_WorldBossRank";//白夜缉凶排行榜名称
+rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+redis_zrevrange(rd,rankName,0,99,0,rankUserIDArr=arr());
+//自己的排名
+rankID=-1;
+@try
+	rankID=redis_zrevrank(rd,rankName,userID);
+@catch
+	rankID=-1;//未上榜
+@catch.
+userInfoArr=arr();
+c=size(rankUserIDArr); 
+if(c==0)//排行榜空
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1,rankUserIDArr,userInfoArr,rankID)
+	);
+	exit();
+}
+
+//userID、名字、世界BOSS累积积分
+cnn=game.cnn;
+tt+=rankUserIDArr[0];
+i=1;while(i<c)
+{
+	tt+=",";
+	tt+=rankUserIDArr[i];
+	++i;
+}
+sql="select id,nickname,worldBossScoreTotal from user where id in("+tt+") limit 100";
+rs=mysqlCreateRs(cnn,sql);
+while(mysqlNextRow(rs))
+{
+	push(userInfoArr,mysqlGetColVal(rs,0));
+	push(userInfoArr,mysqlGetColVal(rs,1));
+	push(userInfoArr,mysqlGetColVal(rs,2));
+}
+mysqlDestroyRs(rs);
+
+rd=game.rd;
+rankUserIDArrLength=size(rankUserIDArr);
+unionNameArr=arr();
+i=0;while(i<rankUserIDArrLength)
+{
+	userIdX=rankUserIDArr[i];
+	userX=rd.getRow(game.cnn,"user","id",userIdX,"*",1000);
+	unionIdX=userX.unionID;
+	if(unionIdX==0)
+	{
+		push(unionNameArr,"无");
+	}
+	else
+	{
+		unionX=rd.getRow(game.cnn,"union","id",unionIdX,"*",1000);
+		name=unionX.name;
+		push(unionNameArr,name);
+	}
+	
+	i++;
+}
+
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,rankUserIDArr,userInfoArr,rankID,unionNameArr)
+);

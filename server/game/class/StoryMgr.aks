@@ -1,0 +1,90 @@
+//剧情管理器
+@class StoryMgr<game>
+	self.game=game;
+	self.chapterMap=dict();//章节图
+	self.chapterArr=arr();//章节数组
+	self.storyMap=dict();//故事图
+	//初始化章节
+	chapter=self.game.table.chapter;
+	chapterCount=chapter.size();
+	i=0;while(i<chapterCount)
+	{
+		row=chapter.getRow(i);
+		id=row.getValFromColName("id");
+		info=Chapter(row);
+		self.chapterMap[id]=info;
+		push(self.chapterArr,info);
+		// trace("init chapter "+id);
+		++i;
+	}
+	//初始化关卡
+	barrier=self.game.table.barrier;
+	barrierCount=barrier.size();
+	i=0;while(i<barrierCount)
+	{
+		row=barrier.getRow(i);
+		id=row.getValFromColName("id");
+		chapterID=row.getValFromColName("chapterID");
+		chapterInfo=self.chapterMap[chapterID];
+		sceneCount=int(row.getValFromColName("num"));
+		// trace("barrier "+id+" "+sceneCount);
+		info=Barrier(row,sceneCount);
+		chapterInfo.barrierMap[id]=info;
+		push(chapterInfo.barrierArr,info);
+		// trace("init barrier "+id);
+		++i;
+	}
+	//初始化场景
+	scene=self.game.table.scene;
+	sceneCount=scene.size();
+	i=0;while(i<sceneCount)
+	{
+		row=scene.getRow(i);
+		id=row.getValFromColName("id");
+		chapterID=row.getValFromColName("chapterID");
+		barrierID=row.getValFromColName("barrierID");
+		chapterInfo=self.chapterMap[chapterID];
+		barrierInfo=chapterInfo.barrierMap[barrierID];
+		if(size(barrierInfo.sceneArr)<barrierInfo.sceneCount)
+		{
+			barrierInfo.sceneMap[id]=row;
+			push(barrierInfo.sceneArr,row);
+		}
+		++i;
+	}
+	//初始化故事
+	storyMap=self.storyMap;
+	story=self.game.table.story;
+	storyCount=story.size();
+	i=0;while(i<storyCount)
+	{
+		row=story.getRow(i);
+		storyID=row.getValFromColName("storyID");
+		if(exist(storyMap,storyID))
+		{
+			storyInfo=storyMap[storyID];
+		}
+		else
+		{
+			storyInfo=arr();
+			storyMap[storyID]=storyInfo;
+		}
+		push(storyInfo,row.getObj(arr("id","position","headType","head","name","talk","goto","option1","goto1","option2","goto2","background","jump","storyID","voice")));
+		++i;
+	}
+@class.
+
+//章节类
+@class Chapter<row>
+	self.row=row;
+	self.barrierMap=dict();//关卡字典
+	self.barrierArr=arr();//关卡数组
+@class.
+
+//关卡类
+@class Barrier<row,sceneCount>
+	self.row=row;
+	self.sceneMap=dict();//场景字典
+	self.sceneArr=arr();//场景数组
+	self.sceneCount=sceneCount;//有效场景数量
+@class.

@@ -1,0 +1,223 @@
+//充值奖励领取
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+rewardID=netMsg[3];//rewardID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,rewardID,userID;
+		json=json_decode(user.json);
+	
+		
+
+		eventPayTable=game.table.eventPay;
+		row=eventPayTable.getRowFromColName("id",rewardID);
+		if(empty(row))
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-99)//rewardID无效
+			);
+			return(0);//不修改
+		}
+		num=row.getValFromColName("num");
+	
+		
+		
+		type=row.getValFromColName("type");
+		dailyTask=ref(json.dailyTask);
+		dailyTask_rechargeRewardIDMap=ref(dailyTask.rechargeRewardIDMap);
+		rechargeOneDay=ref(dailyTask.rechargeOneDay);
+		
+		limitTask=ref(json.limitTask);
+		limitTask_rechargeRewardIDMap=ref(limitTask.rechargeRewardIDMap);
+		recharge=ref(limitTask.recharge);
+		
+		rechargeDays=ref(limitTask.rechargeDays);
+		
+		if(type==1)
+		{
+			
+		
+			if(exist(dailyTask_rechargeRewardIDMap,rewardID))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-2)//已领取
+				);
+				return(0);//不修改
+			}
+			if(number(num)>number(rechargeOneDay))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)//不到目标数值 
+				);
+				return(0);//不修改
+			}
+			
+			push(dailyTask_rechargeRewardIDMap,rewardID,1);
+			
+			
+		}else if(type==2)
+		{			
+			if(exist(limitTask_rechargeRewardIDMap,rewardID))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-2)//已领取
+				);
+				return(0);//不修改
+			}
+			if(number(num)>number(recharge))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)//不到目标数值 
+				);
+				return(0);//不修改
+			}
+			
+			push(limitTask_rechargeRewardIDMap,rewardID,1);
+			
+		}else if(type==3)
+		{
+			if(exist(limitTask_rechargeRewardIDMap,rewardID))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-2)//已领取
+				);
+				return(0);//不修改
+			}
+			if(number(num)>number(rechargeDays))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)//不到目标数值 
+				);
+				return(0);//不修改
+			}
+			
+			push(limitTask_rechargeRewardIDMap,rewardID,1);
+			
+		}
+		
+		addMap=dict();//增加的数据
+		
+		
+
+		money=number(row.getValFromColName("money"));
+		newGold=number(user.money)+money;
+		user.money=newGold;
+		push(addMap,"money",money);
+		
+		food=number(row.getValFromColName("food"));
+		newFood=number(user.food)+food;
+		user.food=newFood;
+		push(addMap,"food",food);
+		
+		soldier=number(row.getValFromColName("soldier"));
+		newSoldier=number(user.soldier)+soldier;
+		user.soldier=newSoldier;
+		push(addMap,"soldier",soldier);
+		
+		gold2=number(row.getValFromColName("gold"));
+		newgold2=number(user.gold2)+gold2;
+		if(newgold2!=0)
+		{
+			user.gold2=newgold2;
+		}
+		
+		push(addMap,"gold2",gold2);
+		if(gold2>0)
+		{
+			allGold=number(user.gold)+newgold2;//元宝余额
+			game.saveResIO(userID,27,0,1,gold2,allGold);//充值奖励(type,itemID,（0=消耗，1=获得）,count,allGold)
+		}
+		
+		
+		itemArr=arr();
+		itemStr=row.getValFromColName("item");
+		if(itemStr!="0")
+		{
+			split(itemArr,itemStr,",");
+		}	
+		
+		
+		itemDict=json.item;
+		
+		c=size(itemArr);
+		i=0;while(i<c)
+		{
+			game.numMgr.addItem(number(itemArr[i]),number(itemArr[i+1]),itemDict);//返回数量
+			i+=2;
+		}
+		
+		
+	
+		//保存
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,addMap,json.item,itemArr,dailyTask_rechargeRewardIDMap,limitTask_rechargeRewardIDMap)
+		);
+		
+		return(1);//修改		
+		
+	
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

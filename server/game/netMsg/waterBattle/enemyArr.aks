@@ -1,0 +1,85 @@
+//论战仇人信息
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+page=int(netMsg[3]);//页码（从0开始）
+
+countPerPage=10;//每页条数
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}
+jsonExt=json_decode(user.jsonExt);
+waterBattleExt=jsonExt.waterBattleExt;
+enemyArr=waterBattleExt.enemyArr;
+count=size(enemyArr);
+if(count==0)//仇人为空
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",2,enemyArr)
+	);
+	exit();
+}
+
+enemyUseIDArr=arr();//当页userIDArr
+enemyInfoMap=dict();//当页被打userIDMap数据
+i=0;
+index=page*countPerPage;
+while(index<count&&i<countPerPage)
+{
+	info=enemyArr[index];
+	userID=info.userID;
+	push(enemyUseIDArr,userID);
+	enemyInfoMap[userID]=dict
+	(
+		"time",info.time,
+	);
+	
+	++index;
+	++i;
+}
+curEnemyCount=size(enemyUseIDArr);
+if(curEnemyCount>0)
+{
+	userIDStr=join(enemyUseIDArr,",");
+	sql="select id,nickname,level,power,head from user where id in("+userIDStr+") limit "+curEnemyCount;
+	rs=mysqlCreateRs(game.cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=mysqlGetColVal(rs,0);
+		enemyInfoMap[userID]["userID"]=userID;
+		enemyInfoMap[userID]["nickname"]=mysqlGetColVal(rs,1);
+		enemyInfoMap[userID]["level"]=mysqlGetColVal(rs,2);
+		enemyInfoMap[userID]["power"]=mysqlGetColVal(rs,3);
+		enemyInfoMap[userID]["head"]=mysqlGetColVal(rs,4);
+	}
+	mysqlDestroyRs(rs);
+}
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,enemyUseIDArr,enemyInfoMap)
+);

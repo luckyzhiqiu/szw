@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t121">68</v>
+<v t="n" n="__sys__t120">68</v>
+<v t="n" n="__sys__t118">67</v>
+<v t="n" n="__sys__t117">67</v>
+<v t="n" n="__sys__t70">39</v>
+<v t="n" n="__sys__t68">38</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="n" n="__sys__t4">205</v>
+<v t="n" n="__sys__t5">1</v>
+<v t="n" n="__sys__t6">0</v>
+<v t="n" n="__sys__t7">0</v>
+<v t="n" n="__sys__t8">0</v>
+<v t="s" n="__sys__t9">._childAddRank.</v>
+<v t="n" n="__sys__t10">0</v>
+<v t="s" n="__sys__t11">.childAddResult.</v>
+<o n="input"><o>__sys__t12</o><i>__sys__t1</i></o>
+<o n="="><o>game</o><i>__sys__t12</i></o>
+<o n="input"><o>__sys__t14</o><i>__sys__t2</i></o>
+<o n="="><o>user</o><i>__sys__t14</i></o>
+<o n="input"><o>__sys__t16</o><i>__sys__t3</i></o>
+<o n="="><o>addScore</o><i>__sys__t16</i></o>
+<v t="s" n="__sys__t19">.activityMgr.</v>
+<o n="." r="99"><o>__sys__t18</o><i>game</i><i>__sys__t19</i></o>
+<o n="=" r="99"><o>activityMgr</o><i>__sys__t18</i></o>
+<o n="=" r="100"><o>activityID</o><i>__sys__t4</i></o>
+<v t="s" n="__sys__t24">.getActivityStatus.</v>
+<o n="." r="101"><o>__sys__t23</o><i>activityMgr</i><i>__sys__t24</i></o>
+<o n="__sys__t23" r="101"><o>__sys__t26</o><i>activityMgr</i><i>activityID</i></o>
+<o n="==" r="101"><o>__sys__t27</o><i>__sys__t26</i><i>__sys__t5</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t27</i></o>
+<o n="=="><o>__sys__t29</o><i>__sys__rt</i><i>__sys__t6</i></o>
+<o n="if_goto"><o>__sys__t30</o><i>__sys__t29</i><i>__sys__t120</i></o>
+<v t="s" n="__sys__t32">.global_var.</v>
+<o n="." r="103"><o>__sys__t31</o><i>game</i><i>__sys__t32</i></o>
+<o n="=" r="103"><o>global_var</o><i>__sys__t31</i></o>
+<v t="s" n="__sys__t36">.rushLoop.</v>
+<o n="." r="104"><o>__sys__t35</o><i>global_var</i><i>__sys__t36</i></o>
+<o n="=" r="104"><o>rushLoop</o><i>__sys__t35</i></o>
+<v t="s" n="__sys__t40">.bt.</v>
+<o n="." r="105"><o>__sys__t39</o><i>rushLoop</i><i>__sys__t40</i></o>
+<o n="=" r="105"><o>rushLoopBt</o><i>__sys__t39</i></o>
+<v t="s" n="__sys__t44">.childAddBT.</v>
+<o n="." r="107"><o>__sys__t43</o><i>user</i><i>__sys__t44</i></o>
+<o n="number" r="107"><o>__sys__t46</o><i>__sys__t43</i></o>
+<o n="=" r="107"><o>childAddBT</o><i>__sys__t46</i></o>
+<v t="s" n="__sys__t49">.childAdd.</v>
+<o n="." r="108"><o>__sys__t48</o><i>user</i><i>__sys__t49</i></o>
+<o n="number" r="108"><o>__sys__t51</o><i>__sys__t48</i></o>
+<o n="=" r="108"><o>childAdd</o><i>__sys__t51</i></o>
+<o n="=" r="109"><o>score</o><i>addScore</i></o>
+<o n="!=" r="110"><o>__sys__t54</o><i>childAddBT</i><i>rushLoopBt</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t54</i></o>
+<o n="=="><o>__sys__t56</o><i>__sys__rt</i><i>__sys__t7</i></o>
+<o n="if_goto"><o>__sys__t57</o><i>__sys__t56</i><i>__sys__t68</i></o>
+<v t="s" n="__sys__t59">.childAddBT.</v>
+<o n="." r="112"><o>__sys__t58</o><i>user</i><i>__sys__t59</i></o>
+<o n="=" r="112"><o>__sys__t58</o><i>rushLoopBt</i></o>
+<o n="=" r="113"><o>childAdd</o><i>score</i></o>
+<v t="s" n="__sys__t64">.childAddReward.</v>
+<o n="." r="114"><o>__sys__t63</o><i>user</i><i>__sys__t64</i></o>
+<o n="=" r="114"><o>__sys__t63</o><i>__sys__t8</i></o>
+<o n="goto"><o>__sys__t67</o><i>__sys__t70</i></o>
+<o n="+=" r="118"><o>childAdd</o><i>score</i></o>
+<v t="s" n="__sys__t72">.childAdd.</v>
+<o n="." r="120"><o>__sys__t71</o><i>user</i><i>__sys__t72</i></o>
+<o n="=" r="120"><o>__sys__t71</o><i>childAdd</i></o>
+<o n="=" r="122"><o>score</o><i>childAdd</i></o>
+<v t="s" n="__sys__t77">.gameConfig.</v>
+<o n="." r="123"><o>__sys__t76</o><i>game</i><i>__sys__t77</i></o>
+<v t="s" n="__sys__t80">.name.</v>
+<o n="." r="123"><o>__sys__t79</o><i>__sys__t76</i><i>__sys__t80</i></o>
+<o n="+" r="123"><o>__sys__t82</o><i>__sys__t79</i><i>__sys__t9</i></o>
+<o n="=" r="123"><o>rankName</o><i>__sys__t82</i></o>
+<v t="s" n="__sys__t85">.rd.</v>
+<o n="." r="124"><o>__sys__t84</o><i>game</i><i>__sys__t85</i></o>
+<v t="s" n="__sys__t88">.getRedisObj.</v>
+<o n="." r="124"><o>__sys__t87</o><i>__sys__t84</i><i>__sys__t88</i></o>
+<o n="__sys__t87" r="124"><o>__sys__t90</o><i>__sys__t84</i><i>rankName</i></o>
+<o n="=" r="124"><o>rd</o><i>__sys__t90</i></o>
+<v t="s" n="__sys__t93">.id.</v>
+<o n="." r="125"><o>__sys__t92</o><i>user</i><i>__sys__t93</i></o>
+<o n="=" r="125"><o>userID</o><i>__sys__t92</i></o>
+<o n="redis_zadd" r="126"><o>__sys__t96</o><i>rd</i><i>rankName</i><i>score</i><i>userID</i></o>
+<v t="s" n="__sys__t98">.userSessionMap.</v>
+<o n="." r="128"><o>__sys__t97</o><i>game</i><i>__sys__t98</i></o>
+<o n="=" r="128"><o>userSessionMap</o><i>__sys__t97</i></o>
+<o n="exist" r="129"><o>__sys__t101</o><i>userSessionMap</i><i>userID</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t101</i></o>
+<o n="=="><o>__sys__t103</o><i>__sys__rt</i><i>__sys__t10</i></o>
+<o n="if_goto"><o>__sys__t104</o><i>__sys__t103</i><i>__sys__t117</i></o>
+<o n="[]" r="131"><o>__sys__t105</o><i>userSessionMap</i><i>userID</i></o>
+<o n="=" r="131"><o>session</o><i>__sys__t105</i></o>
+<o n="arr" r="132"><o>__sys__t107</o><i>__sys__t11</i><i>childAdd</i></o>
+<o n="=" r="132"><o>msg</o><i>__sys__t107</i></o>
+<v t="s" n="__sys__t110">.sendMsg.</v>
+<o n="." r="133"><o>__sys__t109</o><i>game</i><i>__sys__t110</i></o>
+<v t="s" n="__sys__t113">.id.</v>
+<o n="." r="133"><o>__sys__t112</o><i>session</i><i>__sys__t113</i></o>
+<o n="__sys__t109" r="133"><o>__sys__t115</o><i>game</i><i>__sys__t112</i><i>msg</i></o>
+<o n="goto"><o>__sys__t116</o><i>__sys__t118</i></o>
+<o n="goto"><o>__sys__t119</o><i>__sys__t121</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t101" />
+<v n="__sys__t103" />
+<v n="__sys__t104" />
+<v n="__sys__t105" />
+<v n="__sys__t107" />
+<v n="__sys__t109" />
+<v n="__sys__t112" />
+<v n="__sys__t115" />
+<v n="__sys__t116" />
+<v n="__sys__t119" />
+<v n="__sys__t12" />
+<v n="__sys__t14" />
+<v n="__sys__t16" />
+<v n="__sys__t18" />
+<v n="__sys__t23" />
+<v n="__sys__t26" />
+<v n="__sys__t27" />
+<v n="__sys__t29" />
+<v n="__sys__t30" />
+<v n="__sys__t31" />
+<v n="__sys__t35" />
+<v n="__sys__t39" />
+<v n="__sys__t43" />
+<v n="__sys__t46" />
+<v n="__sys__t48" />
+<v n="__sys__t51" />
+<v n="__sys__t54" />
+<v n="__sys__t56" />
+<v n="__sys__t57" />
+<v n="__sys__t58" />
+<v n="__sys__t63" />
+<v n="__sys__t67" />
+<v n="__sys__t71" />
+<v n="__sys__t76" />
+<v n="__sys__t79" />
+<v n="__sys__t82" />
+<v n="__sys__t84" />
+<v n="__sys__t87" />
+<v n="__sys__t90" />
+<v n="__sys__t92" />
+<v n="__sys__t96" />
+<v n="__sys__t97" />
+<v n="activityID" />
+<v n="activityMgr" />
+<v n="addScore" />
+<v n="childAdd" />
+<v n="childAddBT" />
+<v n="game" />
+<v n="global_var" />
+<v n="msg" />
+<v n="rankName" />
+<v n="rd" />
+<v n="rushLoop" />
+<v n="rushLoopBt" />
+<v n="score" />
+<v n="session" />
+<v n="user" />
+<v n="userID" />
+<v n="userSessionMap" />
+</script>

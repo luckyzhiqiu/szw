@@ -1,0 +1,52 @@
+《摄政王服务器相关说明》
+一、配置：
+	（1）gate（网关）
+		server/gate.sh中需要配置：
+			app_name		进程名
+			app_port		端口
+			list			后级游戏节点game描述
+
+	（2）game（游戏节点）
+		server/game.sh中需要配置：
+			app_name		进程名
+		
+		server/config/gameServer.json中需要配置：
+			port			端口列表（对应server/gate.sh中list）
+
+	（3）hub（转发节点）
+		server/hub.sh中需要配置：
+			app_name		进程名
+			app_port		端口
+		
+		server/config/hubClient.json中需要配置：
+			port			hub端口（对应server/hub.sh中app_port）
+
+	（4）tinyWeb（HTTP节点）
+		server/config/tinyWeb.json中需要配置：
+			port			端口
+		
+		server/www/config/tinyWeb/config.php中需要配置：
+			tinyWebRoot		地址（对应server/config/tinyWeb.json中port）
+
+	（5）redis（游戏数据缓存）
+		server/config/account_redis.json中配置
+		server/config/global_redis.json中配置
+		server/config/redis.json中配置
+		server/www/config/mgr/rd.php中配置
+
+	（6）mysql（游戏数据库）
+		server/config/db.json中配置
+		server/www/config/mgr/db.php中配置
+	
+	（7）帐号服PHP访问接口
+		server/config/account_php.json中需要配置：
+			domain			帐号服域名
+			port			端口
+		
+二、更新
+	（1）关闭所有游戏服的后端节点
+	（2）更新所有服务器上的代码
+	（3）在帐号服上运行一次server/upgradeAccountDB.sh
+	（4）在后台服上运行一次server/upgradeGlobalDB.sh
+	（5）在所有游戏服上运行server/upgradeDB.sh
+	（6）启动所有游戏服上的后端节点

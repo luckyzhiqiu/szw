@@ -1,0 +1,135 @@
+//vip福利领取
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+vipLevel=netMsg[3];//VIP等级
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link sessionID,methodName,vipLevel;
+		vipL=number(user.vip);
+		if(vipL<vipLevel)//vip等级不足
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);
+		}
+		
+		json=json_decode(user.json);
+		itemDict=json.item;
+		numMgr=game.numMgr;
+		
+		vipWeal=json.vipWeal;
+		vipMap=vipWeal.vipMap;
+		if(exist(vipMap,vipLevel))//已领取此等级VIP福利
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);
+		}
+			
+		rowV=game.table.vip.getRowFromColName("level",vipLevel);//任务数据
+		heroID=number(rowV.getValFromColName("heroID"));//VIP福利豪杰
+		wifeID=number(rowV.getValFromColName("wifeID"));//VIP福利红颜
+		
+		heroArr=json.hero;
+		wifeDict=json.wife;
+		if(heroID!=0)//奖励豪杰
+		{
+			numMgr.createHero(heroID,heroArr,json);
+		}
+		else if(wifeID!=0)//奖励红颜
+		{
+			numMgr.createWife(wifeID,wifeDict);
+			//计算user红颜数值
+			numMgr.computeUserWifeProperty(user,wifeDict);
+		}
+		
+		//奖励道具
+		newItemArr=arr();
+		itemStr=rowV.getValFromColName("itemID");//VIP福利物品（物品id,物品数量）
+		addItemArr=split(arr(),itemStr,",");
+		addIDCount=size(addItemArr);
+		if(addIDCount>=2)
+		{
+			i=0;j=0;addCount=addIDCount/2;
+			while(i<addCount)
+			{
+				itemID=number(addItemArr[j]);
+				itemCount=number(addItemArr[j+1]);
+				numMgr.addItem(itemID,itemCount,itemDict);//奖励道具
+				push(newItemArr,itemID,itemCount);
+				j+=2;
+				++i;
+			}
+		}
+		
+		//计算豪杰属性加成
+		numMgr.computeHeroArr(json);
+		numMgr.computeUser(user,json);
+		
+		wifePlus=json.wifePlus;
+		
+		//保存
+		power=user.power;
+		strength=user.strength;
+		wisdom=user.wisdom;
+		charm=user.charm;
+		politics=user.politics;
+		intimate=user.intimate;
+		beauty=user.beauty;
+		
+		vipMap[vipLevel]=0;
+		
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,heroArr,wifeDict,itemDict,power,strength,wisdom,charm,politics,intimate,beauty,vipMap,heroID,wifeID,wifePlus,newItemArr)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

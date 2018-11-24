@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="s" n="__sys__t1">.api/init.aks.</v>
+<v t="s" n="__sys__t2">.?HubClient.aks.</v>
+<v t="s" n="__sys__t3">.config/tinyWeb.json.</v>
+<v t="s" n="__sys__t4">..</v>
+<v t="n" n="__sys__t5">1024</v>
+<v t="n" n="__sys__t6">10</v>
+<v t="n" n="__sys__t7">1024</v>
+<v t="n" n="__sys__t8">100</v>
+<v t="n" n="__sys__t9">5000</v>
+<v t="s" n="__sys__t10">.@__unnamed__0.</v>
+<v t="s" n="__sys__t11">.@__unnamed__1.</v>
+<v t="s" n="__sys__t12">.@__unnamed__2.</v>
+<o n="__sys__t1" r="2"><o>__sys__t13</o></o>
+<o n="__sys__t2" r="3"><o>__sys__t14</o></o>
+<o n="file_get_contents" r="5"><o>__sys__t15</o><i>__sys__t3</i></o>
+<o n="json" r="5"><o>__sys__t16</o><i>__sys__t15</i></o>
+<o n="=" r="5"><o>tinyWebConfig</o><i>__sys__t16</i></o>
+<o n="dict" r="6"><o>__sys__t18</o></o>
+<o n="=" r="6"><o>userData</o><i>__sys__t18</i></o>
+<v t="s" n="__sys__t21">.port.</v>
+<o n="." r="12"><o>__sys__t20</o><i>tinyWebConfig</i><i>__sys__t21</i></o>
+<o n="*" r="13"><o>__sys__t23</o><i>__sys__t5</i><i>__sys__t6</i></o>
+<o n="*" r="14"><o>__sys__t24</o><i>__sys__t7</i><i>__sys__t8</i></o>
+<o n="full"><o>__sys__t25</o><i>__sys__t10</i></o>
+<o n="full"><o>__sys__t26</o><i>__sys__t11</i></o>
+<o n="full"><o>__sys__t27</o><i>__sys__t12</i></o>
+<o n="web_s2" r="9"><o>__sys__t28</o><i>__sys__t4</i><i>__sys__t20</i><i>__sys__t23</i><i>__sys__t24</i><i>__sys__t9</i><i>userData</i><i>__sys__t25</i><i>__sys__t26</i><i>__sys__t27</i></o>
+<v n="__sys__t13" />
+<v n="__sys__t14" />
+<v n="__sys__t15" />
+<v n="__sys__t16" />
+<v n="__sys__t18" />
+<v n="__sys__t20" />
+<v n="__sys__t23" />
+<v n="__sys__t24" />
+<v n="__sys__t25" />
+<v n="__sys__t26" />
+<v n="__sys__t27" />
+<v n="__sys__t28" />
+<v n="tinyWebConfig" />
+<v n="userData" />
+</script>

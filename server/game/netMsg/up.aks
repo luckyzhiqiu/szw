@@ -1,0 +1,157 @@
+//升官
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+rd=game.rd;
+
+//修改行数据
+user=rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,rd;
+		table=game.table;
+		level=number(user.level);
+		score=number(user.score);
+		nextLevel=level+1;
+		levelTable=table.level;
+		num=levelTable.size();
+		if(level>=num)
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);
+		}
+		levelRow=levelTable.getRowFromColName("level",nextLevel);
+		if(empty(levelRow))//爆级
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		needScore=number(levelRow.getValFromColName("score"));//所需政绩
+		if(score<needScore)//政绩不足
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		//扣减政绩
+		score-=needScore;
+		//增加等级
+		++level;
+		
+		systemOpenTab=table.systemOpen;
+		sysID=1;//议政厅
+		row=systemOpenTab.getRowFromColName("id",sysID);
+		targetLevel=int(row.getValFromColName("level"));
+		if(level==targetLevel)
+		{
+			//加入论战榜
+			rankName=game.gameConfig.name+"_waterBattleRank";//排行榜名称
+			_rd=rd.getRedisObj(rankName);//排行榜所在的redis对象
+			_score=number(user.waterBattleScore);
+			redis_zadd(_rd,rankName,_score,user.id);
+		}
+		
+		//信息
+		info=dict();
+		
+		//解锁豪杰
+		newHeroID=number(levelRow.getValFromColName("hero"));
+		if(newHeroID>0)
+		{
+			json=json_decode(user.json);
+			numMgr=game.numMgr;
+			heroArr=json.hero;
+			hero=numMgr.createHero(newHeroID,heroArr,json);
+			if(!empty(hero))//创建豪杰成功
+			{
+				info.hero=heroArr;
+				
+				//重新计算加成
+				//numMgr.computeHero(hero,json);
+				numMgr.computeHeroArr(json);
+				numMgr.computeUser(user,json);
+				//保存
+				user.json=json_encode(json);
+			}
+		}
+		//解锁犯人
+		newPrisonerID=number(levelRow.getValFromColName("prisonerID"));
+		if(newPrisonerID!=0)
+		{
+			json=json_decode(user.json);
+			
+			//添加犯人
+			numMgr=game.numMgr;
+			curPrison=numMgr.addPrisoner(table,json,newPrisonerID);
+			if(!empty(curPrison))
+			{
+				info.prison=curPrison;
+			}
+				
+			
+			//保存
+			user.json=json_encode(json);
+		}
+		
+		//保存
+		user.score=score;
+		user.level=level;
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,level,score,info,user.power,user.strength,user.wisdom,user.charm,user.politics,newHeroID)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

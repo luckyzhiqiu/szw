@@ -1,0 +1,10 @@
+/*
+游戏服配置
+*/
+{
+	bindDomain:"",
+	port:[5101],
+	connectTimeout:5000,
+	maxRecvBytes:10240,
+	maxSendBytes:204800
+}

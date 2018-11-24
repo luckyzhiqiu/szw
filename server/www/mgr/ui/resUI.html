@@ -1,0 +1,43 @@
+<style>
+#resUI_pannel{
+	position:fixed;
+	width:100%;
+	top:25px;
+}
+#resUI_resListView{
+	position:fixed;
+	width:100%;
+	top:50px;
+	bottom:25px;
+	overflow:auto;
+}
+#resUI_resListView table{
+	width:100%;
+}
+#resUI_resListView td{
+	height:50px;
+	border-bottom:1px solid;
+	text-align:center;
+	vertical-align:middle;
+}
+#resUI_resListView table tbody tr:first-child{
+	background:#cccccc;
+}
+#resUI_resListView table tbody tr{
+	background:#eeeeee;
+}
+#resUI table:first-child{
+	width:100%;
+}
+</style>
+
+<div id="resUI">
+	<div id="resUI_pannel">
+        <input id="resUI_userID" size="10" placeholder="玩家ID" />
+        <input id="resUI_type1" size="10" placeholder="类型开始" value="1" />
+        <input id="resUI_type2" size="10" placeholder="类型结束" value="100" />
+        <input id="resUI_date" type="date" />
+        <button id="resUI_queryBtn">查询</button>
+    </div>
+	<div id="resUI_resListView">无流水数据</div>
+</div>

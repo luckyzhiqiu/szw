@@ -1,0 +1,517 @@
+//审问
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+prisonerIndex=int(netMsg[3]);//犯人下标
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,prisonerIndex,userID;
+		json=json_decode(user.json);
+		prison=json.prison;
+		prisonerArr=prison.prisonerArr;
+		count=size(prisonerArr);
+		if(count<=prisonerIndex)//犯人下标错误
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		prisoner=prisonerArr[prisonerIndex];
+		
+		tableData=game.table;
+		rowPC=tableData.prisonerConfigure.getRow(0);
+		
+		hitFame=number(rowPC.getValFromColName("hitFame"));//每次打消耗名望
+		fame=number(user.fame);//名望值
+		if(fame<hitFame)//名望不足
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		hp=ref(prisoner.hp);//血量		
+		if(hp<=0)//无血量
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+		hitLife=number(rowPC.getValFromColName("hitLife"));//每次打血量
+		hitPercent=prison.hitPercent;//严刑拷打（万份比加成）
+		hitLife*=1+hitPercent/10000;
+		check=ref(prisoner.check);//审查次数
+		
+		if(check==8)
+		{
+			hp-=hitLife;//更新血量
+		}
+		if(hp<=0)
+		{
+			hp=0;
+		}
+		
+		def=ref(prisoner.def);//心理防线值
+		hitHeart=number(rowPC.getValFromColName("hitHeart"));//每次打心理防线
+		hitHeart*=1+hitPercent/10000;
+		
+		itemDict=json.item;
+		numMgr=game.numMgr;
+		addItemArrAll=arr();
+		ifCheck=0;
+		storyIDS=0;
+		storyArr=arr();
+		gemSys=json.gemSys;
+		gemArr=gemSys.gemArr;
+		heroArr=json.hero;
+		structMgr=game.structMgr;
+		if(check!=8)
+		{
+			def-=hitHeart;
+			if(def<=0)//心理防线值为0
+			{
+				def=0;
+				check+=1;
+				
+				prisonerId=prisoner.id;
+				rowP=tableData.prisoner.getRowFromColName("id",prisonerId);
+				itemStr=rowP.getValFromColName("item"+check);//*审物品奖励（物品id,数量）
+				treasure=number(rowP.getValFromColName("treasure"));//1审珍宝奖励ID
+				treasureTable=tableData.treasure;
+				
+				if(treasure!=0)
+				{
+					//数据升级//////////////////////////////////////////
+					f=0;treasureIDMap=dict();treasureNext=treasure;
+					treasureIDMap[treasureNext]=0;
+					while(f!=-1)
+					{
+						rowT=treasureTable.getRowFromColName("id",treasureNext);
+						nextID=number(rowT.getValFromColName("nextID"));//下一级珍宝id
+						if(nextID!=0)
+						{
+							treasureIDMap[nextID]=0;
+							treasureNext=nextID;
+							++f;
+						}
+						else
+						{
+							f=-1;
+						}
+					}
+
+					getGemIDPass=0;
+					gemArrCount=size(gemArr);
+					b=0;
+					while(b<gemArrCount)
+					{
+						gemInfo=gemArr[b];
+						gemIDS=gemInfo.id;
+						if(exist(treasureIDMap,gemIDS))
+						{
+							getGemIDPass=1;
+						}
+						
+						++b;
+					}
+					
+					if(check>1 && getGemIDPass==0)
+					{
+						//获得珍宝
+						gem=structMgr_upgradeObj(structMgr,"Gem",dict());
+						gem.id=treasure;
+						push(gemArr,gem);
+						gemArrCount=size(gemArr);
+						prisoner.gemIndex=gemArrCount-1;
+						
+						rowT=treasureTable.getRowFromColName("id",gem.id);
+						heroIDS=number(rowT.getValFromColName("heroID"));//对应豪杰
+						heroCount=size(heroArr);
+						i=0;while(i<heroCount)
+						{
+							hero=heroArr[i];
+							heroID=hero.heroID;
+							if(heroID==heroIDS)
+							{
+								gemIndexArr=hero.gemIndexArr;
+								gemIndex=gemArrCount;
+								push(gemIndexArr,gemIndex-1);
+								break;
+							}
+							++i;
+						}
+						
+						//升级珍宝
+						d=0;
+						while(d<check-2)
+						{
+							rowT=treasureTable.getRowFromColName("id",gem.id);
+							nextID=number(rowT.getValFromColName("nextID"));//下一级珍宝id
+							if(nextID!=0)
+							{
+								gem.id=nextID;//升级后珍宝ID
+								attArr=gem.attArr;
+								attArrCount=size(attArr);
+								k=0;attMapPoolIDMap=dict();
+								while(k<attArrCount)
+								{
+									gemAtt=attArr[k];
+									tPID=gemAtt.id;
+									attMapPoolIDMap[tPID]=0;
+									++k;
+								}
+
+								treasureActiveTable=tableData.treasureActive;
+								rowTA=treasureActiveTable.getRow(attArrCount);
+								quality1=number(rowTA.getValFromColName("quality1"));//生成品质1几率
+								quality2=number(rowTA.getValFromColName("quality2"));//生成品质2几率
+								quality3=number(rowTA.getValFromColName("quality3"));//生成品质3几率
+								quality4=number(rowTA.getValFromColName("quality4"));//生成品质4几率
+								quality5=number(rowTA.getValFromColName("quality5"));//生成品质5几率
+								randArr=arr();
+								push(randArr,quality1,quality2,quality3,quality4,quality5);
+								indexS=randSelect(randArr)+1;
+								treasurePoolTable=tableData.treasurePool;
+								treasurePoolTableCount=treasurePoolTable.size();
+								j=0;treasurePoolIDArr=arr();
+								while(j<treasurePoolTableCount)
+								{
+									rowTP=treasurePoolTable.getRow(j);
+									quality=number(rowTP.getValFromColName("quality"));
+									if(quality==indexS)
+									{
+										idS=j+1;
+
+										if(!exist(attMapPoolIDMap,idS))
+										{
+											push(treasurePoolIDArr,idS);
+										}
+									}
+									++j;
+								}
+
+								tpIDCount=size(treasurePoolIDArr);
+								tpIDS=rand()%tpIDCount;
+								treasurePoolID=treasurePoolIDArr[tpIDS];
+								gemAttFuck=structMgr_upgradeObj(structMgr,"GemAtt",dict());
+								gemAttFuck.id=treasurePoolID;
+								push(attArr,gemAttFuck);
+							}
+						
+							++d;
+						}
+					}
+					//数据升级//////////////////////////////////////////
+					
+					gemIndex=prisoner.gemIndex;
+					if(gemIndex!=-1)
+					{
+						gemID=gemArr[gemIndex].id;
+						treasure=gemID;//珍宝升级ID
+					}
+					
+					if(check==1)//获得珍宝
+					{
+						gem=structMgr_upgradeObj(structMgr,"Gem",dict());
+						gem.id=treasure;
+						push(gemArr,gem);
+						gemArrCount=size(gemArr);
+						prisoner.gemIndex=gemArrCount-1;
+						
+						rowT=treasureTable.getRowFromColName("id",treasure);
+						heroIDS=number(rowT.getValFromColName("heroID"));//对应豪杰
+						heroCount=size(heroArr);
+						i=0;while(i<heroCount)
+						{
+							hero=heroArr[i];
+							heroID=hero.heroID;
+							if(heroID==heroIDS)
+							{
+								gemIndexArr=hero.gemIndexArr;
+								gemIndex=gemArrCount;
+								push(gemIndexArr,gemIndex-1);
+								break;
+							}
+							++i;
+						}
+					}
+					else//升级珍宝
+					{
+						rowT=treasureTable.getRowFromColName("id",treasure);
+						nextID=number(rowT.getValFromColName("nextID"));//下一级珍宝id
+						if(nextID!=0)
+						{
+							gemArr[gemIndex].id=nextID;//升级后珍宝ID
+							treasure=nextID;
+							attArr=gemArr[gemIndex].attArr;
+							attArrCount=size(attArr);
+							
+							k=0;attMapPoolIDMap=dict();
+							while(k<attArrCount)
+							{
+								gemAtt=attArr[k];
+								tPID=gemAtt.id;
+								attMapPoolIDMap[tPID]=0;
+								++k;
+							}
+
+							treasureActiveTable=tableData.treasureActive;
+							rowTA=treasureActiveTable.getRow(attArrCount);
+							quality1=number(rowTA.getValFromColName("quality1"));//生成品质1几率
+							quality2=number(rowTA.getValFromColName("quality2"));//生成品质2几率
+							quality3=number(rowTA.getValFromColName("quality3"));//生成品质3几率
+							quality4=number(rowTA.getValFromColName("quality4"));//生成品质4几率
+							quality5=number(rowTA.getValFromColName("quality5"));//生成品质5几率
+							randArr=arr();
+							push(randArr,quality1,quality2,quality3,quality4,quality5);
+							indexS=randSelect(randArr)+1;
+							treasurePoolTable=tableData.treasurePool;
+							treasurePoolTableCount=treasurePoolTable.size();
+							j=0;treasurePoolIDArr=arr();
+							while(j<treasurePoolTableCount)
+							{
+								rowTP=treasurePoolTable.getRow(j);
+								quality=number(rowTP.getValFromColName("quality"));
+								if(quality==indexS)
+								{
+									idS=j+1;
+
+									if(!exist(attMapPoolIDMap,idS))
+									{
+										push(treasurePoolIDArr,idS);
+									}
+								}
+								++j;
+							}
+
+							tpIDCount=size(treasurePoolIDArr);
+							tpIDS=rand()%tpIDCount;
+							treasurePoolID=treasurePoolIDArr[tpIDS];
+							gemAttFuck=structMgr_upgradeObj(structMgr,"GemAtt",dict());
+							gemAttFuck.id=treasurePoolID;
+							push(attArr,gemAttFuck);
+						}
+					}
+					
+					///////////程序优化///////////
+					gemArrCount=size(gemArr);
+					l=0;gemArrIndex=-1;
+					while(l<gemArrCount)
+					{
+						gemInfo=gemArr[l];
+						gemID=gemInfo.id;
+						if(gemID==treasure)
+						{
+							gemArrIndex=l;
+						}
+						++l;
+					}
+
+					u=0;heroIndex=-1;
+					heroArrCount=size(heroArr);
+					while(u<heroArrCount)
+					{
+						heroInfo=heroArr[u];
+						gemIndexArrS=heroInfo.gemIndexArr;
+						gemIndexArrSCount=size(gemIndexArrS);
+						p=0;
+						if(gemIndexArrSCount>0)
+						{
+							while(p<gemIndexArrSCount)
+							{
+								gemArrIndexS=gemIndexArrS[p];
+								if(gemArrIndexS==gemArrIndex)
+								{
+									heroIndex=u;
+									break;
+								}
+								++p;
+							}
+						}
+						
+						++u;
+					}
+					if(heroIndex!=-1)
+					{
+						//属性计算
+						numMgr.computeHero(heroArr[heroIndex],json);
+						numMgr.computeUser(user,json);
+					}
+					///////////程序优化///////////
+				}
+
+				addItemArr=split(arr(),itemStr,",");
+				addIDCount=size(addItemArr);
+				if(addIDCount>=2)
+				{
+					i=0;j=0;addCount=addIDCount/2;
+					while(i<addCount)
+					{
+						itemID=number(addItemArr[j]);
+						itemCount=number(addItemArr[j+1]);
+						numMgr.addItem(itemID,itemCount,itemDict);//奖励道具
+						push(addItemArrAll,itemID,itemCount);
+						j+=2;
+						++i;
+					}
+				}
+				
+				ifCheck=1;
+				storyID=number(rowP.getValFromColName("story"+check));//*审剧情
+				storyIDS=storyID;
+				storyArr=game.storyMgr.storyMap[storyID];
+					
+				if(check!=8)
+				{
+					checkNum=check+1;//下一级心理防线
+					defMax=number(rowP.getValFromColName("heart"+checkNum));//*审心理防线
+					def=defMax;
+					prisoner.defMax=defMax;//*审心理防线最大值
+				}
+				else
+				{
+					remove=number(rowP.getValFromColName("remove"));//是否可移除（0=不可，1=可）
+					if(remove==1)
+					{
+						remove(prisonerArr,prisonerIndex);
+					}
+				}
+			}
+		}
+		
+		//打犯人次数奖励
+		hitCount=ref(prison.hitCount);//打犯人次数
+		prisonerHitRewardTable=tableData.prisonerHitReward;
+		c=prisonerHitRewardTable.size();
+		index=hitCount%c;
+		hitCount+=1;//更新打犯人次数
+		rowHR=prisonerHitRewardTable.getRow(index);
+		money=number(rowHR.getValFromColName("money"));
+		food=number(rowHR.getValFromColName("food"));
+		soldier=number(rowHR.getValFromColName("soldier"));
+		gold2=number(rowHR.getValFromColName("gold"));
+		itemStrAdd=rowHR.getValFromColName("item");
+		
+		addItemArr=split(arr(),itemStrAdd,",");
+		addIDCount=size(addItemArr);
+		if(addIDCount>=2)
+		{
+			i=0;j=0;addCount=addIDCount/2;
+			while(i<addCount)
+			{
+				itemID=number(addItemArr[j]);
+				itemCount=number(addItemArr[j+1]);
+				numMgr.addItem(itemID,itemCount,itemDict);//奖励道具
+				j+=2;
+				++i;
+				
+				pass=1;
+				k=0;
+				num=size(addItemArrAll);
+				while(k<num)
+				{
+					itemIDAdd=addItemArrAll[k];
+					if(itemIDAdd==itemID)
+					{
+						addItemArrAll[k+1]+=itemCount;
+						pass=0;
+						break;
+					}
+					k+=2;
+				}
+				
+				if(pass)
+				{
+					push(addItemArrAll,itemID,itemCount);
+				}
+			}
+		}
+		
+		user.money=number(user.money)+money;
+		user.food=number(user.food)+food;
+		user.soldier=number(user.soldier)+soldier;
+		
+		uGold2=number(user.gold2);
+		uGold2+=gold2;
+		if(gold2>0)
+		{
+			allGold=number(user.gold)+uGold2;//元宝余额
+			game.saveResIO(userID,29,0,1,gold2,allGold);//牢房打犯人(type,itemID,（0=消耗，1=获得）,count,allGold)
+		}
+		if(uGold2!=0)
+		{
+			user.gold2=uGold2;
+		}
+		
+		power=number(user.power);
+		strength=number(user.strength);
+		wisdom=number(user.wisdom);
+		charm=number(user.charm);
+		politics=number(user.politics);
+		
+		//限时任务//惩戒犯人次数
+		limitTask=json.limitTask;
+		limitTask.hitPrisonerCount+=1;
+		
+		//成就//惩戒犯人次数
+		achievement=json.achievement;
+		achievement.hitPrisonerCount+=1;
+		
+		//保存
+		user.fame=fame-hitFame;
+		user.json=json_encode(json);
+		
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,prison,itemDict,addItemArrAll,money,food,soldier,user.fame,number(user.gold2),ifCheck,storyIDS,limitTask.hitPrisonerCount,achievement.hitPrisonerCount,gemSys,heroArr,power,strength,wisdom,charm,politics)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

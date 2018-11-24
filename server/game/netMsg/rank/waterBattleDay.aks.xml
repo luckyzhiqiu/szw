@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t112">73</v>
+<v t="n" n="__sys__t109">71</v>
+<v t="n" n="__sys__t100">63</v>
+<v t="n" n="__sys__t90">54</v>
+<v t="n" n="__sys__t73">40</v>
+<v t="n" n="__sys__t72">40</v>
+<v t="n" n="__sys__t55">28</v>
+<v t="n" n="__sys__t54">28</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="n" n="__sys__t4">3</v>
+<v t="n" n="__sys__t5">0</v>
+<v t="n" n="__sys__t6">1</v>
+<v t="n" n="__sys__t7">2</v>
+<v t="n" n="__sys__t8">3</v>
+<v t="n" n="__sys__t9">10</v>
+<v t="n" n="__sys__t10">1</v>
+<v t="n" n="__sys__t11">0</v>
+<v t="n" n="__sys__t12">0</v>
+<v t="n" n="__sys__t13">1</v>
+<v t="n" n="__sys__t14">0</v>
+<v t="s" n="__sys__t15">.Result.</v>
+<v t="n" n="__sys__t16">0</v>
+<v t="s" n="__sys__t17">.water_battle.</v>
+<v t="s" n="__sys__t18">.select genTime,userID,userName,heroID,enemyUserID,enemyUserName,killCount,enemyCount,winCount from .</v>
+<v t="s" n="__sys__t19">. order by id desc limit .</v>
+<v t="s" n="__sys__t20">.,.</v>
+<v t="n" n="__sys__t21">0</v>
+<v t="n" n="__sys__t22">0</v>
+<v t="n" n="__sys__t23">0</v>
+<v t="s" n="__sys__t24">.Result.</v>
+<v t="n" n="__sys__t25">1</v>
+<o n="input"><o>__sys__t26</o><i>__sys__t1</i></o>
+<o n="="><o>server</o><i>__sys__t26</i></o>
+<o n="input"><o>__sys__t28</o><i>__sys__t2</i></o>
+<o n="="><o>sessionID</o><i>__sys__t28</i></o>
+<o n="input"><o>__sys__t30</o><i>__sys__t3</i></o>
+<o n="="><o>game</o><i>__sys__t30</i></o>
+<o n="input"><o>__sys__t32</o><i>__sys__t4</i></o>
+<o n="="><o>netMsg</o><i>__sys__t32</i></o>
+<o n="[]" r="3"><o>__sys__t34</o><i>netMsg</i><i>__sys__t5</i></o>
+<o n="=" r="3"><o>methodName</o><i>__sys__t34</i></o>
+<o n="[]" r="4"><o>__sys__t36</o><i>netMsg</i><i>__sys__t6</i></o>
+<o n="=" r="4"><o>userID</o><i>__sys__t36</i></o>
+<o n="[]" r="5"><o>__sys__t38</o><i>netMsg</i><i>__sys__t7</i></o>
+<o n="=" r="5"><o>tick</o><i>__sys__t38</i></o>
+<o n="[]" r="6"><o>__sys__t40</o><i>netMsg</i><i>__sys__t8</i></o>
+<o n="int" r="6"><o>__sys__t41</o><i>__sys__t40</i></o>
+<o n="=" r="6"><o>page</o><i>__sys__t41</i></o>
+<o n="=" r="8"><o>countPerPage</o><i>__sys__t9</i></o>
+<o n="*" r="9"><o>__sys__t44</o><i>page</i><i>countPerPage</i></o>
+<o n="=" r="9"><o>begin</o><i>__sys__t44</i></o>
+<o n=" -" r="11"><o>__sys__t46</o><i>__sys__t10</i></o>
+<o n="==" r="11"><o>__sys__t47</o><i>page</i><i>__sys__t46</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t47</i></o>
+<o n="=="><o>__sys__t49</o><i>__sys__rt</i><i>__sys__t11</i></o>
+<o n="if_goto"><o>__sys__t50</o><i>__sys__t49</i><i>__sys__t54</i></o>
+<o n="=" r="13"><o>begin</o><i>__sys__t12</i></o>
+<o n="=" r="14"><o>countPerPage</o><i>__sys__t13</i></o>
+<o n="goto"><o>__sys__t53</o><i>__sys__t55</i></o>
+<v t="s" n="__sys__t57">.checkTick.</v>
+<o n="." r="17"><o>__sys__t56</o><i>game</i><i>__sys__t57</i></o>
+<o n="__sys__t56" r="17"><o>__sys__t59</o><i>game</i><i>userID</i><i>tick</i></o>
+<o n="!" r="17"><o>__sys__t60</o><i>__sys__t59</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t60</i></o>
+<o n="=="><o>__sys__t62</o><i>__sys__rt</i><i>__sys__t14</i></o>
+<o n="if_goto"><o>__sys__t63</o><i>__sys__t62</i><i>__sys__t72</i></o>
+<v t="s" n="__sys__t65">.sendMsg.</v>
+<o n="." r="20"><o>__sys__t64</o><i>game</i><i>__sys__t65</i></o>
+<o n="+" r="23"><o>__sys__t67</o><i>methodName</i><i>__sys__t15</i></o>
+<o n="arr" r="23"><o>__sys__t68</o><i>__sys__t67</i><i>__sys__t16</i></o>
+<o n="__sys__t64" r="20"><o>__sys__t69</o><i>game</i><i>sessionID</i><i>__sys__t68</i></o>
+<o n="exit" r="25"><o>__sys__t70</o></o>
+<o n="goto"><o>__sys__t71</o><i>__sys__t73</i></o>
+<v t="s" n="__sys__t75">.cnn.</v>
+<o n="." r="28"><o>__sys__t74</o><i>game</i><i>__sys__t75</i></o>
+<o n="=" r="28"><o>cnn</o><i>__sys__t74</i></o>
+<o n="createDayTable" r="30"><o>__sys__t78</o><i>cnn</i><i>__sys__t17</i></o>
+<o n="=" r="30"><o>tableName</o><i>__sys__t78</i></o>
+<o n="arr" r="31"><o>__sys__t80</o></o>
+<o n="=" r="31"><o>infoArr</o><i>__sys__t80</i></o>
+<o n="+" r="33"><o>__sys__t82</o><i>__sys__t18</i><i>tableName</i></o>
+<o n="+" r="33"><o>__sys__t83</o><i>__sys__t82</i><i>__sys__t19</i></o>
+<o n="+" r="33"><o>__sys__t84</o><i>__sys__t83</i><i>begin</i></o>
+<o n="+" r="33"><o>__sys__t85</o><i>__sys__t84</i><i>__sys__t20</i></o>
+<o n="+" r="33"><o>__sys__t86</o><i>__sys__t85</i><i>countPerPage</i></o>
+<o n="=" r="33"><o>sql</o><i>__sys__t86</i></o>
+<o n="mysqlCreateRs" r="35"><o>__sys__t88</o><i>cnn</i><i>sql</i></o>
+<o n="=" r="35"><o>rs</o><i>__sys__t88</i></o>
+<o n="mysqlNextRow" r="36"><o>__sys__t91</o><i>rs</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t91</i></o>
+<o n="=="><o>__sys__t93</o><i>__sys__rt</i><i>__sys__t21</i></o>
+<o n="if_goto"><o>__sys__t94</o><i>__sys__t93</i><i>__sys__t112</i></o>
+<o n="arr" r="38"><o>__sys__t95</o></o>
+<o n="=" r="38"><o>info</o><i>__sys__t95</i></o>
+<o n="mysqlGetCols" r="39"><o>__sys__t97</o><i>rs</i></o>
+<o n="=" r="39"><o>cols</o><i>__sys__t97</i></o>
+<o n="=" r="40"><o>i</o><i>__sys__t22</i></o>
+<o n="&lt;" r="40"><o>__sys__t101</o><i>i</i><i>cols</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t101</i></o>
+<o n="=="><o>__sys__t103</o><i>__sys__rt</i><i>__sys__t23</i></o>
+<o n="if_goto"><o>__sys__t104</o><i>__sys__t103</i><i>__sys__t109</i></o>
+<o n="mysqlGetColVal" r="42"><o>__sys__t105</o><i>rs</i><i>i</i></o>
+<o n="push" r="42"><o>__sys__t106</o><i>info</i><i>__sys__t105</i></o>
+<o n="++" r="43"><o>i</o><i>i</i></o>
+<o n="goto"><o>__sys__t108</o><i>__sys__t100</i></o>
+<o n="push" r="45"><o>__sys__t110</o><i>infoArr</i><i>info</i></o>
+<o n="goto"><o>__sys__t111</o><i>__sys__t90</i></o>
+<o n="mysqlDestroyRs" r="47"><o>__sys__t113</o><i>rs</i></o>
+<v t="s" n="__sys__t115">.sendMsg.</v>
+<o n="." r="50"><o>__sys__t114</o><i>game</i><i>__sys__t115</i></o>
+<o n="+" r="53"><o>__sys__t117</o><i>methodName</i><i>__sys__t24</i></o>
+<o n="arr" r="53"><o>__sys__t118</o><i>__sys__t117</i><i>__sys__t25</i><i>infoArr</i></o>
+<o n="__sys__t114" r="50"><o>__sys__t119</o><i>game</i><i>sessionID</i><i>__sys__t118</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t101" />
+<v n="__sys__t103" />
+<v n="__sys__t104" />
+<v n="__sys__t105" />
+<v n="__sys__t106" />
+<v n="__sys__t108" />
+<v n="__sys__t110" />
+<v n="__sys__t111" />
+<v n="__sys__t113" />
+<v n="__sys__t114" />
+<v n="__sys__t117" />
+<v n="__sys__t118" />
+<v n="__sys__t119" />
+<v n="__sys__t26" />
+<v n="__sys__t28" />
+<v n="__sys__t30" />
+<v n="__sys__t32" />
+<v n="__sys__t34" />
+<v n="__sys__t36" />
+<v n="__sys__t38" />
+<v n="__sys__t40" />
+<v n="__sys__t41" />
+<v n="__sys__t44" />
+<v n="__sys__t46" />
+<v n="__sys__t47" />
+<v n="__sys__t49" />
+<v n="__sys__t50" />
+<v n="__sys__t53" />
+<v n="__sys__t56" />
+<v n="__sys__t59" />
+<v n="__sys__t60" />
+<v n="__sys__t62" />
+<v n="__sys__t63" />
+<v n="__sys__t64" />
+<v n="__sys__t67" />
+<v n="__sys__t68" />
+<v n="__sys__t69" />
+<v n="__sys__t70" />
+<v n="__sys__t71" />
+<v n="__sys__t74" />
+<v n="__sys__t78" />
+<v n="__sys__t80" />
+<v n="__sys__t82" />
+<v n="__sys__t83" />
+<v n="__sys__t84" />
+<v n="__sys__t85" />
+<v n="__sys__t86" />
+<v n="__sys__t88" />
+<v n="__sys__t91" />
+<v n="__sys__t93" />
+<v n="__sys__t94" />
+<v n="__sys__t95" />
+<v n="__sys__t97" />
+<v n="begin" />
+<v n="cnn" />
+<v n="cols" />
+<v n="countPerPage" />
+<v n="game" />
+<v n="i" />
+<v n="info" />
+<v n="infoArr" />
+<v n="methodName" />
+<v n="netMsg" />
+<v n="page" />
+<v n="rs" />
+<v n="server" />
+<v n="sessionID" />
+<v n="sql" />
+<v n="tableName" />
+<v n="tick" />
+<v n="userID" />
+</script>

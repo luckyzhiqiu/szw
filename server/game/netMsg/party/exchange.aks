@@ -1,0 +1,136 @@
+//
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+ID=netMsg[3];//ID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,ID,userID;
+		
+		
+		jsonExt=json_decode(user.jsonExt);
+		json=json_decode(user.json);
+		itemDict=ref(json.item);
+		party=ref(jsonExt.party);
+		resMap=ref(party.resMap);
+		
+		partyMoney=ref(user.partyMoney);
+		
+		tabelData=game.table.dinnerShop;
+		
+		row=tabelData.getRowFromColName("id",ID);
+		
+		if(empty(row))
+		{
+			//不存在
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		
+		pointCost=number(row.getValFromColName("pointCost"));
+		itemID=row.getValFromColName("item");
+		limit=number(row.getValFromColName("limit"));
+		
+		if(resMap[ID] &&number(resMap[ID])>=limit)
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-11)//兑换上限
+			);
+			return(0);//不修改
+			
+		}
+		
+		
+		game.numMgr.addItem(number(itemID),1,itemDict);//返回数量
+		
+		if(number(partyMoney)<pointCost)
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-5)//积分不足
+			);
+			return(0);//不修改
+			
+		}	
+		
+		partyMoney=number(partyMoney)-pointCost;
+		
+		
+		if(!exist(resMap,ID))
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)//不在可选兑换
+			);
+			return(0);//不修改
+			
+		}
+		
+		resMap[ID]=number(resMap[ID])+1;				
+	
+		
+		
+			
+		//保存
+		user.jsonExt=json_encode(jsonExt);
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,partyMoney,resMap,itemDict)
+		);
+		
+		return(1);//修改
+	
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

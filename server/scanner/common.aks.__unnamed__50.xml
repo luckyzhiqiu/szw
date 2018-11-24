@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t39">22</v>
+<v t="n" n="__sys__t38">22</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="s" n="__sys__t3">.row.</v>
+<v t="s" n="__sys__t4">.title.</v>
+<v t="n" n="__sys__t5">0</v>
+<v t="n" n="__sys__t6">0</v>
+<v t="n" n="__sys__t7">0</v>
+<v t="n" n="__sys__t8">1</v>
+<v t="n" n="__sys__t9">1</v>
+<o n="input"><o>__sys__t10</o><i>__sys__t1</i></o>
+<o n="="><o>unknownUser</o><i>__sys__t10</i></o>
+<o n="input"><o>__sys__t12</o><i>__sys__t2</i></o>
+<o n="="><o>userData</o><i>__sys__t12</i></o>
+<o n="link" r="1184"><o>__sys__t14</o><i>__sys__t3</i></o>
+<o n="=" r="1184"><o>row</o><i>__sys__t14</i></o>
+<v t="s" n="__sys__t17">.getValFromColName.</v>
+<o n="." r="1185"><o>__sys__t16</o><i>row</i><i>__sys__t17</i></o>
+<o n="__sys__t16" r="1185"><o>__sys__t19</o><i>row</i><i>__sys__t4</i></o>
+<o n="number" r="1185"><o>__sys__t20</o><i>__sys__t19</i></o>
+<o n="=" r="1185"><o>playTitle</o><i>__sys__t20</i></o>
+<v t="s" n="__sys__t23">.json.</v>
+<o n="." r="1186"><o>__sys__t22</o><i>unknownUser</i><i>__sys__t23</i></o>
+<o n="json_decode" r="1186"><o>__sys__t25</o><i>__sys__t22</i></o>
+<o n="=" r="1186"><o>json</o><i>__sys__t25</i></o>
+<o n="!=" r="1187"><o>__sys__t27</o><i>playTitle</i><i>__sys__t5</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t27</i></o>
+<o n="=="><o>__sys__t29</o><i>__sys__rt</i><i>__sys__t6</i></o>
+<o n="if_goto"><o>__sys__t30</o><i>__sys__t29</i><i>__sys__t38</i></o>
+<v t="s" n="__sys__t32">.titleMap.</v>
+<o n="." r="1190"><o>__sys__t31</o><i>json</i><i>__sys__t32</i></o>
+<o n="=" r="1190"><o>titleMap</o><i>__sys__t31</i></o>
+<o n="[]" r="1191"><o>__sys__t35</o><i>titleMap</i><i>playTitle</i></o>
+<o n="=" r="1191"><o>__sys__t35</o><i>__sys__t7</i></o>
+<o n="goto"><o>__sys__t37</o><i>__sys__t39</i></o>
+<v t="s" n="__sys__t41">.waterBattleScoreReward.</v>
+<o n="." r="1194"><o>__sys__t40</o><i>unknownUser</i><i>__sys__t41</i></o>
+<o n="=" r="1194"><o>__sys__t40</o><i>__sys__t8</i></o>
+<v t="s" n="__sys__t45">.json.</v>
+<o n="." r="1195"><o>__sys__t44</o><i>unknownUser</i><i>__sys__t45</i></o>
+<o n="json_encode" r="1195"><o>__sys__t47</o><i>json</i></o>
+<o n="=" r="1195"><o>__sys__t44</o><i>__sys__t47</i></o>
+<o n="return" r="1196"><o>__sys__t49</o><i>__sys__t9</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t10" />
+<v n="__sys__t12" />
+<v n="__sys__t14" />
+<v n="__sys__t16" />
+<v n="__sys__t19" />
+<v n="__sys__t20" />
+<v n="__sys__t22" />
+<v n="__sys__t25" />
+<v n="__sys__t27" />
+<v n="__sys__t29" />
+<v n="__sys__t30" />
+<v n="__sys__t31" />
+<v n="__sys__t35" />
+<v n="__sys__t37" />
+<v n="__sys__t40" />
+<v n="__sys__t44" />
+<v n="__sys__t47" />
+<v n="__sys__t49" />
+<v n="json" />
+<v n="playTitle" />
+<v n="row" />
+<v n="titleMap" />
+<v n="unknownUser" />
+<v n="userData" />
+</script>

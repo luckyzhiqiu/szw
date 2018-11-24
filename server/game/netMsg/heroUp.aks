@@ -1,0 +1,182 @@
+//豪杰升级
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+heroIndex=netMsg[3];//豪杰位置
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,heroIndex,userID;
+		json=json_decode(user.json);
+		heroArr=json.hero;
+		heroCount=size(heroArr);
+		
+		if(heroIndex<0||heroIndex>=heroCount)//豪杰位置不存在
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		
+		hero=heroArr[heroIndex];
+		level=hero.level;//豪杰等级
+		targetLevel=level+1;//目标等级
+		
+		heroLevelTable=game.table.heroLevel;
+		row=heroLevelTable.getRowFromColName("heroLevel",targetLevel);
+		if(empty(row))//爆级
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		levelExp=hero.levelExp;
+		money=number(user.money);
+		needMoney=number(row.getValFromColName("cost"));//消耗银两
+		if(needMoney>(money+levelExp))//银两不足
+		{
+			//银两存入等级经验中
+			user.money=0;
+			hero.levelExp+=money;
+			
+			//流水
+			allMoney=number(user.money);//银两余额
+			game.saveResIO(userID,1001,0,0,money,allMoney);//升级豪杰(type,itemID,（0=消耗，1=获得）,count,allMoney)
+			
+			//保存
+			user.json=json_encode(json);
+			
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",2,allMoney,hero)
+			);
+			return(1);//不修改
+		}
+		
+		//扣减银两和等级经验
+		needM=needMoney-levelExp;
+		money-=needM;
+		levelExp=0;
+		
+		numMgr=game.numMgr;
+		
+		//流水
+		game.saveResIO(userID,1001,0,0,needMoney,money);//升级豪杰(type,itemID,（0=消耗，1=获得）,count,money)
+		
+		//最大等级（根据爵位）
+		//连升3级不能超过
+		tableData=game.table;
+		promotionID=hero.promotion;//提拔等级
+		pRow=tableData.promotion.getRowFromColName("id",promotionID);
+		limit=number(pRow.getValFromColName("limit"));//等级上限
+
+		//已达到当前爵位最大等级
+		if(level>=limit)
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//修改
+		}
+		
+		heroUpCount=ref(json.dailyTask.heroUpCount);
+		vip=json.vip;
+		__heroUpCount=ref(vip.heroUpCount);//已获取连升三级每日次数
+		//连升三级
+		addLevel=0;//连升3级触发失败
+		rowVip=tableData.vip.getRowFromColName("level",user.vip);//角色VIP等级
+		if(!empty(rowVip))//返回行数据
+		{
+			miricle2=number(rowVip.getValFromColName("miricle2"));//连升三级每日次数（豪杰升级概率2触发）
+			if(__heroUpCount<miricle2)//未满十倍商产每日次数
+			{
+				rate2=number(rowVip.getValFromColName("rate2"));//连升三级概率
+				num = rand()%10000;//随机数
+				if(rate2>num)//中奖
+				{
+					addLevel=1;//连升3级触发成功
+					if(level<limit)
+					{
+						targetLevel+=2;//再加上2级
+						heroUpCount+=2;//再加上2级
+						if(targetLevel>limit)//超过等级
+						{
+							targetLevel=limit;//最大等级
+						}
+					}
+					++__heroUpCount;//连升三级每日次数+1
+				}
+			}
+		}
+
+		//增加等级
+		hero.level=targetLevel;
+		hero.levelExp=levelExp;
+		
+		//重新计算加成
+		numMgr.computeHero(hero,json);
+		numMgr.computeUser(user,json);
+		
+		heroUpCount+=1;//豪杰升级次数
+		
+		//保存
+		user.json=json_encode(json);
+		user.money=money;
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,money,hero,heroUpCount,user.strength,user.wisdom,user.charm,user.politics,user.power,addLevel,__heroUpCount)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

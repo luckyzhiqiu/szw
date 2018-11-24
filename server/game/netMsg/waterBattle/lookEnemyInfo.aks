@@ -1,0 +1,360 @@
+//正常议政前查看敌方信息
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+type=int(netMsg[3]);//类型：1=议政;2=追杀（输入玩家ID）;3=反击（仇人列表）;4=挑战（日榜）;
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+if(type<=0||type>=5)//类型无效
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID,type,netMsg;
+		json=json_decode(user.json);
+		limitTask=json.limitTask;
+		numMgr=game.numMgr;
+		itemDict=json.item;
+		achievement=json.achievement;
+		useItemMap=achievement.useItemMap;
+		waterBattleCountExt=number(user.waterBattleCountExt);//额外对战次数（使用道具开始）
+		waterBattle=json.waterBattle;
+		enemyUserID=number(waterBattle.enemyUserID);//敌方userID
+		waterBattleStep=number(user.waterBattleStep);//论战阶段
+		if(waterBattleStep==0)//未开战状态下
+		{
+			if(type==1)
+			{
+				//敌方userID
+				if(enemyUserID!=0)//数据已获取
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-13)
+					);
+					return(0);
+				}
+			}
+		}
+		else//已开战
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-11)
+			);
+			return(0);
+		}
+		
+		if(type==1)
+		{
+			curTime=time_milli();//当前时间
+			waterBattleEndTime=number(user.waterBattleEndTime);//论战结束时间（毫秒)
+			waterBattleCount=number(user.waterBattleCount);//议政次数
+			talbeData=game.table;
+			row=talbeData.waterBattleConfigure.getRow(0);
+			count=number(row.getValFromColName("count"));//每日参与次数
+			cooldown=number(row.getValFromColName("cooldown"));//战后CD时间（分钟）
+			newTime=waterBattleEndTime+cooldown*60*1000;//论战结束时间（毫秒)+战后CD时间（毫秒)
+			
+			if(waterBattleCount==count)//超过每日参与论战次数
+			{
+				itemID=52;
+				buyCount=number(row.getValFromColName("buyCount"));
+				if(waterBattleCountExt>=buyCount)//超过每日额外次数
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-4)
+					);
+					return(0);
+				}
+
+				//道具出战令消耗
+				itemCount=numMgr.subItem(itemID,1,itemDict);//出战令减1
+				if(itemCount!=-1)//有出战令
+				{
+					user.waterBattleCountExt=waterBattleCountExt+1;//额外对战次数+1
+				}
+				else//没出战令
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-5)
+					);
+					return(0);
+				}
+			}
+			else//未超过每日参与论战次数
+			{
+				if(type==1)
+				{
+					//（1）判断条件：阶段、间隔时间
+					if(curTime<newTime)//论战时间未满足
+					{
+						//回复
+						game.sendMsg
+						(
+							sessionID,
+							arr(methodName+"Result",-3)
+						);
+						return(0);
+					}
+				}
+			}
+		}
+		else if(type==2)//追杀
+		{
+			enemyUserID=netMsg[4];//追杀的敌方userID
+			//检查是否存在
+			enemyUserRow=game.rd.getRow(game.cnn,"user","id",enemyUserID,"*",1000);
+			if(empty(enemyUserRow))//敌方不存在
+			{
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-10)
+				);
+				return(0);
+			}
+			
+			itemCount=numMgr.subItem(51,1,itemDict);//追杀令减1
+			if(itemCount==-1){//没追杀令
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-6)
+				);
+				return(0);
+			}
+		}
+		else if(type==3 || type==4)//反击//挑战
+		{
+			itemID=50;
+			itemCount=numMgr.subItem(itemID,1,itemDict);//挑战书减1
+			if(itemCount==-1){//没挑战书
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-7)
+				);
+				return(0);
+			}
+			
+			//限时任务//挑战书消耗
+			limitTask.useItem50+=1;
+
+			if(exist(useItemMap,itemID))
+			{
+				useItemMap[itemID]+=1;
+			}
+			else
+			{
+				useItemMap[itemID]=1;
+			}
+		}
+
+		if(waterBattleStep==0)//未开始
+		{
+			heroArr=json.hero;
+			waterBattleHeroIndex=-1;
+			if(type==1)
+			{
+				//（2）匹配对手玩家，从议政榜中选出前后3个对手，并进行随机匹配
+				rankName=game.gameConfig.name+"_waterBattleRank";//排行榜名称
+				rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+				@try
+					index=redis_zrevrank(rd,rankName,userID);//排名多少
+				@catch
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-14)
+					);
+					return(0);
+				@catch.
+				redis_zrevrange(rd,rankName,max(index-10,0),index+10,0,userIDArr=arr());
+				debug(userIDArr);
+				uIDIndex=arrFindNumberKey(userIDArr,userID);
+				remove(userIDArr,uIDIndex);
+				debug(userIDArr);
+				rankUserIDArrCount=size(userIDArr);
+				if(rankUserIDArrCount==0)//仪征榜中无对手
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-8)
+					);
+					return(0);
+				}
+				normalUseHeroIndexMap=waterBattle.normalUseHeroIndexMap;
+				uIDCount=rand()%rankUserIDArrCount;
+				debug(uIDCount);
+				enemyID=userIDArr[uIDCount];
+				debug(enemyID);
+				enemyUser=game.rd.getRow(game.cnn,"user","id",enemyID,"*",1000);//获取对战玩家
+				rank=number(row.getValFromColName("rank"));//随机豪杰属性排名
+				strongheroArr=numMgr.getStrongestHeroArr(heroArr,rank,normalUseHeroIndexMap);//选出15个最强的
+				heroArrCount=size(strongheroArr);
+				heroIndex=rand()%heroArrCount;
+				hero=strongheroArr[heroIndex];//选中豪杰
+				waterBattleHeroIndex=hero.heroIndex;
+				
+				//豪杰使用字典（记录：正常议政所使用的heroIndex）//normalUseHeroIndexMap[heroIndex]=1;
+				//normalUseHeroIndexMap[hero.heroIndex]=1;
+			}
+			else if(type==2 || type==3 || type==4)
+			{
+				targetUserID=netMsg[4];//追杀反击挑战userID
+				heroIndex=netMsg[5];//自选豪杰heroIndex
+				enemyUser=game.rd.getRow(game.cnn,"user","id",targetUserID,"*",1000);//指定对战玩家
+				hero=heroArr[heroIndex];//选中豪杰
+				waterBattleHeroIndex=hero.heroIndex;
+				useHeroIndexMap=waterBattle.useHeroIndexMap;//豪杰使用字典
+				if(exist(useHeroIndexMap,heroIndex))//豪杰当天已使用
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-12)
+					);
+					return(0);
+				}
+				waterBattle.useHeroIndexMap[heroIndex]=1;//豪杰使用字典
+			}
+
+			//（5）随机三个敌方豪杰，并放入数组enemyHeroIDArr
+			jsonExt=json_decode(user.jsonExt);
+			enemyJson=json_decode(enemyUser.json);
+			enemyheroArr=enemyJson.hero;
+			enemyheroCount=size(enemyheroArr);
+			waterBattle.enemyHeroCount=enemyheroCount;//敌方豪杰总数量
+			waterBattleExt=jsonExt.waterBattleExt;
+			enemyHeroBattleArr=waterBattleExt.enemyHeroArr;//（7）计算敌方豪杰数据，并放入数组heroArr
+			clean(enemyHeroBattleArr);
+			selectEnemyHeroIndexArr=arr();
+			enemyHeroPromotionIndexArr=arr();
+			i=0;
+			while(i<enemyheroCount)
+			{
+				enemyhero=numMgr.computeWaterBattleHero(enemyheroArr[i],enemyJson.wifePlus);
+				push(enemyHeroBattleArr,enemyhero);//敌方论战豪杰信息数组
+				push(selectEnemyHeroIndexArr,enemyhero.heroID);
+				push(enemyHeroPromotionIndexArr,enemyhero.promotion);
+				++i;
+			}
+			enemyHeroIDArr=waterBattle.enemyHeroIDArr;//选中的3个豪杰ID
+			enemyHeroPromotionArr=waterBattle.enemyHeroPromotionArr;//提拔等级数组（爵位），对应enemyHeroIDArr
+			clean(enemyHeroIDArr);
+			clean(enemyHeroPromotionArr);
+			indexCount=size(selectEnemyHeroIndexArr);
+			if(indexCount<4)//少于4个论战豪杰信息数组ID
+			{
+				k=0;
+				while(k<size(selectEnemyHeroIndexArr))
+				{
+					push(enemyHeroIDArr,selectEnemyHeroIndexArr[k]);//最多保存3个敌方豪杰ID
+					push(enemyHeroPromotionArr,enemyHeroPromotionIndexArr[k]);
+					remove(selectEnemyHeroIndexArr,k);
+					remove(enemyHeroPromotionIndexArr,k);
+				}
+			}
+			else//大于3个豪杰
+			{
+				j=0;
+				while(j<3)
+				{
+					indexCount=size(selectEnemyHeroIndexArr);
+					selectEnemyHeroIndex=rand()%indexCount;
+					push(enemyHeroIDArr,selectEnemyHeroIndexArr[selectEnemyHeroIndex]);//随机3个敌方豪杰ID
+					push(enemyHeroPromotionArr,enemyHeroPromotionIndexArr[selectEnemyHeroIndex]);//随机3个敌方豪杰ID
+					remove(selectEnemyHeroIndexArr,selectEnemyHeroIndex);
+					remove(enemyHeroPromotionIndexArr,selectEnemyHeroIndex);
+					++j;
+				}
+			}
+
+			waterBattle.type=type;//记录敌方userID
+			waterBattle.enemyUserID=enemyUser.id;//记录敌方userID
+			waterBattle.enemyUserHead=enemyUser.head;//记录敌方头像
+			waterBattle.enemyUserLevel=enemyUser.level;//记录敌方敌方等级
+			waterBattle.heroIndex=waterBattleHeroIndex;//我方豪杰位置
+			
+			//保存
+			waterBattleScore=number(user.waterBattleScore);//论战总积分（论战积分榜）
+			user.json=json_encode(json);
+			user.jsonExt=json_encode(jsonExt);
+			
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,waterBattle,user.waterBattleCountExt,itemDict,limitTask.useItem50,useItemMap,waterBattleScore)
+			);
+			return(1);
+		}
+		else//论战已开始
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-9)
+			);
+			return(0);
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

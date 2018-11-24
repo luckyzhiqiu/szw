@@ -1,0 +1,103 @@
+//子嗣一键培养
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		
+		@link methodName,sessionID;
+		json=json_decode(user.json);
+		childSys=json.childSys;
+		childrenArr=childSys.children;
+		childrenCount=size(childrenArr);
+
+		fosterArr=arr();
+		strengthTotalAll=0;
+		wisdomTotalAll=0;
+		charmTotalAll=0;
+		politicsTotalAll=0;
+		miracle=0;
+			
+		i=0;
+		while(i<childrenCount)
+		{
+			child=childrenArr[i];
+			childName=child.name;
+			if(childName!="")
+			{
+				grows=child.grows;//资质
+				level=child.level;//等级
+				tableData=game.table;
+				rowC=tableData.childConfigure.getRow(0);
+				talentLevel=number(rowC.getValFromColName("talentLevel"+grows));//资质N科举等级
+				if(level<talentLevel)//未达到当前资质最大等级
+				{
+					childID=child.id;
+					newDataArr=game.childMgr.childFoster(childID,json,user,0);
+					type=newDataArr[0];
+					if(type==1)//成功
+					{
+						strengthTotalAll+=newDataArr[1];
+						wisdomTotalAll+=newDataArr[2];
+						charmTotalAll+=newDataArr[3];
+						politicsTotalAll+=newDataArr[4];
+						miracle+=newDataArr[5];
+					}
+				}
+			}
+			++i;
+		}
+		
+		userAttribute=arr();
+		push(fosterArr,strengthTotalAll,wisdomTotalAll,charmTotalAll,politicsTotalAll,miracle);
+		push(userAttribute,user.strengthAdd3,user.wisdomAdd3,user.charmAdd3,user.politicsAdd3,user.strength,user.wisdom,user.charm,user.politics,user.power,json.vip.childCount);
+		upChild=json.dailyTask.upChild;//日常任务培养子女次数
+		aUpChild=json.achievement.upChild;//成就//培养子女次数
+		//保存
+		user.json=json_encode(json);
+					
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,childrenArr,userAttribute,fosterArr,upChild,aUpChild)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

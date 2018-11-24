@@ -1,0 +1,273 @@
+//提亲
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+childID=netMsg[3];//孩子id
+hisID=netMsg[4];//对方玩家ID
+type=netMsg[5];//提亲类型 0:向全服提亲 1:向玩家提亲 2:查看提亲状态
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+
+//加入对方提亲数组
+updateHisUser=##<game,userID,PairReqMsg>
+	nickname="";
+	returnType=0;
+	//修改行数据
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link methodName,sessionID,PairReqMsg,nickname,returnType;
+			returnType=1;
+			nickname=user.nickname;
+			jsonExt=json_decode(user.jsonExt);
+			pairReqArr=ref(jsonExt.pairSys.pairReqArr);
+			push(pairReqArr,PairReqMsg);
+			
+			
+			//保存
+			
+			user.jsonExt=json_encode(jsonExt);	
+		
+			
+			return(1);//修改
+		
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	if(returnType==1)
+	{
+		return(nickname);
+	}else
+	{
+		return(3);
+	}
+	
+	
+##.;
+
+
+
+	//修改行数据
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link methodName,sessionID,childID,hisID,userID,updateHisUser,type;
+			
+			json=json_decode(user.json);
+			itemDict=ref(json.item);
+			jsonExt=json_decode(user.jsonExt);
+			pairSys=ref(jsonExt.pairSys);
+			childArr=ref(pairSys.children);
+			hadChild=0;
+			hisNickname="";
+			currentTime=time();		
+			c=size(childArr);
+			i=0;while(i<c){
+				if(childArr[i].id==childID)
+				{
+					if(type==2)
+					{
+						//提亲状态
+						game.sendMsg
+						(
+							sessionID,
+							arr(methodName+"Result",1,childArr[i].targetUserID)
+						);
+						return(0);	
+						
+					}
+					
+					childConfigureTable=game.table.childConfigure.getRow(0);
+					itemID=childConfigureTable.getValFromColName("talentMarrigeCost"+childArr[i].grows);
+					talentMarketCostStr=childConfigureTable.getValFromColName("talentMarketCost"+childArr[i].grows);
+					
+					t=split(arr(),talentMarketCostStr,",");
+					t_a=number(t[0]);
+					t_b=number(t[1]);
+				
+					
+					hadChild=1;
+					if(childArr[i].targetUserID!=-1)
+					{
+						//回复已提过亲
+						game.sendMsg
+						(
+							sessionID,
+							arr(methodName+"Result",-2)
+						);
+						return(0);	
+					}
+					
+					childArr[i].genTime=currentTime;
+					
+					if(type==1)
+					{
+						if(game.numMgr.subItem(itemID,1,itemDict)==-1)
+						{
+							//道具不足
+							game.sendMsg
+							(
+								sessionID,
+								arr(methodName+"Result",5)
+							);
+							return(0);	
+							
+						}
+					
+						if(userID==hisID)
+						{
+							//不能向自己提亲
+							game.sendMsg
+							(
+								sessionID,
+								arr(methodName+"Result",2)
+							);
+							return(0);
+						}
+						childArr[i].targetUserID=hisID;
+						
+						PairReqMsg=dict();
+						PairReqMsg["name"]=childArr[i].name;
+						PairReqMsg["nickname"]=user.nickname;
+						PairReqMsg["grows"]=childArr[i].grows;
+						PairReqMsg["num"]=number(childArr[i].strengthTotal)+number(childArr[i].wisdomTotal)+number(childArr[i].charmTotal)+number(childArr[i].politicsTotal);
+						PairReqMsg["sex"]=childArr[i].sex;
+						PairReqMsg["skin"]=childArr[i].skin;
+						PairReqMsg["childID"]=childID;
+						PairReqMsg["userID"]=userID;					
+					
+						hisUser=updateHisUser(game,hisID,PairReqMsg);
+						
+						
+						
+						if(type(hisUser)=="string")//对方用户不存在
+						{
+							childArr[i].targetNickname=hisUser;
+							hisNickname=hisUser;
+						}else
+						{
+							//回复
+							game.sendMsg
+							(
+								sessionID,
+								arr(methodName+"Result",3)
+							);
+							return(0);
+							
+						}							
+						
+					}else if(type==0)
+					{
+						if(game.numMgr.subItem(t_a,t_b,itemDict)==-1)
+						{
+							//道具不足
+							game.sendMsg
+							(
+								sessionID,
+								arr(methodName+"Result",5)
+							);
+							return(0);	
+							
+						}
+						
+						childArr[i].targetUserID=0;
+						
+						num=number(childArr[i].strengthTotal)+number(childArr[i].wisdomTotal)+number(childArr[i].charmTotal)+number(childArr[i].politicsTotal);	
+						
+						sql="INSERT INTO unmarry_child (name,nickname,grows,num,sex,skin,childID,userID,genTime) VALUES ('"+childArr[i].name+"','"+user.nickname+"',"+childArr[i].grows
+						+","+num+","+childArr[i].sex+","+childArr[i].skin+","+childID+","+userID+","+currentTime+")";
+						mysqlExec(game.cnn,sql);
+						
+					}else
+					{
+						//类型不存在
+						game.sendMsg
+						(
+							sessionID,
+							arr(methodName+"Result",-3)
+						);
+						return(0);
+						
+						
+					}
+					
+						
+					
+					
+					break;
+				}
+				i++;
+			}
+			if(hadChild==0)
+			{
+				//回复孩子不存在
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",4)
+				);
+				return(0);
+				
+			}
+			//保存
+			user.json=json_encode(json);
+			user.jsonExt=json_encode(jsonExt);
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,json.item,itemID,currentTime,hisID,hisNickname)
+			);
+			
+			return(1);//修改
+		
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	
+
+
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}

@@ -1,0 +1,69 @@
+@class HubClient
+	self.tmp=buf();
+	//hub客户端初始化
+	@member initHubClient
+		hubClientConfig=json(file_get_contents("config/hubClient.json"));//读取数据库配置	
+		// debug(hubClientConfig);
+		self.hubClientDomain=hubClientConfig.domain;
+		self.hubClientPort=hubClientConfig.port;
+		self.hubClientPassword=hubClientConfig.password;
+		self.hubClient=c2Create();
+		c2Connect(self.hubClient,self.hubClientDomain,self.hubClientPort);
+		self.hubClientTimer=0;
+		self.hubClientReady=0;//连接准备：0=未准备；1=准备；
+		self.hubClientRecvBuf=buf();//接收缓存
+	@member.
+	
+	//hub客户端更新
+	@member updateHubClient
+		client=self.hubClient;
+		tmp=self.tmp;
+		if(c2HasConnect(client))
+		{
+			// trace("connect hub succ");
+			c2Send(client,packStr(tmp,self.hubClientPassword));
+			self.hubClientReady=1;
+		}
+		if(c2HasData(client))
+		{
+			@try
+				hubClientRecvBuf=self.hubClientRecvBuf;
+				c2GetData(client,hubClientRecvBuf);
+				//弹出
+				clean(hubClientRecvBuf);
+			@catch
+				c2Close(client);
+			@catch.
+		}
+		if(c2HasNetError(client))
+		{
+			// trace("connect hub fail");
+			c2Connect(self.hubClient,self.hubClientDomain,self.hubClientPort);
+			self.hubClientReady=0;
+			clean(self.hubClientRecvBuf);
+		}
+		if(isTimeout(self.hubClientTimer,5000)&&self.hubClientReady)
+		{
+			//心跳
+			clean(tmp);
+			bufWriteUint32(tmp,0);
+			c2Send(client,tmp);
+		}
+	@member.
+	
+	//请求hub转发
+	@member sendMsgToHub<msg>
+		if(!self.hubClientReady)exit();
+		msgBuf=serialize(msg);
+		tmp=self.tmp;
+		client=self.hubClient;
+		clean(tmp);
+		msgBytes=size(msgBuf);
+		bufWriteUint32(tmp,msgBytes+4);
+		bufWriteUint32(tmp,msgBytes);
+		bufAppend(tmp,msgBuf);
+		// trace("-----------------------"+msgBytes);
+		// trace("-----------------------"+size(tmp));
+		c2Send(client,tmp);
+	@member.
+@class.

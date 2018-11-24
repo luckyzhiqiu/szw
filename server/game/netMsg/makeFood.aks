@@ -1,0 +1,184 @@
+//经营:农业获取粮草
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID;
+		json=json_decode(user.json);
+		makeFood=ref(json.makeFood);//经营:农业
+		beginTime=ref(makeFood.beginTime);//资源增长开始时间戳（毫秒）
+		dt=ref(makeFood.dt);//每轮间隔时间（秒）
+		dt1000=dt*1000;
+		recvSign=0;
+		newBeginTime=beginTime;
+		row=game.table.level.getRowFromColName("level",user.level);//任务数据
+		maxRecvCount=number(row.getValFromColName("ERP2max"));//经营农产累积
+		curTime=time_milli();//当前时间
+		roundBeginTime=beginTime-dt1000*makeFood.recvCount;//第1轮开始时间
+		roundEndTime=roundBeginTime+dt1000;//第1轮结束时间
+		if(makeFood.recvCount>0)//有储存的收成轮数
+		{
+			recvSign=1;
+			endTime=beginTime+dt1000*(maxRecvCount-makeFood.recvCount);
+			if(curTime<endTime)//未超时
+			{
+				--makeFood.recvCount;//减少次数
+			}
+			else//已超时
+			{
+				makeFood.recvCount=maxRecvCount-1;
+				newBeginTime=curTime;
+			}
+		}
+		else
+		{
+			recvCount=floor((curTime-beginTime)/dt1000);//未储存的收成轮数
+			recvCount=limit(recvCount,0,maxRecvCount);
+			if(recvCount>0)//有未储存的收成轮数
+			{
+				recvSign=1;
+				makeFood.recvCount=recvCount-1;//减少次数
+				if(recvCount<maxRecvCount)
+				{
+					remainingTime=curTime-beginTime;//剩下的时间
+					newCurTime=curTime-remainingTime+recvCount*dt1000;
+					newBeginTime=newCurTime;
+				}
+				else
+				{
+					newBeginTime=curTime;
+				}
+			}
+		}
+		if(recvSign)//有收成
+		{
+			heroArr=json.hero;
+			politics=number(user.politics);//势力政治
+			food=number(user.food);
+			//收成
+			point=politics;//势力收益
+			pointPlus=0;//豪杰上阵收益加成
+			//上阵加成
+			useHeroArr=makeFood.hero;
+			c=size(useHeroArr);
+			numMgr=game.numMgr;
+			i=0;while(i<c)
+			{
+				info=useHeroArr[i];
+				heroIndex=info.heroIndex;
+				if(heroIndex>=0)
+				{
+					heroBeginTime=info.beginTime;
+					if(heroBeginTime<roundEndTime)
+					{
+						heroBeginTime=limit(heroBeginTime,roundBeginTime,roundEndTime);
+						useTime=roundEndTime-heroBeginTime;//当前轮的上阵时间
+						usePercent=useTime/dt1000;
+						heroInfo=heroArr[heroIndex];
+						pointPlus+=floor(heroInfo.politicsTotal*usePercent);
+					}
+				}
+				++i;
+			}
+			//修改dt
+			if(politics<10000)
+			{
+				dt=60;
+			}
+			else if(politics<300000)
+			{
+				dt=floor(3*politics/500);
+			}
+			else
+			{
+				dt=1800;
+			}
+			
+			//各种万分比加成
+			percent=1;
+			//红颜势力万分比加成
+			percent+=json.wifePlus.businessPercent;
+			//豪杰势力万分比加成
+			percent+=numMgr.getHeroFarmPercent(heroArr);
+			//权贵势力万分比加成
+			unionID=int(user.unionID);
+			richmanIDArr=numMgr.getRichmanIDArr(unionID);//已拉拢权贵ID数组
+			percent+=numMgr.getRichmanAddPercent(richmanIDArr,type=2);
+			
+			//加成
+			point*=percent;
+			
+			//保存
+			user.food=food+floor(point)+pointPlus;
+			beginTime=newBeginTime;
+			
+			makeFoodCount=ref(json.dailyTask.makeFoodCount);
+			makeFoodCount+=1;//日常任务累计次数
+			
+			makeFoodAchievement=ref(json.achievement.makeFood);
+			makeFoodAchievement+=1;//成就累计//经营农业次数
+			
+			limitTask=json.limitTask;
+			activityMgr=game.activityMgr;
+			activityMgr.updateLimitTask(limitTask);//更新限时任务数据
+			limitTask.makeFoodCount+=1;//限时任务//经营农产
+			
+			//编码
+			user.json=json_encode(json);
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,makeFood,food,point,pointPlus,makeFoodCount,makeFoodAchievement,limitTask.makeFoodCount)
+			);
+			return(1);//修改
+		}
+		else//没收成
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

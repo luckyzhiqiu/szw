@@ -1,0 +1,183 @@
+//子嗣赐名(改名)
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+type=netMsg[3];//类型 1=赐名;2=改名
+childID=netMsg[4];//孩子ID
+childName=netMsg[5];//姓名
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+if(type!=1 && type!=2)
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,type,childID,childName,userID;
+		json=json_decode(user.json);
+		gold=number(user.gold);//元宝（充值，优先使用）
+		gold2=number(user.gold2);//元宝（赠送）
+		
+		if(type==2)
+		{
+			table=game.table;
+			childConfigure=table.childConfigure;
+			rowC=childConfigure.getRow(0);
+			changeNameCost=number(rowC.getValFromColName("changeNameCost"));//改名消耗元宝
+			if(changeNameCost>(gold+gold2))//元宝不足
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)
+				);
+				return(0);//不修改
+			}
+			
+			//扣减元宝
+			if(changeNameCost>gold)
+			{
+				changeNameCost-=gold;
+				gold=0;
+				gold2-=changeNameCost;
+			}
+			else
+			{
+				gold-=changeNameCost;
+			}
+			
+			if(changeNameCost>0)
+			{
+				//流水
+				allGold=gold+gold2;//元宝余额
+				game.saveResIO(userID,26,0,0,changeNameCost,allGold);//子嗣改名(type,itemID,（0=消耗，1=获得）,count,allGold)
+			}
+		}
+		
+		jsonExt=json_decode(user.jsonExt);
+		childSys=json.childSys;
+		pairSys=jsonExt.pairSys;
+		childArr=childSys.children;//孩子数组
+		childArrCount=size(childArr);
+		childrenArr=pairSys.children;//未婚孩子数组
+		childrenArrCount=size(childrenArr);
+		pairArr=pairSys.pairArr;//联姻孩子数组
+		pairArrCount=size(pairArr);
+		
+		//判断姓名是否存在
+		nameIf=1;
+		i=0;
+		while(i<childArrCount)
+		{
+			cName=childArr[i].name;
+			if(cName==childName)
+			{
+				nameIf=0;
+			}
+			++i;
+		}
+		
+		j=0;
+		while(j<childrenArrCount)
+		{
+			cName=childrenArr[j].name;
+			if(cName==childName)
+			{
+				nameIf=0;
+			}
+			++j;
+		}
+		
+		k=0;
+		while(k<pairArrCount)
+		{
+			cName=pairArr[k].name;
+			if(cName==childName)
+			{
+				nameIf=0;
+			}
+			++k;
+		}
+		
+		if(nameIf)//姓名不存在
+		{
+			i=0;
+			while(i<childArrCount)
+			{
+				cID=childArr[i].id;
+				if(cID==childID)
+				{
+					childArr[i].name=childName;
+					break;
+				}
+				++i;
+			}
+		}
+		else//姓名已存在
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//修改
+		}
+		
+		//保存
+		user.gold=gold;
+		user.gold2=gold2;
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,gold,gold2,childArr)
+		);
+		
+		return(1);//修改
+		
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

@@ -1,0 +1,243 @@
+//更新登录日期
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+cnn=game.cnn;
+session=game.sessionMap[sessionID];
+session.userID=userID;
+game.userSessionMap[userID]=session;
+
+//修改行数据
+user=game.rd.updateRow
+(
+	cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,session;
+		json=json_decode(user.json);
+		jsonExt=json_decode(user.jsonExt);
+		achievement=json.achievement;
+		limitTask=json.limitTask;
+		loginDate=achievement.loginDate;//成就//最后登录日期
+		curDate=split(arr(),now()," ")[0];//现在时间日期
+		
+		//最后登录时间
+		user.loginTime=now();
+		user.online=1;//上线
+
+		//每日重置
+		if(loginDate!=curDate)//登录日期不同
+		{
+			//登录ID清0
+			session.loginID=0;
+			table=game.table;
+			
+			achievement.loginDate=curDate;//更新成就最后登录日期
+			++achievement.loginDayCount;//成就累计登录天数
+			
+			activityMgr=game.activityMgr;
+			activityMgr.updateLimitTask(limitTask);//更新限时任务数据
+			++limitTask.loginDay;//活动累计登录天数
+			
+			curTime=time_milli();
+			
+			structMgr=game.structMgr;
+			
+			//日常任务（重置）
+			dailyTask=json.dailyTask;
+			clean(dailyTask);
+			structMgr_upgradeObj(structMgr,"DailyTask",dailyTask);
+			dailyTask.date=curDate;//更新日常任务日期
+			///////////////////////////////////////////////////////////////////////////////
+			//以下代码，为了保证某些操作比重置日常任务的速度更快时引起的计数被清0问题
+			if(user.monthDate==curDate)//月卡
+			{
+				dailyTask.monthCard=1;
+			}
+			if(user.yearDate==curDate)//年卡
+			{
+				dailyTask.yearCard=1;
+			}
+			///////////////////////////////////////////////////////////////////////////////
+			
+			//剧情(重置）
+			story=json.story;
+			clean(story.heroIndexMap);
+			
+			//VIP（重置）
+			vip=json.vip;
+			vip.makeMoneyCount=0;//十倍商产每日次数（经营商产时按概率1触发十倍商产）
+			vip.heroUpCount=0;//连升三级每日次数（豪杰升级概率2触发）
+			vip.fuckCount=0;//红颜赐福每日次数（红颜宠幸概率5触发5倍经验）
+			vip.childCount=0;//天资聪慧每日次数（概率3触发子嗣培养3倍经验）
+			vip.skyCount=0;//天赐元宝每日次数
+			
+			//商城（重置）
+			clean(json.buyMap);//商城限购字典//buyMap[itemID]=buyCount
+			clean(json.vipBuyMap);//vip商城限购字典//vipBuyMap[itemID]=buyCount
+			
+			//皇宫（重置）
+			kingCity=json.kingCity;
+			kingCity.sign=0;
+			
+			//议政（重置）
+			waterBattleConfigure=table.waterBattleConfigure;
+			row=waterBattleConfigure.getRow(0);
+			user.waterBattleToken=number(row.getValFromColName("coin"));//议政代币每日初始化
+			waterBattle=json.waterBattle;
+			clean(waterBattle.useHeroIndexMap);
+			clean(waterBattle.normalUseHeroIndexMap);
+			
+			//百废待兴
+			buildActivity=json.buildActivity;
+			clean(buildActivity.buyItemIDMap);
+			clean(buildActivity.exchangeItemIDMap);
+			buildActivity.buildRewardSign=0;
+			
+			//白夜辑凶（世界BOSS）
+			worldBoss=jsonExt.worldBoss;
+			worldBoss.monCount=0;
+			worldBoss.stage=0;
+			clean(worldBoss.findArr);
+			clean(worldBoss.findTypeArr);
+			worldBoss.status=0;
+			worldBoss.monHP=0;
+			clean(worldBoss.monHeroMap);
+			clean(worldBoss.monHeroRecoveMap);
+			clean(worldBoss.bossHeroMap);
+			clean(worldBoss.bossHeroRecoveMap);
+			clean(worldBoss.itemMap);
+			
+			//牢房重置
+			prisonerConfigureTab=table.prisonerConfigure;
+			prisonerConfigureTabRow=prisonerConfigureTab.getRow(0);
+			prisonerTab=table.prisoner;
+			prison=json.prison;
+			prisonerArr=prison.prisonerArr;
+			//犯人数组（血量每天重置）
+			i=0;c=size(prisonerArr);
+			while(i<c)
+			{
+				prisoner=prisonerArr[i];
+				prisonerID=prisoner.id;
+				row=prisonerTab.getRowFromColName("id",prisonerID);
+				prisoner.hp=number(row.getValFromColName("life"));
+				prisoner.hpMax=number(row.getValFromColName("life"));
+				++i;
+			}
+			//
+			prison.hitCount=0;//打犯人次数（每天清0）
+			prison.hitPercent=0;//严刑拷打（万份比加成）
+			//名望增加
+			chapterID=number(user.chapterID);//章节
+			/*barrierID=number(user.barrierID);//关卡
+			sceneID=number(user.sceneID);//场景*/
+			fameMax=number(prisonerConfigureTabRow.getValFromColName("fameMax"))*chapterID;//(chapterID*7+barrierID)*8+sceneID;
+			fameGet=number(prisonerConfigureTabRow.getValFromColName("fameGet"))*chapterID;
+			fame=number(user.fame);
+			fame+=fameGet;
+			if(fame>fameMax)fame=fameMax;
+			user.fame=fame;
+			
+			////////////////////////////////////////////////////////////////////////////////////
+			//议政扩展
+			waterBattleExt=jsonExt.waterBattleExt;
+			//清理议政仇人数组
+			enemyArr=waterBattleExt.enemyArr;
+			dt=14*24*60*60*1000;
+			i=0;while(i<size(enemyArr))
+			{
+				info=enemyArr[i];
+				if((curTime-info.time)>=dt)//超时
+				{
+					remove(enemyArr,i);
+				}
+				else
+				{
+					++i;
+				}
+			}
+			//清理议政被打数组
+			hitArr=waterBattleExt.hitArr;
+			dt=14*24*60*60*1000;
+			i=0;while(i<size(hitArr))
+			{
+				info=hitArr[i];
+				if((curTime-info.time)>=dt)//超时
+				{
+					remove(hitArr,i);
+				}
+				else
+				{
+					++i;
+				}
+			}
+			////////////////////////////////////////////////////////////////////////////////////
+			
+			//每天议政次数
+			user.waterBattleCount=0;			
+			user.waterBattleCountExt=0;	
+			
+			//保存
+			user.json=json_encode(json);
+			user.jsonExt=json_encode(jsonExt);
+			
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,achievement.loginDate,achievement.loginDayCount,dailyTask,vip,user.waterBattleToken)
+			);
+			
+			return(1);
+		}
+		else//登录日期相同
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(1);
+		}
+
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}
+
+//记录登录日志
+game.saveLogin(session);

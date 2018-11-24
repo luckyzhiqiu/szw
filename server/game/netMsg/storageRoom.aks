@@ -1,0 +1,1038 @@
+//库房®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+itemId=netMsg[3];//itemId
+useQuantity=netMsg[4];//使用数量
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+//改名
+updateAccount=##<game,uid,platformID,serverID,nickname>
+	//帐号信息加入到队列
+	sql="insert into account_info_queue set ";
+	sql+="uid='"+uid+"'";
+	sql+=",platformID="+platformID;
+	sql+=",serverID="+serverID;
+	sql+=",nickname='"+nickname+"'";
+	mysqlExec(game.cnn,sql);
+##.;
+
+//更新萌主Name
+updateXUnion=##<game,unionXID,name>
+	user=game.rd.updateRow
+	(
+		game.cnn,"union","id",unionXID,"*",
+		//修改回调
+		##<unionX,game>
+			@link name;
+			unionX.leaderNickname=name;
+			return(1);
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+##.;
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,itemId,netMsg,useQuantity,updateAccount,userID,updateXUnion;
+		json=json_decode(user.json);
+		table=game.table;
+		itemTable=table.item;//道具表格.
+		itemUseTable=table.itemUse;//道具使用上限表格
+		idRow=itemTable.getRowFromColName("id",itemId);
+		type=number(idRow.getValFromColName("type"));
+		id=number(idRow.getValFromColName("id"));
+		heroArr=json.hero;
+		heroArrLength=size(heroArr);
+		itemUseLength=itemUseTable.size();
+		i=0;
+		while(i<itemUseLength)//非法使用
+		{
+			itemUseRow=itemUseTable.getRow(i);
+			itemUseType=number(itemUseRow.getValFromColName("type"));
+			useMax=number(itemUseRow.getValFromColName("useMax"));
+			if(itemUseType==type)
+			{
+				if(useQuantity>useMax)
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-5)
+					);
+					return(0);//不修改
+				}
+			}
+			i++;
+		}
+		itemDict=json.item;
+		numMgr=game.numMgr;
+		count=numMgr.subItem(itemId,useQuantity,itemDict);
+		if(count<0)//物品不存在
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		if(type==7)//资质经验
+		{
+			if(itemId==id)
+			{
+				heroCount=size(heroArr);
+				heroGrowsMap=dict();
+				heroGrowsNumMap=dict();
+				getGrowsExp=number(idRow.getValFromColName("growsEXP"));
+				if(useQuantity>heroCount)
+				{
+					numArr=arr();
+					i=0;while(i<heroCount)
+					{
+						push(numArr,1);
+						heroGrowsNumMap[i]=0;
+						++i;
+					}
+					countArr=getNumArr(useQuantity,numArr);
+					i=0;while(i<heroCount)
+					{
+						hero=heroArr[i];
+						growsExpAdd=countArr[i]*getGrowsExp;
+						grows=hero.growsExp;
+						grows+=growsExpAdd;
+						//keep
+						hero.growsExp=grows;
+						heroGrowsMap[i]=grows;
+						heroGrowsNumMap[i]+=countArr[i];
+						++i;
+					}
+				}
+				else
+				{
+					while(useQuantity>0)
+					{
+						heroIndex=rand()%heroCount;
+						heroRandom=heroArr[heroIndex];
+						grows=ref(heroRandom.growsExp);
+						grows+=getGrowsExp;
+						heroGrowsMap[heroIndex]=grows;
+						
+						//heroGrowsNumMap[heroIndex]=1;
+						if(exist(heroGrowsNumMap,heroIndex))
+						{
+							heroGrowsNumMap[heroIndex]+=1;
+						}
+						else
+						{
+							heroGrowsNumMap[heroIndex]=1;
+						}
+						//
+						useQuantity-=1;
+					}
+				}
+				
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,heroGrowsMap,heroGrowsNumMap)
+				);
+				return(1);
+			}
+		}
+		else if(type==8)//技能经验
+		{
+			if(itemId==id)
+			{
+				heroCount=size(heroArr);
+				heroSkillMap=dict();
+				heroSkillNumMap=dict();
+				getSkillExp=number(idRow.getValFromColName("skillEXP"));
+				
+				if(useQuantity>heroCount)
+				{
+					numArr=arr();
+					i=0;while(i<heroCount)
+					{
+						push(numArr,1);
+						heroSkillNumMap[i]=0;
+						++i;
+					}
+					countArr=getNumArr(useQuantity,numArr);
+					i=0;while(i<heroCount)
+					{
+						hero=heroArr[i];
+						skillExp=hero.skillExp;
+						skillExpAdd=countArr[i]*getSkillExp;
+						skillExp+=skillExpAdd;
+						//keep
+						hero.skillExp=skillExp;
+						heroSkillMap[i]=skillExp;
+						heroSkillNumMap[i]+=countArr[i];
+						++i;
+					}
+				}
+				else
+				{
+					while(useQuantity>0)
+					{
+						heroIndex=rand()%heroCount;
+						heroRandom=heroArr[heroIndex];
+						skill=ref(heroRandom.skillExp);
+						skill+=getSkillExp;
+						heroSkillMap[heroIndex]=skill;
+						//heroSkillNumMap[heroIndex]=1;
+						if(exist(heroSkillNumMap,heroIndex))
+						{
+							heroSkillNumMap[heroIndex]+=1;
+						}
+						else
+						{
+							heroSkillNumMap[heroIndex]=1;
+						}
+						//
+						useQuantity--;
+					}
+				}
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,heroSkillMap,heroSkillNumMap)
+				);
+				return(1);
+			}
+		}
+		else if(type==10)//增加银两
+		{
+			if(itemId==id)
+			{
+				getMoney=number(idRow.getValFromColName("money"))*useQuantity;
+				money= number(user.money);
+				money+=round(getMoney);
+				
+				//keep
+				user.money=money;
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,money)
+				);
+				return(1);
+			}
+		}
+		else if(type==11)//增加粮草
+		{
+			if(itemId==id)
+			{
+				getFood=number(idRow.getValFromColName("food"))*useQuantity;
+				food= number(user.food);
+				food+=round(getFood);
+				//keep
+				user.food=food;
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,food)
+				);
+			return(1);
+			}
+		}
+		else if(type==12)//增加士兵
+		{
+			if(itemId==id)
+			{
+				getSoldier=number(idRow.getValFromColName("soldier"))*useQuantity;
+				soldier= number(user.soldier);
+				soldier+=round(getSoldier);
+				//keep
+				user.soldier=soldier;
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,soldier)
+				);
+				return(1);
+			}
+		}
+		else if(type==13)//武力
+		{
+			if(itemId==id)
+			{
+				getStrength=round(number(idRow.getValFromColName("strength"))*useQuantity);
+				heroId=netMsg[5];//豪杰索引
+				if(heroId<0 || heroId>=heroArrLength)
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-6)
+					);
+					return(0);
+				}
+				hero=heroArr[heroId];
+				strength=hero.strengthAdd2;
+				strength+=getStrength;
+				
+				//keep
+				json.hero[heroId].strengthAdd2=strength;
+				
+				numMgr.computeHero(hero,json);
+				numMgr.computeUser(user,json);
+				user.json=json_encode(json);
+				
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,getStrength,user.strength,user.wisdom,user.charm,user.politics,user.power,hero)
+				);
+				return(1);
+			}
+		}
+		else if(type==14)//智力
+		{
+			if(itemId==id)
+			{
+				getWisdom=round(number(idRow.getValFromColName("wisdom"))*useQuantity);
+				heroId=netMsg[5];//豪杰索引
+				if(heroId<0 || heroId>=heroArrLength)
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-6)
+					);
+					return(0);
+				}
+				hero=heroArr[heroId];
+				wisdom=hero.wisdomAdd2;
+				wisdom+=getWisdom;
+				
+				//keep
+				json.hero[heroId].wisdomAdd2=wisdom;
+				
+				numMgr.computeHero(hero,json);
+				numMgr.computeUser(user,json);
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,getWisdom,user.strength,user.wisdom,user.charm,user.politics,user.power,hero)
+				);
+				return(1);
+			}
+		}
+		else if(type==15)//魅力
+		{
+			if(itemId==id)
+			{
+				getCharm=round(number(idRow.getValFromColName("charm"))*useQuantity);
+				heroId=netMsg[5];//豪杰索引
+				if(heroId<0 || heroId>=heroArrLength)
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-6)
+					);
+					return(0);
+				}
+				hero=heroArr[heroId];
+				charm=hero.charmAdd2;
+				charm+=getCharm;
+				
+				//keep
+				json.hero[heroId].charmAdd2=charm;
+				
+				numMgr.computeHero(hero,json);
+				numMgr.computeUser(user,json);
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,getCharm,user.strength,user.wisdom,user.charm,user.politics,user.power,hero)
+				);
+				return(1);
+			}
+		}
+		else if(type==16)//政治
+		{
+			if(itemId==id)
+			{
+				getPolitics=round(number(idRow.getValFromColName("politics"))*useQuantity);
+				heroId=netMsg[5];//豪杰索引
+				if(heroId<0 || heroId>=heroArrLength)
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-6)
+					);
+					return(0);
+				}
+				hero=heroArr[heroId];
+				politics=hero.politicsAdd2;
+				politics+=getPolitics;
+				
+				//keep
+				json.hero[heroId].politicsAdd2=politics;
+				
+				numMgr.computeHero(hero,json);
+				numMgr.computeUser(user,json);
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,getPolitics,user.strength,user.wisdom,user.charm,user.politics,user.power,hero)
+				);
+				return(1);
+			}
+		}
+		else if(type==17)//随机增加属性
+		{
+			if(itemId==id)
+			{
+				getrandomAttribute=number(idRow.getValFromColName("randomAttribute"));//randomAttribute
+				heroId=netMsg[5];//豪杰索引
+				if(heroId<0 || heroId>=heroArrLength)
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-6)
+					);
+					return(0);
+				}
+				
+				hero=heroArr[heroId];
+				spareCount=round(useQuantity%4);//剩余数量
+				probabilityArr=arr(25,25,25,25);//机率
+				addArr=arr();
+				addArr=getNumArr(useQuantity-spareCount,probabilityArr);
+				rewardDic=dict();
+				if(addArr[0]!=0)
+				{
+					rewardDic.strength=addArr[0]*getrandomAttribute;
+				}
+				if(addArr[1]!=0)
+				{
+					rewardDic.wisdom=addArr[1]*getrandomAttribute;
+				}
+				if(addArr[2]!=0)
+				{
+					rewardDic.charm=addArr[2]*getrandomAttribute;
+				}
+				if(addArr[3]!=0)
+				{
+					rewardDic.politics=addArr[3]*getrandomAttribute;
+				}
+			
+				i=0;
+				while(i<spareCount)
+				{
+					index=randSelect(probabilityArr);
+					
+					if(index==0)
+					{
+						
+						if(exist(rewardDic,"strength"))
+						{
+							x=rewardDic.strength;
+							x+=getrandomAttribute;
+							rewardDic.strength=x;
+						}
+						else
+						{
+							rewardDic.strength=getrandomAttribute;
+							
+						}
+					}
+					else if(index==1)
+					{
+						
+						if(exist(rewardDic,"wisdom"))
+						{
+							x=rewardDic.wisdom;
+							x+=getrandomAttribute;
+							rewardDic.wisdom=x;
+						}
+						else
+						{
+							rewardDic.wisdom=getrandomAttribute;
+							
+						}
+					}
+					else if(index==2)
+					{
+						
+						if(exist(rewardDic,"charm"))
+						{
+							x=rewardDic.charm;
+							x+=getrandomAttribute;
+							rewardDic.charm=x;
+						}
+						else
+						{
+							rewardDic.charm=getrandomAttribute;
+							
+						}
+						
+					}
+					else if(index==3)
+					{
+						if(exist(rewardDic,"politics"))
+						{
+							x=rewardDic.politics;
+							x+=getrandomAttribute;
+							rewardDic.politics=x;
+						}
+						else
+						{
+							rewardDic.politics=getrandomAttribute;
+							
+						}
+					}
+					i++;
+				}
+				//keep
+				if(exist(rewardDic,"strength"))
+				{
+					num=hero.strengthAdd2;
+					num+=rewardDic.strength;
+					hero.strengthAdd2=num;
+				}
+				
+				if(exist(rewardDic,"wisdom"))
+				{
+					num=hero.wisdomAdd2;
+					num+=rewardDic.wisdom;
+					hero.wisdomAdd2=num;
+				}
+				
+				if(exist(rewardDic,"politics"))
+				{
+					num=hero.politicsAdd2;
+					num+=rewardDic.politics;
+					hero.politicsAdd2=num;
+				}
+			
+				if(exist(rewardDic,"charm"))
+				{
+					num=hero.charmAdd2;
+					num+=rewardDic.charm;
+					hero.charmAdd2=num;
+				}
+			
+				numMgr.computeHero(hero,json);
+				numMgr.computeUser(user,json);
+				achievement=json.achievement;
+				useItemMap=achievement.useItemMap;
+				if(itemId==37)//使用属性散-完成成就
+				{
+					
+					if(itemId!=0 && useQuantity!=0)
+					{
+						if(exist(useItemMap,itemId))
+						{
+							useItemMap[itemId]+=useQuantity;
+						}
+						else
+						{
+							useItemMap[itemId]=useQuantity;
+						}
+					}
+				}
+				//keep
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,rewardDic,user.strength,user.wisdom,user.charm,user.politics,user.power,hero,useItemMap)
+				);
+				return(1);
+			}
+		}
+		else if(type==18)//改名
+		{
+			if(itemId==id)
+			{
+				nickname=netMsg[5];//匿名
+				uid=netMsg[6];//平台帐号uid
+				platformID=netMsg[7];//平台ID
+				serverID=netMsg[8];//游戏服ID
+				if(strFind(nickname,"'")>=0||strFind(nickname,"\"")>=0||nickname=="")//非法昵称
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-3)
+					);
+					return(0);
+				}
+				sql="select id from user where nickname='"+nickname+"' limit 1";
+				existSign=0;
+				rs=mysqlCreateRs(game.cnn,sql);
+				if(mysqlNextRow(rs))existSign=1;
+				mysqlDestroyRs(rs);
+				if(existSign)//重名
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-4)
+					);
+					return(0);
+				}
+				unionID=number(user.unionID);
+				if(unionID!=0)//有联萌
+				{
+					unionX=game.rd.getRow(game.cnn,"union","id",unionID,"*",1000);
+					leaderUserID=unionX.leaderUserID;
+					if(leaderUserID==userID)//系萌主
+					{
+						updateXUnion(game,unionID,nickname);//更新萌主Name
+					}
+				}
+				
+				//keep
+				user.nickname=nickname;
+				//改名更新account
+				updateAccount(game,uid,platformID,serverID,nickname);
+				
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,nickname)
+				);			
+				return(1);
+			}
+		}
+		else if(type==19)//礼包
+		{
+			if(itemId==id)
+			{
+				//控制数量99
+				getuse=idRow.getValFromColName("use");
+				arr=split(arr(),getuse,",");
+				map=dict();
+				addGold2=0;
+				useGoldMin=number(idRow.getValFromColName("useGoldMin"));
+				useGoldMax=number(idRow.getValFromColName("useGoldMax"));
+				while(useQuantity>0)
+				{
+					i=0;c=size(arr);
+					while(i<c)
+					{
+						probability=number(arr[i+2]);
+						if((rand()%10000)<probability)//中奖
+						{
+							itemID=arr[i];
+							itemCount=number(arr[i+1]);
+							if(exist(map,itemID))
+							{
+								map[itemID]+=itemCount;
+							}
+							else
+							{
+								map[itemID]=itemCount;
+							}
+							numMgr.addItem(itemID,itemCount,itemDict);
+						}
+						
+						i+=3;
+						
+					}
+					useQuantity-=1;
+					addGold2+=random(useGoldMax,useGoldMin);//useGoldMin+rand()%(useGoldMax-useGoldMin)+1;
+				}
+				
+				gold2=number(user.gold2);
+				
+				//addGold2=(useGoldMin+rand()%(useGoldMax-useGoldMin)+1)*useQuantity;
+				newGold2=gold2+addGold2;
+				if(newGold2!=0)
+				{
+					user.gold2=newGold2;
+				}
+				
+				//keep
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,map,addGold2)
+				);
+				return(1);	
+			}
+		}
+		else if(type==20)//形象卡
+		{
+			if(itemId==id)
+			{
+				getHead=netMsg[5];//头像
+				//keep
+				user.head=getHead;
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,getHead)
+				);
+				return(1);
+			}
+		}
+		else if(type==21)//资质书
+		{
+			if(itemId==id)
+			{
+				getGrowsExp=round(number(idRow.getValFromColName("growsEXP"))*useQuantity);
+				heroId=netMsg[5];//豪杰索引
+				if(heroId<0 || heroId>=heroArrLength)
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-6)
+					);
+					return(0);
+				}
+				hero=heroArr[heroId];
+				grows=hero.growsExp;
+				grows+=getGrowsExp;
+				//keep
+				hero.growsExp=grows;
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,getGrowsExp)
+				);
+				return(1);
+			}
+		}
+		else if(type==22)//技能书
+		{
+			if(itemId==id)
+			{
+				getSkillExp=round(number(idRow.getValFromColName("skillEXP"))*useQuantity);
+				heroId=netMsg[5];//豪杰索引
+				if(heroId<0 || heroId>=heroArrLength)
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-6)
+					);
+					return(0);
+				}
+				hero=heroArr[heroId];
+				skill=hero.skillExp;
+				skill+=getSkillExp;
+				//keep
+				json.hero[heroId].skillExp=skill;
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,getSkillExp)
+				);
+				return(1);
+			}
+		}
+		else if(type==25)//政绩
+		{
+			if(itemId==id)
+			{
+				getScoreExp=round(number(idRow.getValFromColName("score"))*useQuantity);
+				score=number(user.score);
+				score+=getScoreExp;
+				//保存
+				user.score=score;
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,score,getScoreExp)
+				);
+				return(1);
+			}
+		}
+		else if(type==24)//资质果礼包[道具礼包]
+		{
+			if(itemId==id)
+			{
+				//
+				getuse=idRow.getValFromColName("use");
+				arr=split(arr(),getuse,",");
+				//itemArr=arr();
+				gainItemDic=dict();
+				arrLength=size(arr);
+				while(useQuantity>0)
+				{
+					itemIDArr=arr();//道具id
+					itemCountArr=arr();//数量
+					probabilityArr=arr();//机率Arr
+					i=0;
+					while(i<arrLength)
+					{
+						push(itemIDArr,arr[i]);
+						push(itemCountArr,number(arr[i+1]));
+						push(probabilityArr,number(arr[i+2]));
+						i+=3;
+					}
+					index=randSelect(probabilityArr);
+					itemId=itemIDArr[index];
+					itemCount=number(itemCountArr[index]);
+					
+					if(exist(gainItemDic,itemId))//存在
+					{
+						itemCount+=number(gainItemDic[itemId]);
+						gainItemDic[itemId]=itemCount;
+					}
+					else
+					{
+						gainItemDic[itemId]=itemCount;
+					}
+					//numMgr.addItem(itemId,itemCount,itemDict);
+					useQuantity-=1;
+				}
+				it=dictIt();
+				dictItBegin(gainItemDic,it);
+				while(!dictItEmpty(it))
+				{
+					key=dictItKey(it);
+					count=number(dictItVal(it));
+					numMgr.addItem(key,count,itemDict);
+					dictItNext(it);
+				}
+				//keep
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,gainItemDic)
+				);
+				return(1);
+			}
+		}
+		else if(type==57)//犯人测试道具
+		{
+			if(itemId==id)
+			{
+				info=dict();
+				newPrisonerID=number(idRow.getValFromColName("prisoner"));
+				// //解锁犯人
+				if(newPrisonerID!=0)
+				{
+					// //添加犯人
+					//numMgr=game.numMgr;
+					curPrison=numMgr.addPrisoner(table,json,newPrisonerID);
+					if(!empty(curPrison))
+					{
+						info.prison=curPrison;
+					}
+						
+					
+					//保存
+					user.json=json_encode(json);
+				}
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,info)
+				);
+				return(1);
+				
+			}
+		}
+		else if(type==30)//黑市银票
+		{
+			if(itemId==id)
+			{
+				randMoney=idRow.getValFromColName("randMoney");
+				arr=split(arr(),randMoney,",");
+				arrLength=size(arr);
+				money=number(user.money);
+				moneyAdd=0;
+				while(useQuantity>0)
+				{
+					moneyArr=arr();//moneyAdd Arr
+					probabilityArr=arr();//机率Arr
+					i=0;
+					while(i<arrLength)
+					{
+						push(moneyArr,arr[i]);
+						push(probabilityArr,number(arr[i+1]));
+						i+=2;
+					}
+					index=randSelect(probabilityArr);
+					moneyAdd+=round(number(moneyArr[index]));
+					useQuantity-=1;
+				}
+				money+=moneyAdd;
+				user.money=money;
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,moneyAdd)
+				);
+				return(1);
+			}
+		}
+		else if(type==31)//黑市兵牌
+		{
+			if(itemId==id)
+			{
+				randSoldier=idRow.getValFromColName("randSoldier");
+				arr=split(arr(),randSoldier,",");
+				arrLength=size(arr);
+				soldier=number(user.soldier);
+				soldierAdd=0;
+				while(useQuantity>0)
+				{
+					soldierArr=arr();//soldierAdd Arr
+					probabilityArr=arr();//机率Arr
+					i=0;
+					while(i<arrLength)
+					{
+						push(soldierArr,arr[i]);
+						push(probabilityArr,number(arr[i+1]));
+						i+=2;
+					}
+					index=randSelect(probabilityArr);
+					soldierAdd+=round(number(soldierArr[index]));
+					useQuantity-=1;
+				}
+				soldier+=soldierAdd;
+				user.soldier=soldier;
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,soldierAdd)
+				);
+				return(1);
+			}
+		}
+		else if(type==32)//征收银两
+		{
+			if(itemId==id)
+			{
+				moneyGet=idRow.getValFromColName("moneyGet");
+				wisdom=number(user.wisdom);//势力智力
+				moneyAdd=round(moneyGet*wisdom*useQuantity);
+				money=number(user.money);
+				money+=moneyAdd;
+				user.money=money;
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,moneyAdd)
+				);
+				return(1);
+			}
+		}
+		else if(type==33)//征收银两
+		{
+			if(itemId==id)
+			{
+				soldierGet=idRow.getValFromColName("soldierGet");
+				charm=number(user.charm);//势力魅力
+				soldierAdd=round(soldierGet*charm*useQuantity);
+				soldier=number(user.soldier);
+				soldier+=soldierAdd;
+				user.soldier=soldier;
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,soldierAdd)
+				);
+				return(1);
+			}
+		}
+		
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

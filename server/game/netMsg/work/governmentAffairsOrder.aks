@@ -1,0 +1,127 @@
+//政务令®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+itemId=netMsg[3];//itemId
+useQuantity=netMsg[4];//使用数量
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,itemId,useQuantity;
+		json=json_decode(user.json);
+		itemDict=json.item;
+		numMgr=game.numMgr;
+		if(!exist(itemDict,itemId))//物品不存在
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		count=numMgr.subItem(itemId,useQuantity,itemDict);
+		if(count<0)//资源不足
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		level=number(user.level);
+		levelTable=game.table.level;//等级表
+		levelRow=levelTable.getRowFromColName("level",level);
+		politicCount=number(levelRow.getValFromColName("politicMax"));//获得政绩次数
+		if(useQuantity>politicCount)//使用道具过量
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+		itemTable=game.table.item;//道具表格.
+		idRow=itemTable.getRowFromColName("id",itemId);
+		type=number(idRow.getValFromColName("type"));
+		id=number(idRow.getValFromColName("id"));
+		work=json.work;	
+		beginTime=work.beginTime;//政务开始时间
+		
+		achievement=json.achievement;
+		useItemMap=achievement.useItemMap;
+		if(itemId!=0 && useQuantity!=0)
+		{
+			if(exist(useItemMap,itemId))
+			{
+				useItemMap[itemId]+=useQuantity;
+			}
+			else
+			{
+				useItemMap[itemId]=useQuantity;
+			}
+		}
+		
+		if(type==23)
+		{
+			if(itemId==id)
+			{
+				min=1000*1800;//一次时间
+				while(useQuantity>0)
+				{
+					beginTime-=min;
+					useQuantity--;
+				}
+			}
+		}
+		//保存
+		json.work.beginTime=beginTime;
+		user.json=json_encode(json);
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,beginTime)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

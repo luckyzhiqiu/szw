@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="s" n="__sys__t3">.roleArr.</v>
+<o n="input"><o>__sys__t4</o><i>__sys__t1</i></o>
+<o n="="><o>roleID</o><i>__sys__t4</i></o>
+<o n="input"><o>__sys__t6</o><i>__sys__t2</i></o>
+<o n="="><o>num</o><i>__sys__t6</i></o>
+<o n="link" r="125"><o>__sys__t8</o><i>__sys__t3</i></o>
+<o n="=" r="125"><o>roleArr</o><i>__sys__t8</i></o>
+<o n="push" r="126"><o>__sys__t10</o><i>roleArr</i><i>roleID</i><i>num</i></o>
+<v n="__sys__t10" />
+<v n="__sys__t4" />
+<v n="__sys__t6" />
+<v n="__sys__t8" />
+<v n="num" />
+<v n="roleArr" />
+<v n="roleID" />
+</script>

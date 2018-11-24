@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t91">45</v>
+<v t="n" n="__sys__t90">45</v>
+<v t="n" n="__sys__t60">26</v>
+<v t="n" n="__sys__t59">26</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="n" n="__sys__t4">3</v>
+<v t="n" n="__sys__t5">0</v>
+<v t="n" n="__sys__t6">1</v>
+<v t="n" n="__sys__t7">2</v>
+<v t="n" n="__sys__t8">0</v>
+<v t="s" n="__sys__t9">.Result.</v>
+<v t="n" n="__sys__t10">0</v>
+<v t="s" n="__sys__t11">.user.</v>
+<v t="s" n="__sys__t12">.id.</v>
+<v t="s" n="__sys__t13">.*.</v>
+<v t="n" n="__sys__t14">1000</v>
+<v t="n" n="__sys__t15">0</v>
+<v t="n" n="__sys__t16">0</v>
+<v t="s" n="__sys__t17">.Result.</v>
+<v t="n" n="__sys__t18">2</v>
+<v t="n" n="__sys__t19">1</v>
+<v t="n" n="__sys__t20">2</v>
+<v t="n" n="__sys__t21">3</v>
+<v t="n" n="__sys__t22">4</v>
+<v t="s" n="__sys__t23">.moneyPercent.</v>
+<v t="s" n="__sys__t24">.foodPercent.</v>
+<v t="s" n="__sys__t25">.soldierPercent.</v>
+<v t="s" n="__sys__t26">.bossPercent.</v>
+<v t="s" n="__sys__t27">.Result.</v>
+<v t="n" n="__sys__t28">1</v>
+<o n="input"><o>__sys__t29</o><i>__sys__t1</i></o>
+<o n="="><o>server</o><i>__sys__t29</i></o>
+<o n="input"><o>__sys__t31</o><i>__sys__t2</i></o>
+<o n="="><o>sessionID</o><i>__sys__t31</i></o>
+<o n="input"><o>__sys__t33</o><i>__sys__t3</i></o>
+<o n="="><o>game</o><i>__sys__t33</i></o>
+<o n="input"><o>__sys__t35</o><i>__sys__t4</i></o>
+<o n="="><o>netMsg</o><i>__sys__t35</i></o>
+<o n="[]" r="3"><o>__sys__t37</o><i>netMsg</i><i>__sys__t5</i></o>
+<o n="=" r="3"><o>methodName</o><i>__sys__t37</i></o>
+<o n="[]" r="4"><o>__sys__t39</o><i>netMsg</i><i>__sys__t6</i></o>
+<o n="=" r="4"><o>userID</o><i>__sys__t39</i></o>
+<o n="[]" r="5"><o>__sys__t41</o><i>netMsg</i><i>__sys__t7</i></o>
+<o n="=" r="5"><o>tick</o><i>__sys__t41</i></o>
+<v t="s" n="__sys__t44">.checkTick.</v>
+<o n="." r="7"><o>__sys__t43</o><i>game</i><i>__sys__t44</i></o>
+<o n="__sys__t43" r="7"><o>__sys__t46</o><i>game</i><i>userID</i><i>tick</i></o>
+<o n="!" r="7"><o>__sys__t47</o><i>__sys__t46</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t47</i></o>
+<o n="=="><o>__sys__t49</o><i>__sys__rt</i><i>__sys__t8</i></o>
+<o n="if_goto"><o>__sys__t50</o><i>__sys__t49</i><i>__sys__t59</i></o>
+<v t="s" n="__sys__t52">.sendMsg.</v>
+<o n="." r="10"><o>__sys__t51</o><i>game</i><i>__sys__t52</i></o>
+<o n="+" r="13"><o>__sys__t54</o><i>methodName</i><i>__sys__t9</i></o>
+<o n="arr" r="13"><o>__sys__t55</o><i>__sys__t54</i><i>__sys__t10</i></o>
+<o n="__sys__t51" r="10"><o>__sys__t56</o><i>game</i><i>sessionID</i><i>__sys__t55</i></o>
+<o n="exit" r="15"><o>__sys__t57</o></o>
+<o n="goto"><o>__sys__t58</o><i>__sys__t60</i></o>
+<v t="s" n="__sys__t62">.rd.</v>
+<o n="." r="18"><o>__sys__t61</o><i>game</i><i>__sys__t62</i></o>
+<v t="s" n="__sys__t65">.getRow.</v>
+<o n="." r="18"><o>__sys__t64</o><i>__sys__t61</i><i>__sys__t65</i></o>
+<v t="s" n="__sys__t68">.cnn.</v>
+<o n="." r="18"><o>__sys__t67</o><i>game</i><i>__sys__t68</i></o>
+<o n="__sys__t64" r="18"><o>__sys__t70</o><i>__sys__t61</i><i>__sys__t67</i><i>__sys__t11</i><i>__sys__t12</i><i>userID</i><i>__sys__t13</i><i>__sys__t14</i></o>
+<o n="=" r="18"><o>user</o><i>__sys__t70</i></o>
+<v t="s" n="__sys__t73">.unionID.</v>
+<o n="." r="19"><o>__sys__t72</o><i>user</i><i>__sys__t73</i></o>
+<o n="int" r="19"><o>__sys__t75</o><i>__sys__t72</i></o>
+<o n="=" r="19"><o>unionID</o><i>__sys__t75</i></o>
+<o n="==" r="20"><o>__sys__t77</o><i>unionID</i><i>__sys__t15</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t77</i></o>
+<o n="=="><o>__sys__t79</o><i>__sys__rt</i><i>__sys__t16</i></o>
+<o n="if_goto"><o>__sys__t80</o><i>__sys__t79</i><i>__sys__t90</i></o>
+<v t="s" n="__sys__t82">.sendMsg.</v>
+<o n="." r="22"><o>__sys__t81</o><i>game</i><i>__sys__t82</i></o>
+<o n="+" r="25"><o>__sys__t84</o><i>methodName</i><i>__sys__t17</i></o>
+<o n=" -" r="25"><o>__sys__t85</o><i>__sys__t18</i></o>
+<o n="arr" r="25"><o>__sys__t86</o><i>__sys__t84</i><i>__sys__t85</i></o>
+<o n="__sys__t81" r="22"><o>__sys__t87</o><i>game</i><i>sessionID</i><i>__sys__t86</i></o>
+<o n="exit" r="27"><o>__sys__t88</o></o>
+<o n="goto"><o>__sys__t89</o><i>__sys__t91</i></o>
+<v t="s" n="__sys__t93">.numMgr.</v>
+<o n="." r="30"><o>__sys__t92</o><i>game</i><i>__sys__t93</i></o>
+<o n="=" r="30"><o>numMgr</o><i>__sys__t92</i></o>
+<v t="s" n="__sys__t97">.getRichmanIDArr.</v>
+<o n="." r="31"><o>__sys__t96</o><i>numMgr</i><i>__sys__t97</i></o>
+<o n="__sys__t96" r="31"><o>__sys__t99</o><i>numMgr</i><i>unionID</i></o>
+<o n="=" r="31"><o>richmanIDArr</o><i>__sys__t99</i></o>
+<v t="s" n="__sys__t102">.getRichmanAddPercent.</v>
+<o n="." r="32"><o>__sys__t101</o><i>numMgr</i><i>__sys__t102</i></o>
+<o n="=" r="32"><o>type</o><i>__sys__t19</i></o>
+<o n="__sys__t101" r="32"><o>__sys__t105</o><i>numMgr</i><i>richmanIDArr</i><i>type</i></o>
+<o n="=" r="32"><o>percent1</o><i>__sys__t105</i></o>
+<v t="s" n="__sys__t108">.getRichmanAddPercent.</v>
+<o n="." r="33"><o>__sys__t107</o><i>numMgr</i><i>__sys__t108</i></o>
+<o n="=" r="33"><o>type</o><i>__sys__t20</i></o>
+<o n="__sys__t107" r="33"><o>__sys__t111</o><i>numMgr</i><i>richmanIDArr</i><i>type</i></o>
+<o n="=" r="33"><o>percent2</o><i>__sys__t111</i></o>
+<v t="s" n="__sys__t114">.getRichmanAddPercent.</v>
+<o n="." r="34"><o>__sys__t113</o><i>numMgr</i><i>__sys__t114</i></o>
+<o n="=" r="34"><o>type</o><i>__sys__t21</i></o>
+<o n="__sys__t113" r="34"><o>__sys__t117</o><i>numMgr</i><i>richmanIDArr</i><i>type</i></o>
+<o n="=" r="34"><o>percent3</o><i>__sys__t117</i></o>
+<v t="s" n="__sys__t120">.getRichmanAddPercent.</v>
+<o n="." r="35"><o>__sys__t119</o><i>numMgr</i><i>__sys__t120</i></o>
+<o n="=" r="35"><o>type</o><i>__sys__t22</i></o>
+<o n="__sys__t119" r="35"><o>__sys__t123</o><i>numMgr</i><i>richmanIDArr</i><i>type</i></o>
+<o n="=" r="35"><o>percent4</o><i>__sys__t123</i></o>
+<o n="dict" r="37"><o>__sys__t125</o></o>
+<o n="=" r="37"><o>percentMap</o><i>__sys__t125</i></o>
+<o n="[]" r="38"><o>__sys__t127</o><i>percentMap</i><i>__sys__t23</i></o>
+<o n="=" r="38"><o>__sys__t127</o><i>percent1</i></o>
+<o n="[]" r="39"><o>__sys__t129</o><i>percentMap</i><i>__sys__t24</i></o>
+<o n="=" r="39"><o>__sys__t129</o><i>percent2</i></o>
+<o n="[]" r="40"><o>__sys__t131</o><i>percentMap</i><i>__sys__t25</i></o>
+<o n="=" r="40"><o>__sys__t131</o><i>percent3</i></o>
+<o n="[]" r="41"><o>__sys__t133</o><i>percentMap</i><i>__sys__t26</i></o>
+<o n="=" r="41"><o>__sys__t133</o><i>percent4</i></o>
+<v t="s" n="__sys__t136">.sendMsg.</v>
+<o n="." r="44"><o>__sys__t135</o><i>game</i><i>__sys__t136</i></o>
+<o n="+" r="47"><o>__sys__t138</o><i>methodName</i><i>__sys__t27</i></o>
+<o n="arr" r="47"><o>__sys__t139</o><i>__sys__t138</i><i>__sys__t28</i><i>percentMap</i></o>
+<o n="__sys__t135" r="44"><o>__sys__t140</o><i>game</i><i>sessionID</i><i>__sys__t139</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t101" />
+<v n="__sys__t105" />
+<v n="__sys__t107" />
+<v n="__sys__t111" />
+<v n="__sys__t113" />
+<v n="__sys__t117" />
+<v n="__sys__t119" />
+<v n="__sys__t123" />
+<v n="__sys__t125" />
+<v n="__sys__t127" />
+<v n="__sys__t129" />
+<v n="__sys__t131" />
+<v n="__sys__t133" />
+<v n="__sys__t135" />
+<v n="__sys__t138" />
+<v n="__sys__t139" />
+<v n="__sys__t140" />
+<v n="__sys__t29" />
+<v n="__sys__t31" />
+<v n="__sys__t33" />
+<v n="__sys__t35" />
+<v n="__sys__t37" />
+<v n="__sys__t39" />
+<v n="__sys__t41" />
+<v n="__sys__t43" />
+<v n="__sys__t46" />
+<v n="__sys__t47" />
+<v n="__sys__t49" />
+<v n="__sys__t50" />
+<v n="__sys__t51" />
+<v n="__sys__t54" />
+<v n="__sys__t55" />
+<v n="__sys__t56" />
+<v n="__sys__t57" />
+<v n="__sys__t58" />
+<v n="__sys__t61" />
+<v n="__sys__t64" />
+<v n="__sys__t67" />
+<v n="__sys__t70" />
+<v n="__sys__t72" />
+<v n="__sys__t75" />
+<v n="__sys__t77" />
+<v n="__sys__t79" />
+<v n="__sys__t80" />
+<v n="__sys__t81" />
+<v n="__sys__t84" />
+<v n="__sys__t85" />
+<v n="__sys__t86" />
+<v n="__sys__t87" />
+<v n="__sys__t88" />
+<v n="__sys__t89" />
+<v n="__sys__t92" />
+<v n="__sys__t96" />
+<v n="__sys__t99" />
+<v n="game" />
+<v n="methodName" />
+<v n="netMsg" />
+<v n="numMgr" />
+<v n="percent1" />
+<v n="percent2" />
+<v n="percent3" />
+<v n="percent4" />
+<v n="percentMap" />
+<v n="richmanIDArr" />
+<v n="server" />
+<v n="sessionID" />
+<v n="tick" />
+<v n="type" />
+<v n="unionID" />
+<v n="user" />
+<v n="userID" />
+</script>

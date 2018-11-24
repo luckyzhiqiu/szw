@@ -1,0 +1,1 @@
+ln -s $akserver_home/bin/api api

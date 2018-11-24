@@ -1,0 +1,81 @@
+//获取场景信息
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID;
+		modifSign=0;//修改user数据标记
+		chapterID=number(user.chapterID);//章节ID
+		barrierID=number(user.barrierID);//关卡ID
+		sceneID=number(user.sceneID);//场景ID
+		sceneSoldier=number(user.sceneSoldier);//当前场景剩余兵力（-1代表恢复兵力）
+		sceneMaxSoldier=number(user.sceneMaxSoldier);//当前场景最大兵力
+		
+		//章节信息
+		chapterInfo=game.storyMgr.chapterArr[chapterID];
+		//关卡信息
+		barrierArr=chapterInfo.barrierArr;
+		barrier=barrierArr[barrierID];
+		//场景信息
+		scene=barrier.sceneArr[sceneID];
+		//info=scene.getObj(arr("strength","type","weTalk","enemyName","enemyTalk","background","general","type","head"));
+		info=scene.getObj(arr("strength","type","enemyName","enemyTalk","background","general","type","head"));
+		//兵力
+		if(sceneSoldier==-1)//恢复兵力
+		{
+			modifSign=1;
+			sceneSoldier=int(scene.getValFromColName("soldier"));
+			sceneMaxSoldier=sceneSoldier;
+			
+			//保存
+			user.sceneSoldier=sceneSoldier;
+			user.sceneMaxSoldier=sceneMaxSoldier;
+		}
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,info,sceneSoldier,sceneMaxSoldier)
+		);
+		
+		//按modifSign判断是否修改user数据
+		return(modifSign);
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

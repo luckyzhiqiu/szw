@@ -1,0 +1,187 @@
+//珍宝洗炼
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+gemArrIndex=int(netMsg[3]);//珍宝位置
+attArrIndex=int(netMsg[4]);//珍宝开光Index
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID,gemArrIndex,attArrIndex;
+		json=json_decode(user.json);
+		gemSys=json.gemSys;
+		gemArr=gemSys.gemArr;
+		gemArrCount=size(gemArr);
+		if(gemArrCount<gemArrIndex)//没有此珍宝
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+		
+		gemInfo=gemArr[gemArrIndex];
+		attArr=gemInfo.attArr;
+		attArrCount=size(attArr);
+		if(attArrCount<attArrIndex)//没有此珍宝属性
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-5)
+			);
+			return(0);//不修改
+		}
+		
+		gemAtt=attArr[attArrIndex];
+		open=gemAtt.open;
+		if(open!=1)//没有开光
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+
+		tableData=game.table;
+		treasureConfigTable=tableData.treasureConfig;
+		rowTC=treasureConfigTable.getRow(0);
+		goldCost=number(rowTC.getValFromColName("washCost"));//洗练消耗
+
+		gold=number(user.gold);//元宝（充值，优先使用）
+		gold2=number(user.gold2);//元宝（赠送）
+		if(goldCost>(gold+gold2))//元宝不足
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		//扣减元宝
+		if(goldCost>gold)
+		{
+			goldCost-=gold;
+			gold=0;
+			gold2-=goldCost;
+		}
+		else
+		{
+			gold-=goldCost;
+		}
+		
+		//流水
+		allGold=gold+gold2;//元宝余额
+		game.saveResIO(userID,45,0,0,goldCost,allGold);//珍宝洗练(type,itemID,（0=消耗，1=获得）,count,allGold)
+		
+		attArrCount=size(attArr);
+		k=0;attMapPoolIDMap=dict();
+		while(k<attArrCount)
+		{
+			gemAttFuck=attArr[k];
+			tPID=gemAttFuck.id;
+			attMapPoolIDMap[tPID]=0;
+			++k;
+		}
+		
+		quality1=number(rowTC.getValFromColName("quality1"));//品质1出现几率
+		quality2=number(rowTC.getValFromColName("quality2"));//品质2出现几率
+		quality3=number(rowTC.getValFromColName("quality3"));//品质3出现几率
+		quality4=number(rowTC.getValFromColName("quality4"));//品质4出现几率
+		quality5=number(rowTC.getValFromColName("quality5"));//品质5出现几率
+		randArr=arr();
+		push(randArr,quality1,quality2,quality3,quality4,quality5);
+		indexS=randSelect(randArr)+1;
+		
+		treasurePoolTable=tableData.treasurePool;
+		treasurePoolTableCount=treasurePoolTable.size();
+		j=0;treasurePoolIDArr=arr();
+		while(j<treasurePoolTableCount)
+		{
+			rowTP=treasurePoolTable.getRow(j);
+			quality=number(rowTP.getValFromColName("quality"));
+			if(quality==indexS)
+			{
+				idS=j+1;
+
+				if(!exist(attMapPoolIDMap,idS))
+				{
+					push(treasurePoolIDArr,idS);
+				}
+			}
+			++j;
+		}
+
+		tpIDCount=size(treasurePoolIDArr);
+		tpIDS=rand()%tpIDCount;
+		treasurePoolID=treasurePoolIDArr[tpIDS];
+		gemAtt.id=treasurePoolID;
+
+		//属性计算
+		numMgr=game.numMgr;
+		numMgr.computeHeroArr(json);
+		numMgr.computeUser(user,json);
+		
+		heroArr=json.hero;
+		power=number(user.power);
+		strength=number(user.strength);
+		wisdom=number(user.wisdom);
+		charm=number(user.charm);
+		politics=number(user.politics);
+					
+		//保存
+		user.gold=gold;
+		user.gold2=gold2;
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,gold,gold2,strength,wisdom,charm,politics,power,heroArr,gemSys)
+		);
+		
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

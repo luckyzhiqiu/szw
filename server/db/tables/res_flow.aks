@@ -1,0 +1,9 @@
+//游戏资源流水模板表（日志表）
+mysqlCol("key","id");
+mysqlCol("datetime","genTime");//生成时间
+mysqlCol("int","type",0);//资源类型，对应：json_table/resource.json
+mysqlCol("int","itemID",0);//道具ID，对应type描述
+mysqlCol("int","io",0);//进出：0=消耗；1=获得；
+mysqlCol("bigint","count",0);//进出数量
+mysqlCol("bigint","val",0);//余额（操作之后）
+mysqlCol("int","userID",0);

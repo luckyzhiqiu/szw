@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="s" n="__sys__t3">.wangID.</v>
+<v t="s" n="__sys__t4">.userID.</v>
+<v t="s" n="__sys__t5">.wang.</v>
+<v t="s" n="__sys__t6">..</v>
+<v t="n" n="__sys__t7">1</v>
+<o n="input"><o>__sys__t8</o><i>__sys__t1</i></o>
+<o n="="><o>var</o><i>__sys__t8</i></o>
+<o n="input"><o>__sys__t10</o><i>__sys__t2</i></o>
+<o n="="><o>userData</o><i>__sys__t10</i></o>
+<o n="link" r="284"><o>__sys__t12</o><i>__sys__t3</i></o>
+<o n="=" r="284"><o>wangID</o><i>__sys__t12</i></o>
+<o n="link" r="284"><o>__sys__t14</o><i>__sys__t4</i></o>
+<o n="=" r="284"><o>userID</o><i>__sys__t14</i></o>
+<v t="s" n="__sys__t17">.json.</v>
+<o n="." r="285"><o>__sys__t16</o><i>var</i><i>__sys__t17</i></o>
+<o n="json_decode" r="285"><o>__sys__t19</o><i>__sys__t16</i></o>
+<o n="=" r="285"><o>kingCityJson</o><i>__sys__t19</i></o>
+<o n="+" r="286"><o>__sys__t21</o><i>__sys__t5</i><i>wangID</i></o>
+<o n="[]" r="286"><o>__sys__t22</o><i>kingCityJson</i><i>__sys__t21</i></o>
+<o n="=" r="286"><o>wang</o><i>__sys__t22</i></o>
+<v t="s" n="__sys__t25">.userID.</v>
+<o n="." r="287"><o>__sys__t24</o><i>wang</i><i>__sys__t25</i></o>
+<o n="=" r="287"><o>__sys__t24</o><i>userID</i></o>
+<v t="s" n="__sys__t29">.chat.</v>
+<o n="." r="288"><o>__sys__t28</o><i>wang</i><i>__sys__t29</i></o>
+<o n="=" r="288"><o>__sys__t28</o><i>__sys__t6</i></o>
+<v t="s" n="__sys__t33">.json.</v>
+<o n="." r="290"><o>__sys__t32</o><i>var</i><i>__sys__t33</i></o>
+<o n="json_encode" r="290"><o>__sys__t35</o><i>kingCityJson</i></o>
+<o n="=" r="290"><o>__sys__t32</o><i>__sys__t35</i></o>
+<o n="return" r="291"><o>__sys__t37</o><i>__sys__t7</i></o>
+<v n="__sys__t10" />
+<v n="__sys__t12" />
+<v n="__sys__t14" />
+<v n="__sys__t16" />
+<v n="__sys__t19" />
+<v n="__sys__t21" />
+<v n="__sys__t22" />
+<v n="__sys__t24" />
+<v n="__sys__t28" />
+<v n="__sys__t32" />
+<v n="__sys__t35" />
+<v n="__sys__t37" />
+<v n="__sys__t8" />
+<v n="kingCityJson" />
+<v n="userData" />
+<v n="userID" />
+<v n="var" />
+<v n="wang" />
+<v n="wangID" />
+</script>

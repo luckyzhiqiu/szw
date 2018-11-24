@@ -1,0 +1,296 @@
+//加入宴会
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+type=netMsg[3];//赴宴方式
+selectUserID=netMsg[4];//他人userID宴会
+seatArrIndex=netMsg[5];//座位
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+if(userID==selectUserID)//不能参加自己宴会
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+resulfNum=-99;
+updateUserS=##<game,user,type,selectUserID,seatArrIndex,point,pointDown>
+	//修改宴会主办方行数据
+	userS=game.rd.updateRow
+	(
+		game.cnn,"user","id",selectUserID,"*",
+		//修改回调
+		##<userS,game>
+			@link sessionID,methodName,type,seatArrIndex,point,pointDown,resulfNum,userID,user;
+			partyBt=number(userS.partyBt);//宴会开始时间（秒）：0=未开始；
+			partyType=number(userS.partyType);//宴会类型：0=家宴；1=官宴（必须公开）；
+			nowTime=time();
+			
+			tableData=game.table;
+			rowD=tableData.dinner.getRowFromColName("type",partyType);
+			time=number(rowD.getValFromColName("time"));//持续时间（分钟）
+			timeS=time*60;
+			
+			passtime=nowTime-partyBt;
+			
+			if(passtime>timeS)//宴会已结束
+			{
+				resulfNum=-9;
+				return(0);//修改
+			}
+		
+			jsonExtS=json_decode(userS.jsonExt);
+			party=jsonExtS.party;
+			seatArr=party.seatArr;
+			seatArrCount=size(seatArr);
+			if(seatArrCount<seatArrIndex)//座位信息错误
+			{
+				resulfNum=-3;
+				return(0);
+			}
+			
+			i=0;
+			while(i<seatArrCount)
+			{
+				info=seatArr[i];
+				sUID=info.userID;
+				if(sUID==userID)//已出席宴会
+				{
+					resulfNum=-8;
+					return(0);
+				}
+				
+				++i;
+			}
+			
+			partySeat=seatArr[seatArrIndex];
+			partySeatUID=partySeat.userID;
+			if(partySeatUID!=0)//此座位已经有玩家
+			{
+				resulfNum=-4;
+				return(0);
+			}
+			
+			nickname=user.nickname;
+			
+			partySeat.userID=userID;
+			partySeat.nickname=nickname;//昵称
+			partySeat.vip=user.vip;//vip
+			partySeat.head=user.head;//头像
+			partySeat.level=user.level;//等级
+			partySeat.genTime=now();//就座时间，格式：2018-01-30 15:18:30
+			partySeat.joinType=type;//参加类型：对应json_table/dinnerGo.json
+			
+			scoreS=party.score;
+			if(point>0)
+			{
+				partySeat.score=point;//影响分数：参加为正，捣乱为负
+				scoreS+=point;
+			}
+			else
+			{
+				partySeat.score=-pointDown;//影响分数：参加为正，捣乱为负
+				scoreS-=pointDown;
+				scoreS=limit(scoreS,0,9999999);
+			}
+
+			structMgr=game.structMgr;
+			PartyBreakHistroyArr=party.partyBreakHistroyArr;//宴会捣乱历史信息
+			partyBreakHistroy=structMgr_upgradeObj(structMgr,"PartyBreakHistroy",dict());
+			
+			partyBreakHistroy.userID=userID;
+			partyBreakHistroy.nickname=nickname;
+			partyBreakHistroy.genTime=now();
+			
+			if(point>0)
+			{
+				partyBreakHistroy.score=point;
+			}
+			else
+			{
+				partyBreakHistroy.score=-pointDown;
+				push(PartyBreakHistroyArr,partyBreakHistroy);
+			}
+			
+			resulfNum=1;
+			
+			//保存
+			party.score=scoreS;//分数（主办方结算时所得分数）
+			userS.jsonExt=json_encode(jsonExtS);
+			return(1);//修改
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	return(userS);
+##.;
+
+//修改宴会主办方行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link sessionID,methodName,type,selectUserID,seatArrIndex,updateUserS,resulfNum,userID;
+		json=json_decode(user.json);
+		dailyTask=json.dailyTask;
+		partyCount=dailyTask.partyCount;//赴宴次数
+		
+		tableData=game.table;
+		rowD=tableData.dinnerConfig.getRow(0);
+		countEveryday=number(rowD.getValFromColName("countEveryday"));//每日赴宴次数
+			
+		itemDict=json.item;
+		numMgr=game.numMgr;
+		tableData=game.table;
+		rowDG=tableData.dinnerGo.getRowFromColName("type",type);
+		needGold=number(rowDG.getValFromColName("gold"));//消耗元宝
+		item=rowDG.getValFromColName("item");//消耗道具
+		point=number(rowDG.getValFromColName("point"));//获得分数
+		pointDown=number(rowDG.getValFromColName("pointDown"));//减少宴会分数
+		
+		if(partyCount>=countEveryday && pointDown==0)//已达到当日赴宴次数上限
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-5)
+			);
+			return(0);
+		}
+		
+		//扣减元宝
+		gold=number(user.gold);//元宝（充值，优先使用）
+		gold2=number(user.gold2);//元宝（赠送）
+		if(needGold>(gold+gold2))//元宝不足
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-6)
+			);
+			return(0);//不修改
+		}
+
+		if(needGold>gold)
+		{
+			needGold-=gold;
+			gold=0;
+			gold2-=needGold;
+		}
+		else
+		{
+			gold-=needGold;
+		}
+		
+		if(needGold>0)
+		{
+			//流水
+			allGold=gold+gold2;//元宝余额
+			game.saveResIO(userID,52,0,0,needGold,allGold);//参加宴会(type,itemID,（0=消耗，1=获得）,count,allGold)
+		}
+		
+		//道具是否足够
+		addItemArr=split(arr(),item,",");
+		addIDCount=size(addItemArr);
+		if(addIDCount>=2)
+		{
+			i=0;j=0;addCount=addIDCount/2;
+			while(i<addCount)
+			{
+				itemID=number(addItemArr[j]);
+				itemCount=number(addItemArr[j+1]);
+				itemCount=numMgr.subItem(itemID,itemCount,itemDict);//消耗道具
+				if(itemCount==-1)//道具不足
+				{
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-7)
+					);
+					return(0);
+				}
+				
+				j+=2;
+				++i;
+			}
+		}
+		
+		userS=updateUserS(game,user,type,selectUserID,seatArrIndex,point,pointDown);
+		if(resulfNum!=1)
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",resulfNum)
+			);
+			return(0);
+		}
+
+		partyScore=number(user.partyScore);
+		partyMoney=number(user.partyMoney);
+		partyScore+=point;
+		partyMoney+=point;
+		
+		//参加宴会次数
+		if(point>0)
+		{
+			partyCount+=1;
+			json.dailyTask.partyCount=partyCount;
+		}
+		
+		//保存
+		user.partyScore=partyScore;
+		user.partyMoney=partyMoney;
+		user.gold=gold;
+		user.gold2=gold2;
+		user.json=json_encode(json);
+		
+		//返回
+		jsonExtS=json_decode(userS.jsonExt);
+		party=jsonExtS.party;
+		seatArr=party.seatArr;
+		score=party.score;
+		
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,gold,gold2,partyScore,partyMoney,seatArr,score,partyCount,time(),itemDict)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+

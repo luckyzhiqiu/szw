@@ -1,0 +1,334 @@
+//关卡BOSS战斗
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+heroIndex=netMsg[3];//豪杰位置
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,heroIndex,userID;
+		json=json_decode(user.json);
+		
+		//判断豪杰是否存在
+		heroArr=json.hero;
+		if(!exist(heroArr,heroIndex))//豪杰不存在
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+		
+		//判断此豪杰当天是否对战过BOSS
+		story=json.story;
+		date=ref(story.date);
+		heroIndexMap=ref(story.heroIndexMap);
+		curDate=split(arr(),now()," ")[0];//当前日期
+		if(date!=curDate)//日期不同
+		{
+			date=curDate;
+			//清空对战列表
+			clean(heroIndexMap);
+		}
+		if(exist(heroIndexMap,heroIndex))//已经对战过
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		//记录对战信息
+		heroIndexMap[heroIndex]=heroIndex;
+		
+		table=game.table;
+		bossTable=table.boss;
+		chapterArr=game.storyMgr.chapterArr;
+		modifSign=0;//修改user数据标记
+		chapterID=number(user.chapterID);//章节ID
+		barrierID=number(user.barrierID);//关卡ID
+		
+		//章节信息
+		chapterInfo=chapterArr[chapterID];
+		//关卡信息
+		barrierArr=chapterInfo.barrierArr;
+		barrier=barrierArr[barrierID];
+		barrierType=number(barrier.row.getValFromColName("type"));//关卡类型
+		if(barrierType!=2)//非BOSS关卡
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		modifSign=1;
+		bossID=number(barrier.row.getValFromColName("bossID"));//bossID
+		boss=bossTable.getRowFromColName("id",bossID);//boss信息
+		bossLife=number(boss.getValFromColName("life"));//boss生命值
+		
+		//boss生命
+		barrierBossLife=number(user.barrierBossLife);
+		if(barrierBossLife==-1)//恢复boss生命
+		{
+			barrierBossLife=bossLife;
+			user.barrierBossMaxLife=bossLife;
+		}
+		
+		numMgr=game.numMgr;
+		//战斗逻辑
+		hero=heroArr[heroIndex];//对战豪杰
+		//战斗力=武力资质×5000×等级＋武力属性
+		attack=numMgr.getHeroAttack(hero,json);
+		//扣减BOSS生命
+		barrierBossLife-=attack;
+		if(barrierBossLife>0)//战斗未结束
+		{
+			//保存
+			user.json=json_encode(json);
+			user.barrierBossLife=barrierBossLife;
+			
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",2,story,barrierBossLife)
+			);
+			return(modifSign);//修改
+		}
+		
+		chapterSign=number(user.chapterSign);
+		barrierSign=number(user.barrierSign);
+		money=number(user.money);
+		score=number(user.score);
+		
+		info=dict();
+		
+		//过关
+		barrierID=0;
+		++chapterID;//下一章节
+		if(!exist(chapterArr,chapterID))//下一章节不存在
+		{
+			//停留在本章节本关卡本场景
+			chapterID=number(user.chapterID);//章节ID
+			barrierID=number(user.barrierID);//关卡ID
+		}
+		else//下一章节存在
+		{
+			chapterSign=0;//标记章节剧情未看
+			barrierSign=0;//标记关卡剧情未看
+			
+			//名望增加
+			prisonerConfigureTab=table.prisonerConfigure;
+			prisonerConfigureTabRow=prisonerConfigureTab.getRow(0);
+			fameMax=number(prisonerConfigureTabRow.getValFromColName("fameMax"))*chapterID;
+			fameGet=number(prisonerConfigureTabRow.getValFromColName("fameGet"));
+			fame=number(user.fame);
+			fame+=fameGet;
+			if(fame>fameMax)fame=fameMax;
+			user.fame=fame;
+			info.fame=fame;
+		}
+		
+		//boss血量恢复
+		barrierBossLife=-1;
+		
+		//清空对战列表
+		clean(heroIndexMap);
+		
+		dropHeroID=number(boss.getValFromColName("heroID"));//获得豪杰
+		dropWifeID=number(boss.getValFromColName("wifeID"));//获得美人
+		dropMoney=number(boss.getValFromColName("dropMoney"));//获得银两
+		dropScore=number(boss.getValFromColName("dropScore"));//获得政绩
+		dropItem=boss.getValFromColName("dropItem");//获得道具
+		dropGold=number(boss.getValFromColName("dropGold"));//获得元宝
+		
+		//奖励元宝
+		gold=number(user.gold);
+		gold2=number(user.gold2);
+		gold2+=dropGold;
+		if(dropGold>0)
+		{
+			//流水
+			allGold=gold+gold2;//元宝余额
+			game.saveResIO(userID,37,0,1,dropGold,allGold);//关卡Boss(type,itemID,（0=消耗，1=获得）,count,allGold)
+		}
+		//奖励信息
+		rewardInfo=dict();
+		isNeedCompleteHeroArr=0;
+		//获得新豪杰
+		rewardInfo.heroID=dropHeroID;
+		if(dropHeroID>0)
+		{
+			newHero=numMgr.createHero(dropHeroID,heroArr,json);
+			if(!empty(newHero))
+			{
+				isNeedCompleteHeroArr=1;
+				rewardInfo.newHero=newHero;
+			}
+		}
+		//获得红颜
+		rewardInfo.wifeID=dropWifeID;
+		if(dropWifeID>0)
+		{
+			wifeDic=json.wife;
+			newWife=numMgr.createWife(dropWifeID,wifeDic);
+			if(!empty(newWife))
+			{
+				heroZero=heroArr[0];//主角
+				numMgr.computeUserWifeProperty(user,wifeDic);
+				isNeedCompleteHeroArr=1;
+				rewardInfo.newWife=newWife;
+				rewardInfo.heroZero=heroZero;
+			}
+			else
+			{
+				rewardInfo.wifeID=0;
+			}
+		}
+		if(isNeedCompleteHeroArr)
+		{
+			numMgr.computeHeroArr(json);
+			numMgr.computeUser(user,json);
+			rewardInfo.heroArr=heroArr;//如果获得新豪杰或新红颜，前端需要同步heroArr
+			//势力属性
+			rewardInfo.power=arr(
+				user.strength,
+				user.wisdom,
+				user.charm,
+				user.politics,
+				user.power,
+				user.intimate,
+				user.beauty,
+			);
+		}
+		//获得银两
+		rewardInfo.money=dropMoney;
+		if(dropMoney>0)
+		{
+			money+=dropMoney;
+		}
+		//获得政绩
+		rewardInfo.score=dropScore;
+		if(dropScore>0)
+		{
+			score+=dropScore;
+		}
+		//获得道具
+		newAddItemArr=arr();
+		addItemArr=split(arr(),dropItem,",");
+		addItemCount=size(addItemArr);
+		if(addItemCount>=2)
+		{
+			itemDict=json.item;
+			i=0;j=0;count=size(addItemArr)/2;
+			while(i<count)
+			{
+				itemID=number(addItemArr[j]);
+				itemCount=number(addItemArr[j+1]);
+				numMgr.addItem(itemID,itemCount,itemDict);//道具奖励
+				push(newAddItemArr,itemID,itemCount);
+				j+=2;
+				++i;
+			}
+		}
+		rewardInfo.addItemArr=newAddItemArr;
+		rewardInfo.wifePlus=json.wifePlus;
+		
+		//解锁犯人
+		newPrisonerID=number(boss.getValFromColName("prisonerID"));
+		if(newPrisonerID!=0)
+		{
+			//添加犯人
+			curPrison=numMgr.addPrisoner(table,json,newPrisonerID);
+			if(!empty(curPrison))
+			{
+				info.prison=curPrison;
+			}
+		}
+		
+		
+		//增加通关次数
+		barrierCount=ref(json.dailyTask.barrierCount);
+		barrierCount+=1;
+		//增加分数和刷新关卡冲榜
+		addAndUpdateBarrierAddRank(game,user);
+		
+		chapterTab=table.chapter;
+		row=chapterTab.getRowFromColName("id",chapterID+1);
+		name=row.getValFromColName("name");
+		title=name+"("+(barrierID+1)+")";
+		user.chapter_barrier=title;
+		
+		//保存
+		if(gold2!=0)
+		{
+			user.gold2=gold2;
+		}
+		user.json=json_encode(json);
+		user.chapterID=chapterID;
+		user.barrierID=barrierID;
+		user.money=money;
+		user.score=score;
+		user.barrierBossLife=barrierBossLife;
+		user.chapterSign=chapterSign;
+		user.barrierSign=barrierSign;
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,rewardInfo,chapterID,barrierID,barrierCount,info,title,newPrisonerID,chapterSign,barrierSign,dropGold)
+		);
+		
+		//更新关卡榜
+		rankName=game.gameConfig.name+"_chapterRank";//排行榜名称
+		rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+		score=(chapterID*7+barrierID)*8;
+		redis_zadd(rd,rankName,score,user.id);
+		
+		//按modifSign判断是否修改user数据
+		return(modifSign);
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

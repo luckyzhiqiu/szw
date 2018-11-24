@@ -1,0 +1,6 @@
+//权贵表
+mysqlCol("key","id");
+mysqlCol("int","unionID",0);//所属联盟ID，值从10001开始，小于此值时表示特殊联盟
+mysqlCol("int","catchTime",0);//拉拢时间（秒）
+mysqlCol("int","keepTime",0);//拉拢保护时间（秒）
+mysqlCol("mediumblob","json");//参考struct.h文件中UnionRichmanJson

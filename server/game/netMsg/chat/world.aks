@@ -1,0 +1,66 @@
+//世界聊天
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+str=netMsg[3];//文本
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}
+limitChat=int(user.limitChat);//禁言开关：0=关闭；1=开启；
+if(limitChat!=0)
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)//沉默状态
+	);
+	exit();
+}
+limitChatEndTime=int(user.limitChatEndTime);//禁言结束时间（秒）
+limitTime=time();//现在时间（秒）
+if(limitChatEndTime>limitTime)
+{
+	endTime=limitChatEndTime-limitTime;
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-3,endTime)//禁言结束时间未过
+	);
+	exit();
+}
+level=user.level;//Lv
+vip=user.vip;//Vip
+head=user.head;//head
+nickname=user.nickname;//nickname
+titleID=int(user.titleID);
+//群发
+worldSendMsg(game,userID,nickname,vip,level,head,str,titleID,0);
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1)
+);

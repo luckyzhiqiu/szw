@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t209">113</v>
+<v t="n" n="__sys__t208">113</v>
+<v t="n" n="__sys__t207">113</v>
+<v t="n" n="__sys__t196">105</v>
+<v t="n" n="__sys__t195">105</v>
+<v t="n" n="__sys__t166">89</v>
+<v t="n" n="__sys__t165">89</v>
+<v t="n" n="__sys__t149">74</v>
+<v t="n" n="__sys__t105">47</v>
+<v t="n" n="__sys__t104">47</v>
+<v t="n" n="__sys__t103">47</v>
+<v t="n" n="__sys__t87">36</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="s" n="__sys__t3">.rushLoopTable.</v>
+<v t="s" n="__sys__t4">.cnn.</v>
+<v t="s" n="__sys__t5">.rd.</v>
+<v t="s" n="__sys__t6">.gameConfig.</v>
+<v t="s" n="__sys__t7">.table.</v>
+<v t="s" n="__sys__t8">.game.</v>
+<v t="s" n="__sys__t9">.global_var.</v>
+<v t="s" n="__sys__t10">.name.</v>
+<v t="s" n="__sys__t11">.gameServer.</v>
+<v t="s" n="__sys__t12">.*.</v>
+<v t="n" n="__sys__t13">1000</v>
+<v t="n" n="__sys__t14">0</v>
+<v t="n" n="__sys__t15">0</v>
+<v t="n" n="__sys__t16">0</v>
+<v t="n" n="__sys__t17">0</v>
+<v t="n" n="__sys__t18">0</v>
+<v t="s" n="__sys__t19">.global_var.</v>
+<v t="s" n="__sys__t20">.name.</v>
+<v t="s" n="__sys__t21">.gameServer.</v>
+<v t="s" n="__sys__t22">.*.</v>
+<v t="s" n="__sys__t23">.@__unnamed__28.</v>
+<v t="s" n="__sys__t24">.@__unnamed__29.</v>
+<v t="s" n="__sys__t25">.@__unnamed__30.</v>
+<v t="n" n="__sys__t26">1000</v>
+<v t="n" n="__sys__t27">0</v>
+<v t="n" n="__sys__t28">0</v>
+<v t="n" n="__sys__t29">1</v>
+<v t="n" n="__sys__t30">1</v>
+<v t="n" n="__sys__t31">0</v>
+<v t="n" n="__sys__t32">0</v>
+<v t="n" n="__sys__t33">1</v>
+<v t="s" n="__sys__t34">.重置所有冲榜.</v>
+<v t="n" n="__sys__t35">1</v>
+<v t="n" n="__sys__t36">0</v>
+<v t="n" n="__sys__t37">1</v>
+<v t="n" n="__sys__t38">0</v>
+<o n="input"><o>__sys__t39</o><i>__sys__t1</i></o>
+<o n="="><o>var</o><i>__sys__t39</i></o>
+<o n="input"><o>__sys__t41</o><i>__sys__t2</i></o>
+<o n="="><o>userData</o><i>__sys__t41</i></o>
+<o n="link" r="681"><o>__sys__t43</o><i>__sys__t3</i></o>
+<o n="=" r="681"><o>rushLoopTable</o><i>__sys__t43</i></o>
+<o n="link" r="681"><o>__sys__t45</o><i>__sys__t4</i></o>
+<o n="=" r="681"><o>cnn</o><i>__sys__t45</i></o>
+<o n="link" r="681"><o>__sys__t47</o><i>__sys__t5</i></o>
+<o n="=" r="681"><o>rd</o><i>__sys__t47</i></o>
+<o n="link" r="681"><o>__sys__t49</o><i>__sys__t6</i></o>
+<o n="=" r="681"><o>gameConfig</o><i>__sys__t49</i></o>
+<o n="link" r="681"><o>__sys__t51</o><i>__sys__t7</i></o>
+<o n="=" r="681"><o>table</o><i>__sys__t51</i></o>
+<o n="link" r="681"><o>__sys__t53</o><i>__sys__t8</i></o>
+<o n="=" r="681"><o>game</o><i>__sys__t53</i></o>
+<v t="s" n="__sys__t56">.json.</v>
+<o n="." r="682"><o>__sys__t55</o><i>var</i><i>__sys__t56</i></o>
+<o n="debug" r="682"><o>__sys__t58</o><i>__sys__t55</i></o>
+<v t="s" n="__sys__t60">.json.</v>
+<o n="." r="683"><o>__sys__t59</o><i>var</i><i>__sys__t60</i></o>
+<o n="json_decode" r="683"><o>__sys__t62</o><i>__sys__t59</i></o>
+<o n="=" r="683"><o>varJson</o><i>__sys__t62</i></o>
+<v t="s" n="__sys__t65">.stage.</v>
+<o n="." r="684"><o>__sys__t64</o><i>varJson</i><i>__sys__t65</i></o>
+<o n="=" r="684"><o>stage</o><i>__sys__t64</i></o>
+<v t="s" n="__sys__t69">.getRow.</v>
+<o n="." r="686"><o>__sys__t68</o><i>rd</i><i>__sys__t69</i></o>
+<o n="__sys__t68" r="686"><o>__sys__t71</o><i>rd</i><i>cnn</i><i>__sys__t9</i><i>__sys__t10</i><i>__sys__t11</i><i>__sys__t12</i><i>__sys__t13</i></o>
+<o n="=" r="686"><o>gameServerVar</o><i>__sys__t71</i></o>
+<v t="s" n="__sys__t74">.json.</v>
+<o n="." r="687"><o>__sys__t73</o><i>gameServerVar</i><i>__sys__t74</i></o>
+<o n="json_decode" r="687"><o>__sys__t76</o><i>__sys__t73</i></o>
+<o n="=" r="687"><o>gameServerJson</o><i>__sys__t76</i></o>
+<v t="s" n="__sys__t79">.switch.</v>
+<o n="." r="688"><o>__sys__t78</o><i>gameServerJson</i><i>__sys__t79</i></o>
+<o n="==" r="688"><o>__sys__t81</o><i>__sys__t78</i><i>__sys__t14</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t81</i></o>
+<o n="=="><o>__sys__t83</o><i>__sys__rt</i><i>__sys__t15</i></o>
+<o n="if_goto"><o>__sys__t84</o><i>__sys__t83</i><i>__sys__t87</i></o>
+<o n="return" r="690"><o>__sys__t85</o><i>__sys__t16</i></o>
+<o n="goto"><o>__sys__t86</o><i>__sys__t105</i></o>
+<v t="s" n="__sys__t89">.isResetStage.</v>
+<o n="." r="694"><o>__sys__t88</o><i>gameServerJson</i><i>__sys__t89</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t88</i></o>
+<o n="=="><o>__sys__t92</o><i>__sys__rt</i><i>__sys__t17</i></o>
+<o n="if_goto"><o>__sys__t93</o><i>__sys__t92</i><i>__sys__t103</i></o>
+<o n="=" r="696"><o>stage</o><i>__sys__t18</i></o>
+<v t="s" n="__sys__t96">.updateRow.</v>
+<o n="." r="697"><o>__sys__t95</o><i>rd</i><i>__sys__t96</i></o>
+<o n="full"><o>__sys__t98</o><i>__sys__t23</i></o>
+<o n="full"><o>__sys__t99</o><i>__sys__t24</i></o>
+<o n="full"><o>__sys__t100</o><i>__sys__t25</i></o>
+<o n="__sys__t95" r="697"><o>__sys__t101</o><i>rd</i><i>cnn</i><i>__sys__t19</i><i>__sys__t20</i><i>__sys__t21</i><i>__sys__t22</i><i>__sys__t98</i><i>__sys__t99</i><i>__sys__t100</i><i>userData</i><i>__sys__t26</i></o>
+<o n="goto"><o>__sys__t102</o><i>__sys__t104</i></o>
+<o n="==" r="721"><o>__sys__t106</o><i>stage</i><i>__sys__t27</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t106</i></o>
+<o n="=="><o>__sys__t108</o><i>__sys__rt</i><i>__sys__t28</i></o>
+<o n="if_goto"><o>__sys__t109</o><i>__sys__t108</i><i>__sys__t149</i></o>
+<v t="s" n="__sys__t111">.bt.</v>
+<o n="." r="725"><o>__sys__t110</o><i>gameServerJson</i><i>__sys__t111</i></o>
+<o n="strtotime" r="725"><o>__sys__t113</o><i>__sys__t110</i></o>
+<o n="=" r="725"><o>bt</o><i>__sys__t113</i></o>
+<o n="resetActivityRank" r="728"><o>__sys__t115</o><i>rd</i><i>gameConfig</i></o>
+<o n="=" r="731"><o>stage</o><i>__sys__t29</i></o>
+<v t="s" n="__sys__t118">.bt.</v>
+<o n="." r="732"><o>__sys__t117</o><i>varJson</i><i>__sys__t118</i></o>
+<o n="=" r="732"><o>__sys__t117</o><i>bt</i></o>
+<v t="s" n="__sys__t122">.stage.</v>
+<o n="." r="733"><o>__sys__t121</o><i>varJson</i><i>__sys__t122</i></o>
+<o n="=" r="733"><o>__sys__t121</o><i>stage</i></o>
+<v t="s" n="__sys__t126">.activityMap.</v>
+<o n="." r="734"><o>__sys__t125</o><i>varJson</i><i>__sys__t126</i></o>
+<o n="getStageActivity" r="734"><o>__sys__t128</o><i>rushLoopTable</i><i>stage</i></o>
+<o n="=" r="734"><o>__sys__t125</o><i>__sys__t128</i></o>
+<v t="s" n="__sys__t131">.dt.</v>
+<o n="." r="735"><o>__sys__t130</o><i>varJson</i><i>__sys__t131</i></o>
+<v t="s" n="__sys__t134">.activityMap.</v>
+<o n="." r="735"><o>__sys__t133</o><i>varJson</i><i>__sys__t134</i></o>
+<o n="getStageDt" r="735"><o>__sys__t136</o><i>__sys__t133</i></o>
+<o n="=" r="735"><o>__sys__t130</o><i>__sys__t136</i></o>
+<v t="s" n="__sys__t139">.oldActivityMap.</v>
+<o n="." r="736"><o>__sys__t138</o><i>varJson</i><i>__sys__t139</i></o>
+<o n="clean" r="736"><o>__sys__t141</o><i>__sys__t138</i></o>
+<v t="s" n="__sys__t143">.json.</v>
+<o n="." r="739"><o>__sys__t142</o><i>var</i><i>__sys__t143</i></o>
+<o n="json_encode" r="739"><o>__sys__t145</o><i>varJson</i></o>
+<o n="=" r="739"><o>__sys__t142</o><i>__sys__t145</i></o>
+<o n="return" r="742"><o>__sys__t147</o><i>__sys__t30</i></o>
+<o n="goto"><o>__sys__t148</o><i>__sys__t209</i></o>
+<o n="updateActivityInfo" r="747"><o>__sys__t150</o><i>game</i><i>varJson</i><i>cnn</i><i>rd</i><i>gameConfig</i></o>
+<o n="=" r="747"><o>modif</o><i>__sys__t150</i></o>
+<o n="isStageEnd" r="748"><o>__sys__t152</o><i>varJson</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t152</i></o>
+<o n="=="><o>__sys__t154</o><i>__sys__rt</i><i>__sys__t31</i></o>
+<o n="if_goto"><o>__sys__t155</o><i>__sys__t154</i><i>__sys__t195</i></o>
+<o n="rushLoopReward" r="751"><o>__sys__t156</o><i>cnn</i><i>rd</i><i>table</i><i>gameConfig</i><i>game</i></o>
+<o n="++" r="754"><o>stage</o><i>stage</i></o>
+<o n="isStageExist" r="755"><o>__sys__t158</o><i>rushLoopTable</i><i>stage</i></o>
+<o n="!" r="755"><o>__sys__t159</o><i>__sys__t158</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t159</i></o>
+<o n="=="><o>__sys__t161</o><i>__sys__rt</i><i>__sys__t32</i></o>
+<o n="if_goto"><o>__sys__t162</o><i>__sys__t161</i><i>__sys__t165</i></o>
+<o n="=" r="755"><o>stage</o><i>__sys__t33</i></o>
+<o n="goto"><o>__sys__t164</o><i>__sys__t166</i></o>
+<o n="trace" r="758"><o>__sys__t167</o><i>__sys__t34</i></o>
+<o n="resetActivityRank" r="759"><o>__sys__t168</o><i>rd</i><i>gameConfig</i></o>
+<v t="s" n="__sys__t170">.bt.</v>
+<o n="." r="761"><o>__sys__t169</o><i>varJson</i><i>__sys__t170</i></o>
+<v t="s" n="__sys__t173">.dt.</v>
+<o n="." r="761"><o>__sys__t172</o><i>varJson</i><i>__sys__t173</i></o>
+<o n="+=" r="761"><o>__sys__t169</o><i>__sys__t172</i></o>
+<v t="s" n="__sys__t177">.stage.</v>
+<o n="." r="762"><o>__sys__t176</o><i>varJson</i><i>__sys__t177</i></o>
+<o n="=" r="762"><o>__sys__t176</o><i>stage</i></o>
+<v t="s" n="__sys__t181">.activityMap.</v>
+<o n="." r="763"><o>__sys__t180</o><i>varJson</i><i>__sys__t181</i></o>
+<o n="getStageActivity" r="763"><o>__sys__t183</o><i>rushLoopTable</i><i>stage</i></o>
+<o n="=" r="763"><o>__sys__t180</o><i>__sys__t183</i></o>
+<v t="s" n="__sys__t186">.dt.</v>
+<o n="." r="764"><o>__sys__t185</o><i>varJson</i><i>__sys__t186</i></o>
+<v t="s" n="__sys__t189">.activityMap.</v>
+<o n="." r="764"><o>__sys__t188</o><i>varJson</i><i>__sys__t189</i></o>
+<o n="getStageDt" r="764"><o>__sys__t191</o><i>__sys__t188</i></o>
+<o n="=" r="764"><o>__sys__t185</o><i>__sys__t191</i></o>
+<o n="=" r="765"><o>modif</o><i>__sys__t35</i></o>
+<o n="goto"><o>__sys__t194</o><i>__sys__t196</i></o>
+<o n="="><o>__sys__rt</o><i>modif</i></o>
+<o n="=="><o>__sys__t198</o><i>__sys__rt</i><i>__sys__t36</i></o>
+<o n="if_goto"><o>__sys__t199</o><i>__sys__t198</i><i>__sys__t207</i></o>
+<v t="s" n="__sys__t201">.json.</v>
+<o n="." r="770"><o>__sys__t200</o><i>var</i><i>__sys__t201</i></o>
+<o n="json_encode" r="770"><o>__sys__t203</o><i>varJson</i></o>
+<o n="=" r="770"><o>__sys__t200</o><i>__sys__t203</i></o>
+<o n="return" r="771"><o>__sys__t205</o><i>__sys__t37</i></o>
+<o n="goto"><o>__sys__t206</o><i>__sys__t208</i></o>
+<o n="return" r="774"><o>__sys__t210</o><i>__sys__t38</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t100" />
+<v n="__sys__t101" />
+<v n="__sys__t102" />
+<v n="__sys__t106" />
+<v n="__sys__t108" />
+<v n="__sys__t109" />
+<v n="__sys__t110" />
+<v n="__sys__t113" />
+<v n="__sys__t115" />
+<v n="__sys__t117" />
+<v n="__sys__t121" />
+<v n="__sys__t125" />
+<v n="__sys__t128" />
+<v n="__sys__t130" />
+<v n="__sys__t133" />
+<v n="__sys__t136" />
+<v n="__sys__t138" />
+<v n="__sys__t141" />
+<v n="__sys__t142" />
+<v n="__sys__t145" />
+<v n="__sys__t147" />
+<v n="__sys__t148" />
+<v n="__sys__t150" />
+<v n="__sys__t152" />
+<v n="__sys__t154" />
+<v n="__sys__t155" />
+<v n="__sys__t156" />
+<v n="__sys__t158" />
+<v n="__sys__t159" />
+<v n="__sys__t161" />
+<v n="__sys__t162" />
+<v n="__sys__t164" />
+<v n="__sys__t167" />
+<v n="__sys__t168" />
+<v n="__sys__t169" />
+<v n="__sys__t172" />
+<v n="__sys__t176" />
+<v n="__sys__t180" />
+<v n="__sys__t183" />
+<v n="__sys__t185" />
+<v n="__sys__t188" />
+<v n="__sys__t191" />
+<v n="__sys__t194" />
+<v n="__sys__t198" />
+<v n="__sys__t199" />
+<v n="__sys__t200" />
+<v n="__sys__t203" />
+<v n="__sys__t205" />
+<v n="__sys__t206" />
+<v n="__sys__t210" />
+<v n="__sys__t39" />
+<v n="__sys__t41" />
+<v n="__sys__t43" />
+<v n="__sys__t45" />
+<v n="__sys__t47" />
+<v n="__sys__t49" />
+<v n="__sys__t51" />
+<v n="__sys__t53" />
+<v n="__sys__t55" />
+<v n="__sys__t58" />
+<v n="__sys__t59" />
+<v n="__sys__t62" />
+<v n="__sys__t64" />
+<v n="__sys__t68" />
+<v n="__sys__t71" />
+<v n="__sys__t73" />
+<v n="__sys__t76" />
+<v n="__sys__t78" />
+<v n="__sys__t81" />
+<v n="__sys__t83" />
+<v n="__sys__t84" />
+<v n="__sys__t85" />
+<v n="__sys__t86" />
+<v n="__sys__t88" />
+<v n="__sys__t92" />
+<v n="__sys__t93" />
+<v n="__sys__t95" />
+<v n="__sys__t98" />
+<v n="__sys__t99" />
+<v n="bt" />
+<v n="cnn" />
+<v n="game" />
+<v n="gameConfig" />
+<v n="gameServerJson" />
+<v n="gameServerVar" />
+<v n="modif" />
+<v n="rd" />
+<v n="rushLoopTable" />
+<v n="stage" />
+<v n="table" />
+<v n="userData" />
+<v n="var" />
+<v n="varJson" />
+</script>

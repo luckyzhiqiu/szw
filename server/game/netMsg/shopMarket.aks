@@ -1,0 +1,194 @@
+//商城®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2]; // 通行证
+buyID=netMsg[3];//购买物品id
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+itemTable=game.table.shop;//道具表格.
+idRow=itemTable.getRowFromColName("id",buyID);
+
+if(empty(idRow))//商品下架了
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+payPrice=number(idRow.getValFromColName("payPrice"));//充值价格
+type=number(idRow.getValFromColName("type"));//物品类型
+
+//判类型
+if(type==3&&payPrice>0)//非法交易
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,buyID,idRow,payPrice,type,userID;
+		json=json_decode(user.json);
+		gold=number(user.gold);//元宝（充值，优先使用）
+		gold2=number(user.gold2);//元宝（赠送）
+		itemDict=json.item;
+		numMgr=game.numMgr;
+		buyMap=json.buyMap;
+		
+		goods=number(idRow.getValFromColName("id"));//购买商品id
+		type=number(idRow.getValFromColName("type"));//物品类型
+		
+		needGold=number(idRow.getValFromColName("goldPrice"));//元宝价格
+		limited=number(idRow.getValFromColName("limited"));//限购数量
+		itemID=number(idRow.getValFromColName("itemID"));//获得id
+		eventID=number(idRow.getValFromColName("eventID"));//关联活动ID
+		if(limited!=0)
+		{
+			if(!exist(buyMap,goods))
+			{
+				buyMap[goods]=limited;//购买ID 不存在 重置3次
+			}
+			
+			if(buyMap[goods]<=0)//限买次数用完
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-2)
+				);
+				return(0);//不修改
+			}
+		}
+		if(eventID!=0)//活动商品
+		{
+			activityMgr=game.activityMgr;
+			activityStatus=activityMgr.getActivityStatus(eventID);
+			if(activityStatus!=1)//不在活动进行中
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)
+				);
+				return(0);		
+			}
+		}
+		if(type==1 || type ==2)//元宝购买
+		{
+			if(needGold>(gold+gold2))//元宝不足
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)
+				);
+				return(0);//不修改
+			}
+			
+			if(goods==buyID)
+			{
+				buyMap[goods]-=1;
+				numMgr.addItem(itemID,1,itemDict);
+			}
+			//扣减元宝
+			if(needGold>gold)
+			{
+				needGold-=gold;
+				gold=0;
+				gold2-=needGold;
+			}
+			else
+			{
+				gold-=needGold;
+			}
+		}
+		
+		
+		if(type==3 && payPrice==0)//免费CNY购买
+		{
+			buyMap[goods]-=1;
+			numMgr.addItem(itemID,1,itemDict);
+		}
+		
+		if(needGold>0)//产生流水
+		{
+			allGold=gold+gold2;//元宝余额
+			if(type==1)
+			{
+				game.saveResIO(userID,2,itemID,0,needGold,allGold);//商城type1(type,itemID,（0=消耗，1=获得）,count,allGold)
+			}
+			else if(type==2)
+			{
+				game.saveResIO(userID,46,itemID,0,needGold,allGold);//商城type2-优惠礼包(type,itemID,（0=消耗，1=获得）,count,allGold)
+			}
+		}
+
+		//保存
+		user.gold2=gold2;
+		user.gold=gold;
+		json.buyMap[goods]=buyMap[goods];
+		
+		//商城购物次数
+		dailyTask=json.dailyTask;
+		dailyTask.buyCount+=1;
+		
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,buyMap[goods],gold,gold2,itemID,dailyTask.buyCount)
+			
+		);
+		return(1);//修改
+		
+	##.,
+	
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

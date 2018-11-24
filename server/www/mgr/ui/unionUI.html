@@ -1,0 +1,67 @@
+<style>
+#unionUI_pannel{
+	position:fixed;
+	width:100%;
+	top:25px;
+}
+#unionUI_unionListView{
+	position:fixed;
+	width:100%;
+	top:50px;
+	bottom:25px;
+	overflow:auto;
+}
+#unionUI_unionListView table{
+	width:100%;
+}
+#unionUI_unionListView td{
+	height:50px;
+	border-bottom:1px solid;
+	text-align:center;
+	vertical-align:middle;
+}
+#unionUI_unionListView table tbody tr:first-child{
+	background:#cccccc;
+}
+#unionUI_unionListView table tbody tr{
+	background:#eeeeee;
+}
+#unionUI table:first-child{
+	width:100%;
+}
+</style>
+
+<div id="unionUI">
+	<div id="unionUI_pannel">
+    	<input id="unionUI_name" size="10" placeholder="名称" />
+        <input id="unionUI_unionID" size="10" placeholder="联盟ID" />
+        <button id="unionUI_queryBtn">查询</button>
+    </div>
+	<div id="unionUI_unionListView">无联盟数据</div>
+</div>
+
+<div id="editUnionUI" class="am-modal am-modal-loading am-modal-no-btn" tabindex="-1">
+  <div class="am-modal-dialog">
+    <div class="am-modal-hd">编辑联盟
+      <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+    </div>
+    <div class="am-modal-bd">
+    	<div id="editUnionUI_jsonEditor" style="height:500px;"></div>
+	<br />
+	<button id="editUnionUI_saveBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<div id="editUnionJsonUI" class="am-modal am-modal-loading am-modal-no-btn" tabindex="-1">
+  <div class="am-modal-dialog">
+    <div class="am-modal-hd">编辑联盟json
+      <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+    </div>
+    <div class="am-modal-bd">
+    	<div id="editUnionJsonUI_jsonEditor" style="height:500px;"></div>
+	<br />
+	<button id="editUnionJsonUI_saveBtn">保存</button>
+    </div>
+  </div>
+</div>

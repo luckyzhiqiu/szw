@@ -1,0 +1,23 @@
+"api/init.aks"();
+
+str="";//str="userID 已打关卡数 当前主线任务ID\r\n";
+cnn=mysqlCnn("s6.szw.jingyuyouxi.net",3306,"szwgsuser","jy_szw_GAME89XOK23CM4KCMhhJSKb","game_jipin_6");
+sql="select id,chapterID,barrierID,sceneID,json from user";
+rs=mysqlCreateRs(cnn,sql);
+while(mysqlNextRow(rs))
+{
+	userID=mysqlGetColVal(rs,0);//userID
+	chapterID=number(mysqlGetColVal(rs,1));
+	barrierID=number(mysqlGetColVal(rs,2));
+	sceneID=number(mysqlGetColVal(rs,3));
+	debug(chapterID+","+barrierID+","+sceneID);
+	//score=(chapterID*7+barrierID)*8+sceneID;//已打关卡数
+	json=mysqlGetColVal(rs,4);
+	uJson=json_decode(json);
+	mainTaskID=uJson.mainTask.id;//当前主线任务ID
+
+	str+=userID+"\t"+chapterID+"\t"+barrierID+"\t"+sceneID+"\t"+mainTaskID+"\r\n";
+}
+mysqlDestroyRs(rs);
+file_put_contents("1.txt",str);
+trace("ok");

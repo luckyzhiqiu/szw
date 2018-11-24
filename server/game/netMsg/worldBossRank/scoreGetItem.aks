@@ -1,0 +1,112 @@
+//白夜缉凶[世界Boss]-积分兑换物品®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+rowId=netMsg[3];//ID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID,rowId;
+		itemTable=game.table.worldBossChange;
+		tableLength=itemTable.size();
+		if(rowId>tableLength)
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)//非法参数
+			);
+			return(0);//不修改
+		}
+		itemRow=itemTable.getRowFromColName("id",rowId);
+		itemId=number(itemRow.getValFromColName("itemID"));//item
+		cutScore=number(itemRow.getValFromColName("costPoint"));//score
+		limit=number(itemRow.getValFromColName("limit"));//LE
+		json=json_decode(user.json);
+		jsonExt=json_decode(user.jsonExt);
+		worldBossScore=number(user.worldBossScore);//世界BOSS兑换积分
+		if(worldBossScore<cutScore)
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)//积分不足
+			);
+			return(0);//不修改
+		}
+		worldBoss=jsonExt.worldBoss;
+		itemMap=worldBoss.itemMap;//兑换信息字典
+		
+		worldBossScore-=cutScore;
+		if(exist(itemMap,itemId))//存在
+		{
+			if(itemMap[itemId]>=limit)
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)//物品已下架
+				);
+				return(0);//不修改
+			}
+			itemMap[itemId]+=1;
+		}
+		else//不存在
+		{
+			itemMap[itemId]=1;
+		}
+		itemDic=json.item;
+		numMgr=game.numMgr;
+		//保存
+		user.worldBossScore=worldBossScore;
+		jsonExt.worldBoss.itemMap=itemMap;
+		numMgr.addItem(itemId,1,itemDic);
+		user.jsonExt=json_encode(jsonExt);
+		user.json=json_encode(json);
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,itemMap)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

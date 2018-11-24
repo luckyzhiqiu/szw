@@ -1,0 +1,181 @@
+//百废待兴活动排行榜-获取物品®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+activityMgr=game.activityMgr;
+activityStatus=activityMgr.getBuildActivityStatus();
+if(activityStatus!=2)//不在活动领取状态
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();			
+}
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID;
+		//获取
+		rankName=game.gameConfig.name+"_buildActivityRank";//排行榜名称
+		isGet=user.buildActivityRecvSign;//奖励领取标记
+		rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+		//自己的排名0开始
+		rankID=-1;
+		@try
+			rankID=redis_zrevrank(rd,rankName,userID);
+		@catch
+			rankID=-1;//未上榜
+		@catch.
+		
+		if(rankID<0) 
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//没上榜-排名
+		}
+		//自己排名
+		myRankId=rankID+1; 
+		if(myRankId<1 && myRankId>200) 
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//没在领取物品排名之内
+		}
+		if(isGet!=0)
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-5)
+			);
+			return(0);//以领取
+		}
+		table=game.table;//
+		buildEventRankTable=table.buildEventRank;//表
+		num=buildEventRankTable.size();
+		eventXID=0;
+		i=0;while(i<num)
+		{
+			row=buildEventRankTable.getRow(i);
+			beginRank=number(row.getValFromColName("beginRank"));//开始名次
+			endRank=number(row.getValFromColName("endRank"));//结束名次
+			if(beginRank<=myRankId && myRankId<=endRank)
+			{
+				eventXID=i+1;
+			}
+			++i;
+		}
+		numMgr=game.numMgr;
+		eventXrow=buildEventRankTable.getRowFromColName("id",eventXID);
+		getMoney=number(eventXrow.getValFromColName("money"));//银两
+		getFood=number(eventXrow.getValFromColName("food"));//粮草
+		getSoldier=number(eventXrow.getValFromColName("soldier"));//士兵
+		getGold=number(eventXrow.getValFromColName("gold"));//元宝
+		item=eventXrow.getValFromColName("item");//物品
+		arr=split(arr(),item,",");
+		getItem=size(arr);//物品
+		
+		money=number(user.money);//银两
+		food=number(user.food);//粮草
+		soldier=number(user.soldier);//兵力
+		gold2=number(user.gold2);//元宝（赠送）
+		json=json_decode(user.json);
+		itemDict=json.item;
+		
+		//保存
+		if(getMoney!=0)
+		{
+			money+=getMoney;
+			user.money=money;
+		}
+		else if(getFood!=0)
+		{
+			food+=getFood;
+			user.food=food;
+		}
+		else if(getSoldier!=0)
+		{
+			soldier+=getSoldier;
+			user.soldier=soldier;
+		}
+		else if(getGold!=0)
+		{
+			gold2+=getGold;
+			if(gold2!=0)
+			{
+				user.gold2=gold2;
+			}
+			
+		}
+		else if(getItem!=0)
+		{
+			i=0;
+			while(i<getItem)
+			{
+				itemID=arr[i];
+				itemCount=number(arr[i+1]);
+				numMgr.addItem(itemID,itemCount,itemDict);
+				i+=2;
+			}
+		}
+		
+		
+		user.buildActivityRecvSign=1;
+		
+		user.json=json_encode(json);
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,eventXID)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

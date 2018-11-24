@@ -1,0 +1,8 @@
+//世界聊天转发
+<game,netMsg>
+// debug(netMsg);
+userIDMap=netMsg[10];
+userID=netMsg[11];
+remove(netMsg,10);
+remove(netMsg,11);
+game.sendMsgToAnyUser(netMsg,userIDMap,userID);

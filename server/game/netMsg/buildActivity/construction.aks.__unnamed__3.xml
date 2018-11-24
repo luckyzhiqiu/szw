@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t111">60</v>
+<v t="n" n="__sys__t110">60</v>
+<v t="n" n="__sys__t79">40</v>
+<v t="n" n="__sys__t78">40</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="s" n="__sys__t3">.methodName.</v>
+<v t="s" n="__sys__t4">.sessionID.</v>
+<v t="s" n="__sys__t5">.bulidNum.</v>
+<v t="s" n="__sys__t6">.buildNumTotal.</v>
+<v t="s" n="__sys__t7">.user.</v>
+<v t="s" n="__sys__t8">.point.</v>
+<v t="s" n="__sys__t9">.passResulf.</v>
+<v t="n" n="__sys__t10">0</v>
+<v t="s" n="__sys__t11">.buildNumAll.</v>
+<v t="n" n="__sys__t12">0</v>
+<v t="n" n="__sys__t13">4</v>
+<v t="n" n="__sys__t14">0</v>
+<v t="n" n="__sys__t15">0</v>
+<v t="n" n="__sys__t16">0</v>
+<v t="n" n="__sys__t17">0</v>
+<v t="s" n="__sys__t18">.union.</v>
+<v t="s" n="__sys__t19">.id.</v>
+<v t="s" n="__sys__t20">.*.</v>
+<v t="s" n="__sys__t21">.@__unnamed__0.</v>
+<v t="s" n="__sys__t22">.@__unnamed__1.</v>
+<v t="s" n="__sys__t23">.@__unnamed__2.</v>
+<v t="n" n="__sys__t24">1000</v>
+<v t="n" n="__sys__t25">1</v>
+<o n="input"><o>__sys__t26</o><i>__sys__t1</i></o>
+<o n="="><o>global</o><i>__sys__t26</i></o>
+<o n="input"><o>__sys__t28</o><i>__sys__t2</i></o>
+<o n="="><o>game</o><i>__sys__t28</i></o>
+<o n="link" r="30"><o>__sys__t30</o><i>__sys__t3</i></o>
+<o n="=" r="30"><o>methodName</o><i>__sys__t30</i></o>
+<o n="link" r="30"><o>__sys__t32</o><i>__sys__t4</i></o>
+<o n="=" r="30"><o>sessionID</o><i>__sys__t32</i></o>
+<o n="link" r="30"><o>__sys__t34</o><i>__sys__t5</i></o>
+<o n="=" r="30"><o>bulidNum</o><i>__sys__t34</i></o>
+<o n="link" r="30"><o>__sys__t36</o><i>__sys__t6</i></o>
+<o n="=" r="30"><o>buildNumTotal</o><i>__sys__t36</i></o>
+<o n="link" r="30"><o>__sys__t38</o><i>__sys__t7</i></o>
+<o n="=" r="30"><o>user</o><i>__sys__t38</i></o>
+<o n="link" r="30"><o>__sys__t40</o><i>__sys__t8</i></o>
+<o n="=" r="30"><o>point</o><i>__sys__t40</i></o>
+<o n="link" r="30"><o>__sys__t42</o><i>__sys__t9</i></o>
+<o n="=" r="30"><o>passResulf</o><i>__sys__t42</i></o>
+<v t="s" n="__sys__t45">.json.</v>
+<o n="." r="33"><o>__sys__t44</o><i>global</i><i>__sys__t45</i></o>
+<o n="json_decode" r="33"><o>__sys__t47</o><i>__sys__t44</i></o>
+<o n="=" r="33"><o>globalJson</o><i>__sys__t47</i></o>
+<v t="s" n="__sys__t50">.buildVal.</v>
+<o n="." r="34"><o>__sys__t49</o><i>globalJson</i><i>__sys__t50</i></o>
+<o n="=" r="34"><o>buildVal</o><i>__sys__t49</i></o>
+<v t="s" n="__sys__t54">.table.</v>
+<o n="." r="36"><o>__sys__t53</o><i>game</i><i>__sys__t54</i></o>
+<v t="s" n="__sys__t57">.buildEvent.</v>
+<o n="." r="36"><o>__sys__t56</o><i>__sys__t53</i><i>__sys__t57</i></o>
+<v t="s" n="__sys__t60">.getRow.</v>
+<o n="." r="36"><o>__sys__t59</o><i>__sys__t56</i><i>__sys__t60</i></o>
+<o n="__sys__t59" r="36"><o>__sys__t62</o><i>__sys__t56</i><i>__sys__t10</i></o>
+<o n="=" r="36"><o>rowBE</o><i>__sys__t62</i></o>
+<v t="s" n="__sys__t65">.getValFromColName.</v>
+<o n="." r="37"><o>__sys__t64</o><i>rowBE</i><i>__sys__t65</i></o>
+<o n="__sys__t64" r="37"><o>__sys__t67</o><i>rowBE</i><i>__sys__t11</i></o>
+<o n="number" r="37"><o>__sys__t68</o><i>__sys__t67</i></o>
+<o n="=" r="37"><o>buildNumAll</o><i>__sys__t68</i></o>
+<o n=">=" r="38"><o>__sys__t70</o><i>buildVal</i><i>buildNumAll</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t70</i></o>
+<o n="=="><o>__sys__t72</o><i>__sys__rt</i><i>__sys__t12</i></o>
+<o n="if_goto"><o>__sys__t73</o><i>__sys__t72</i><i>__sys__t78</i></o>
+<o n=" -" r="40"><o>__sys__t74</o><i>__sys__t13</i></o>
+<o n="=" r="40"><o>passResulf</o><i>__sys__t74</i></o>
+<o n="return" r="41"><o>__sys__t76</o><i>__sys__t14</i></o>
+<o n="goto"><o>__sys__t77</o><i>__sys__t79</i></o>
+<o n="+=" r="44"><o>buildVal</o><i>bulidNum</i></o>
+<o n="limit" r="45"><o>__sys__t81</o><i>buildVal</i><i>__sys__t15</i><i>buildNumAll</i></o>
+<o n="=" r="45"><o>buildNumTotal</o><i>__sys__t81</i></o>
+<v t="s" n="__sys__t84">.buildVal.</v>
+<o n="." r="46"><o>__sys__t83</o><i>globalJson</i><i>__sys__t84</i></o>
+<o n="=" r="46"><o>__sys__t83</o><i>buildNumTotal</i></o>
+<v t="s" n="__sys__t88">.unionID.</v>
+<o n="." r="49"><o>__sys__t87</o><i>user</i><i>__sys__t88</i></o>
+<o n="int" r="49"><o>__sys__t90</o><i>__sys__t87</i></o>
+<o n="=" r="49"><o>unionID</o><i>__sys__t90</i></o>
+<o n=">" r="50"><o>__sys__t92</o><i>unionID</i><i>__sys__t16</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t92</i></o>
+<o n="=="><o>__sys__t94</o><i>__sys__rt</i><i>__sys__t17</i></o>
+<o n="if_goto"><o>__sys__t95</o><i>__sys__t94</i><i>__sys__t110</i></o>
+<v t="s" n="__sys__t97">.rd.</v>
+<o n="." r="52"><o>__sys__t96</o><i>game</i><i>__sys__t97</i></o>
+<v t="s" n="__sys__t100">.updateRow.</v>
+<o n="." r="52"><o>__sys__t99</o><i>__sys__t96</i><i>__sys__t100</i></o>
+<v t="s" n="__sys__t103">.cnn.</v>
+<o n="." r="54"><o>__sys__t102</o><i>game</i><i>__sys__t103</i></o>
+<o n="full"><o>__sys__t105</o><i>__sys__t21</i></o>
+<o n="full"><o>__sys__t106</o><i>__sys__t22</i></o>
+<o n="full"><o>__sys__t107</o><i>__sys__t23</i></o>
+<o n="__sys__t99" r="52"><o>__sys__t108</o><i>__sys__t96</i><i>__sys__t102</i><i>__sys__t18</i><i>__sys__t19</i><i>unionID</i><i>__sys__t20</i><i>__sys__t105</i><i>__sys__t106</i><i>__sys__t107</i><i>game</i><i>__sys__t24</i></o>
+<o n="goto"><o>__sys__t109</o><i>__sys__t111</i></o>
+<v t="s" n="__sys__t113">.json.</v>
+<o n="." r="86"><o>__sys__t112</o><i>global</i><i>__sys__t113</i></o>
+<o n="json_encode" r="86"><o>__sys__t115</o><i>globalJson</i></o>
+<o n="=" r="86"><o>__sys__t112</o><i>__sys__t115</i></o>
+<o n="return" r="87"><o>__sys__t117</o><i>__sys__t25</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t102" />
+<v n="__sys__t105" />
+<v n="__sys__t106" />
+<v n="__sys__t107" />
+<v n="__sys__t108" />
+<v n="__sys__t109" />
+<v n="__sys__t112" />
+<v n="__sys__t115" />
+<v n="__sys__t117" />
+<v n="__sys__t26" />
+<v n="__sys__t28" />
+<v n="__sys__t30" />
+<v n="__sys__t32" />
+<v n="__sys__t34" />
+<v n="__sys__t36" />
+<v n="__sys__t38" />
+<v n="__sys__t40" />
+<v n="__sys__t42" />
+<v n="__sys__t44" />
+<v n="__sys__t47" />
+<v n="__sys__t49" />
+<v n="__sys__t53" />
+<v n="__sys__t56" />
+<v n="__sys__t59" />
+<v n="__sys__t62" />
+<v n="__sys__t64" />
+<v n="__sys__t67" />
+<v n="__sys__t68" />
+<v n="__sys__t70" />
+<v n="__sys__t72" />
+<v n="__sys__t73" />
+<v n="__sys__t74" />
+<v n="__sys__t76" />
+<v n="__sys__t77" />
+<v n="__sys__t81" />
+<v n="__sys__t83" />
+<v n="__sys__t87" />
+<v n="__sys__t90" />
+<v n="__sys__t92" />
+<v n="__sys__t94" />
+<v n="__sys__t95" />
+<v n="__sys__t96" />
+<v n="__sys__t99" />
+<v n="buildNumAll" />
+<v n="buildNumTotal" />
+<v n="buildVal" />
+<v n="bulidNum" />
+<v n="game" />
+<v n="global" />
+<v n="globalJson" />
+<v n="methodName" />
+<v n="passResulf" />
+<v n="point" />
+<v n="rowBE" />
+<v n="sessionID" />
+<v n="unionID" />
+<v n="user" />
+</script>

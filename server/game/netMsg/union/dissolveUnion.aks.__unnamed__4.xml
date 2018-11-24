@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t68">39</v>
+<v t="n" n="__sys__t67">39</v>
+<v t="n" n="__sys__t51">28</v>
+<v t="n" n="__sys__t50">28</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="s" n="__sys__t3">.unionID.</v>
+<v t="s" n="__sys__t4">.rID.</v>
+<v t="n" n="__sys__t5">0</v>
+<v t="s" n="__sys__t6">.id.</v>
+<v t="s" n="__sys__t7">.belong.</v>
+<v t="n" n="__sys__t8">0</v>
+<v t="n" n="__sys__t9">1</v>
+<o n="input"><o>__sys__t10</o><i>__sys__t1</i></o>
+<o n="="><o>uRichman</o><i>__sys__t10</i></o>
+<o n="input"><o>__sys__t12</o><i>__sys__t2</i></o>
+<o n="="><o>game</o><i>__sys__t12</i></o>
+<o n="link" r="70"><o>__sys__t14</o><i>__sys__t3</i></o>
+<o n="=" r="70"><o>unionID</o><i>__sys__t14</i></o>
+<o n="link" r="70"><o>__sys__t16</o><i>__sys__t4</i></o>
+<o n="=" r="70"><o>rID</o><i>__sys__t16</i></o>
+<v t="s" n="__sys__t19">.unionID.</v>
+<o n="." r="71"><o>__sys__t18</o><i>uRichman</i><i>__sys__t19</i></o>
+<o n="number" r="71"><o>__sys__t21</o><i>__sys__t18</i></o>
+<o n="=" r="71"><o>unionIDR</o><i>__sys__t21</i></o>
+<o n="==" r="72"><o>__sys__t23</o><i>unionIDR</i><i>unionID</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t23</i></o>
+<o n="=="><o>__sys__t25</o><i>__sys__rt</i><i>__sys__t5</i></o>
+<o n="if_goto"><o>__sys__t26</o><i>__sys__t25</i><i>__sys__t50</i></o>
+<v t="s" n="__sys__t28">.table.</v>
+<o n="." r="74"><o>__sys__t27</o><i>game</i><i>__sys__t28</i></o>
+<v t="s" n="__sys__t31">.allianceNoble.</v>
+<o n="." r="74"><o>__sys__t30</o><i>__sys__t27</i><i>__sys__t31</i></o>
+<o n="=" r="74"><o>allianceNobleTable</o><i>__sys__t30</i></o>
+<v t="s" n="__sys__t35">.getRowFromColName.</v>
+<o n="." r="75"><o>__sys__t34</o><i>allianceNobleTable</i><i>__sys__t35</i></o>
+<o n="__sys__t34" r="75"><o>__sys__t37</o><i>allianceNobleTable</i><i>__sys__t6</i><i>rID</i></o>
+<o n="=" r="75"><o>rowAN</o><i>__sys__t37</i></o>
+<v t="s" n="__sys__t40">.getValFromColName.</v>
+<o n="." r="76"><o>__sys__t39</o><i>rowAN</i><i>__sys__t40</i></o>
+<o n="__sys__t39" r="76"><o>__sys__t42</o><i>rowAN</i><i>__sys__t7</i></o>
+<o n="number" r="76"><o>__sys__t43</o><i>__sys__t42</i></o>
+<o n="=" r="76"><o>belong</o><i>__sys__t43</i></o>
+<v t="s" n="__sys__t46">.unionID.</v>
+<o n="." r="77"><o>__sys__t45</o><i>uRichman</i><i>__sys__t46</i></o>
+<o n="=" r="77"><o>__sys__t45</o><i>belong</i></o>
+<o n="goto"><o>__sys__t49</o><i>__sys__t51</i></o>
+<v t="s" n="__sys__t53">.json.</v>
+<o n="." r="80"><o>__sys__t52</o><i>uRichman</i><i>__sys__t53</i></o>
+<o n="json_decode" r="80"><o>__sys__t55</o><i>__sys__t52</i></o>
+<o n="=" r="80"><o>urJson</o><i>__sys__t55</i></o>
+<v t="s" n="__sys__t58">.unionFriendMap.</v>
+<o n="." r="81"><o>__sys__t57</o><i>urJson</i><i>__sys__t58</i></o>
+<o n="=" r="81"><o>unionFriendMap</o><i>__sys__t57</i></o>
+<o n="exist" r="83"><o>__sys__t61</o><i>unionFriendMap</i><i>unionID</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t61</i></o>
+<o n="=="><o>__sys__t63</o><i>__sys__rt</i><i>__sys__t8</i></o>
+<o n="if_goto"><o>__sys__t64</o><i>__sys__t63</i><i>__sys__t67</i></o>
+<o n="remove" r="85"><o>__sys__t65</o><i>unionFriendMap</i><i>unionID</i></o>
+<o n="goto"><o>__sys__t66</o><i>__sys__t68</i></o>
+<v t="s" n="__sys__t70">.json.</v>
+<o n="." r="87"><o>__sys__t69</o><i>uRichman</i><i>__sys__t70</i></o>
+<o n="json_encode" r="87"><o>__sys__t72</o><i>urJson</i></o>
+<o n="=" r="87"><o>__sys__t69</o><i>__sys__t72</i></o>
+<o n="return" r="89"><o>__sys__t74</o><i>__sys__t9</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t10" />
+<v n="__sys__t12" />
+<v n="__sys__t14" />
+<v n="__sys__t16" />
+<v n="__sys__t18" />
+<v n="__sys__t21" />
+<v n="__sys__t23" />
+<v n="__sys__t25" />
+<v n="__sys__t26" />
+<v n="__sys__t27" />
+<v n="__sys__t30" />
+<v n="__sys__t34" />
+<v n="__sys__t37" />
+<v n="__sys__t39" />
+<v n="__sys__t42" />
+<v n="__sys__t43" />
+<v n="__sys__t45" />
+<v n="__sys__t49" />
+<v n="__sys__t52" />
+<v n="__sys__t55" />
+<v n="__sys__t57" />
+<v n="__sys__t61" />
+<v n="__sys__t63" />
+<v n="__sys__t64" />
+<v n="__sys__t65" />
+<v n="__sys__t66" />
+<v n="__sys__t69" />
+<v n="__sys__t72" />
+<v n="__sys__t74" />
+<v n="allianceNobleTable" />
+<v n="belong" />
+<v n="game" />
+<v n="rID" />
+<v n="rowAN" />
+<v n="uRichman" />
+<v n="unionFriendMap" />
+<v n="unionID" />
+<v n="unionIDR" />
+<v n="urJson" />
+</script>

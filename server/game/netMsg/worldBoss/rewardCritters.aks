@@ -1,0 +1,147 @@
+//犒赏阶段
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID;
+		jsonExt=json_decode(user.jsonExt);
+		worldBoss=jsonExt.worldBoss;
+		
+		tableData=game.table;
+		worldBossTable=tableData.worldBoss;
+		rowWB=worldBossTable.getRow(0);
+		dayBt=strtotime(split(arr(),now()," ")[0]);//今天的开始时间（秒）
+		btDay=rowWB.getValFromColName("bt");
+		dtDay=rowWB.getValFromColName("dt");
+		bt=dateStrToSeconds(btDay);//开放时间
+		dt=dateStrToSeconds(dtDay);//结束时间
+		ct=time();
+		if(ct<(dayBt+bt) || ct>(dayBt+dt))//不在侦查探案时间
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		
+		status=worldBoss.status;
+		if(status==3)//已犒赏
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		monHeroMap=worldBoss.monHeroMap;//日场豪杰上阵字典，heroIndex存在时代表上阵过//monHeroMap[heroIndex]=1;
+		mHMCount=size(monHeroMap);
+		
+		json=json_decode(user.json);
+		heroArr=json.hero;
+		heroCount=size(heroArr);
+		if(mHMCount<heroCount)//还有豪杰未出战
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+		
+		heroIDArr=arr();
+		i=0;
+		while(i<heroCount)
+		{
+			push(heroIDArr,heroArr[i].heroID);
+			++i;
+		}
+
+		endRewardNum=number(rowWB.getValFromColName("endRewardNum"));//犒赏豪杰个数
+		j=0;
+		rewardHeroDict=dict();
+		while(j<endRewardNum)
+		{
+			endRewardEXPMin=number(rowWB.getValFromColName("endRewardEXPMin"));//犒赏资质经验最小值
+			endRewardEXPMax=number(rowWB.getValFromColName("endRewardEXPMax"));//犒赏资质经验最大值
+			count=size(heroIDArr);
+			if(count==0)
+			{
+				break;
+			}
+			addExp=endRewardEXPMin+rand()%(endRewardEXPMax-endRewardEXPMin);
+			heroIndexSelect=rand()%count;
+			k=0;
+			while(k<heroCount)
+			{
+				hero=heroArr[k];
+				heroID=hero.heroID;
+				if(heroID==heroIDArr[heroIndexSelect])
+				{
+					growsExp=hero.growsExp;
+					hero.growsExp=growsExp+addExp;
+					break;
+				}
+				++k;
+			}
+			rewardHeroDict[heroIDArr[heroIndexSelect]]=addExp;
+			remove(heroIDArr,heroIndexSelect);
+
+			++j;
+		}
+
+		//保存
+		worldBoss.status=3;
+		user.jsonExt=json_encode(jsonExt);
+		user.json=json_encode(json);
+		
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,heroArr,worldBoss.status,rewardHeroDict)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

@@ -1,0 +1,135 @@
+//结束宴会
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link sessionID,methodName;
+		partyBt=number(user.partyBt);//宴会开始时间
+		if(partyBt==0)//宴会未开始
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);
+		}
+		
+		partyBt=number(user.partyBt);//宴会开始时间（秒）：0=未开始；
+		partyType=number(user.partyType);//宴会类型：0=家宴；1=官宴（必须公开）；
+		nowTime=time();
+		
+		tableData=game.table;
+		rowD=tableData.dinner.getRowFromColName("type",partyType);
+		time=number(rowD.getValFromColName("time"));//持续时间（分钟）
+		timeS=time*60;
+		
+		passtime=nowTime-partyBt;
+		
+		if(passtime<timeS)//宴会未结束
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//修改
+		}
+		
+		structMgr=game.structMgr;
+		jsonExt=json_decode(user.jsonExt);
+		party=jsonExt.party;
+		score=party.score;//分数（主办方结算时所得分数）
+		seatArr=party.seatArr;//自己宴会的座位数组（必须初始化为user表中partyNum个位置）
+		partyHistroyArr=party.partyHistroyArr;//宴会历史信息
+
+		str=timetostr(partyBt);
+		joinNum=0;breakNum=0;
+		i=0;seatArrCount=size(seatArr);
+		while(i<seatArrCount)
+		{
+			partySeat=seatArr[i];
+			userIDS=partySeat.userID;
+			if(userIDS!=0)
+			{
+				scoreS=partySeat.score;
+				if(scoreS!=0)
+				{
+					joinNum+=1;
+				}
+				
+				if(scoreS<0)
+				{
+					breakNum+=1;
+				}
+			}
+			++i;
+		}
+		
+		partyHistroy=structMgr_upgradeObj(structMgr,"PartyHistroy",dict());
+		partyHistroy.genTime=str;//开始时间，格式：2018-01-30 15:18:30
+		partyHistroy.type=partyType;//类型：0=家宴；1=官宴（必须公开）；
+		partyHistroy.joinNum=joinNum;//赴宴人数
+		partyHistroy.breakNum=breakNum;//捣乱人数
+		partyHistroy.partyScore=score;//宴会分数
+        partyHistroy.partyMoney=score;//宴会积分
+		push(partyHistroyArr,partyHistroy);
+
+		partyScore=number(user.partyScore);//宴会分数
+		partyMoney=number(user.partyMoney);//宴会积分
+		partyScore+=score;
+		partyMoney+=score;
+
+		//保存
+		user.partyBt=0;
+		user.partyScore=partyScore;
+		user.partyMoney=partyMoney;
+		party.score=0;
+		user.jsonExt=json_encode(jsonExt);
+			
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,user.partyBt,user.partyScore,user.partyMoney,score,seatArr)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

@@ -1,0 +1,198 @@
+//
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+goldType=netMsg[3];//0:不用元宝 1:要用元宝
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID,goldType;
+		
+		
+		jsonExt=json_decode(user.jsonExt);
+		json=json_decode(user.json);
+		
+		
+		party=ref(jsonExt.party);	
+		resMap=ref(party.resMap);
+		
+		resMapUpdateTime=ref(party.resMapUpdateTime);
+		curTime=time_milli();//当前时间
+		gold=ref(user.gold);
+		gold2=ref(user.gold2);
+		
+		dailyTask=ref(json.dailyTask);
+		partyFlushResCount=ref(dailyTask.partyFlushResCount);
+		
+		
+		dinnerConfigRow=game.table.dinnerConfig.getRow(0);
+		needGold=number(dinnerConfigRow.getValFromColName("goldCost"));
+		goldCostIncrease=number(dinnerConfigRow.getValFromColName("goldCostIncrease"));
+		
+		if(partyFlushResCount>0)
+		{
+			needGold=needGold+goldCostIncrease*number(partyFlushResCount);
+		}
+		
+		
+		goldNumMax=number(dinnerConfigRow.getValFromColName("goldNumMax"));
+		autoTime=number(dinnerConfigRow.getValFromColName("autoTime"));
+		
+		
+		
+		
+		
+		
+		if(goldType==1)
+		{
+			if(number(partyFlushResCount)>=goldNumMax)
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-6)//当日兑换刷新上限
+				);
+				return(0);//不修改
+				
+			}
+			partyFlushResCount=number(partyFlushResCount)+1;
+			
+			
+			if(number(gold)+number(gold2)<needGold)
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-5)//gold不足
+				);
+				return(0);//不修改
+				
+			}		
+			
+			if(number(gold)<needGold)
+			{
+				gold2=number(gold2)-(needGold-number(gold));
+				gold=0;
+			}else
+			{
+				gold=number(gold)-needGold;
+			}
+		}else
+		{
+			if(resMapUpdateTime!=0)
+			{		
+				if(resMapUpdateTime>curTime)
+				{
+					//时间未到
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",1,resMapUpdateTime,resMap,gold,gold2,partyFlushResCount)
+					);
+					return(0);
+				}
+						
+			}
+			
+		}
+		
+		
+	
+		resMapUpdateTime=curTime+autoTime*60*1000;
+		
+		
+		tabelData=game.table.dinnerShop;
+		len=tabelData.size();
+		rows=arr();
+		
+		z=0;while(z<len)
+		{
+			push(rows,tabelData.getRow(z));
+			z++;
+		}
+	
+		
+		
+		
+		resMap=dict();
+	
+		
+		j=0;while(j<9)
+		{
+			c=size(rows);
+			nums=arr();
+			
+			i=0;while(i<c)
+			{	
+				push(nums,number(rows[i].getValFromColName("rate")));
+
+				i++;
+			}
+			index=randSelect(nums);
+			
+			push(resMap,rows[index].getValFromColName("id"),0);
+			remove(nums,index);
+			remove(rows,index);
+		
+			
+			j++;
+		}
+		
+		
+		
+		
+		
+			
+		//保存
+		user.json=json_encode(json);
+		user.jsonExt=json_encode(jsonExt);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,resMapUpdateTime,resMap,gold,gold2,partyFlushResCount)
+		);
+		
+		return(1);//修改
+	
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

@@ -1,0 +1,52 @@
+//查询联盟
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+unionID=netMsg[3];//联盟ID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//联盟ID
+unionData=game.rd.getRow(game.cnn,"union","id",unionID,"*",1000);
+if(empty(unionData))//联盟不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}
+
+infoDict=dict();
+
+infoDict["id"]=unionData.id;//联盟名称
+infoDict["name"]=unionData.name;//联盟名称
+infoDict["leaderNickname"]=unionData.leaderNickname;//联盟盟主
+infoDict["effect"]=unionData.effect;//联盟影响力
+infoDict["power"]=unionData.power;//联盟势力
+infoDict["peopleNum"]=unionData.peopleNum;//联盟人数
+infoDict["peopleNumMax"]=number(unionData.peopleNumMax);//联盟最大人数
+infoDict["qq"]=unionData.qq;//联盟QQ群
+infoDict["remark"]=unionData.remark;//联盟宣言
+infoDict["level"]=unionData.level;//联盟等级
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,infoDict)
+);
+	
+	

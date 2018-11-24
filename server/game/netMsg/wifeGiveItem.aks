@@ -1,0 +1,199 @@
+//红颜赏赐
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+itemID=int(netMsg[3]);//道具ID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,netMsg,itemID;
+		json=json_decode(user.json);
+		itemDict=json.item;
+		numMgr=game.numMgr;
+		tableData=game.table;
+		row=tableData.item.getRowFromColName("id",itemID);
+		type=number(row.getValFromColName("type"));//道具类型
+		if(type!=1 && type!=2 && type!=3)//类型必须为123
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+		
+		num=numMgr.subItem(itemID,1,itemDict);//返回数量
+		if(num==-1)//数量不足扣除失败
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-5)
+			);
+			return(0);//不修改
+		}
+		
+		achievement=json.achievement;
+		useItemMap=achievement.useItemMap;
+		limitTask=json.limitTask;
+		intimate=0;beauty=0;
+		tableData=game.table;
+		if(type==2)
+		{
+			limitTask.useItem4+=1;
+			row=tableData.level.getRowFromColName("level",user.level);
+			wifeCount=number(row.getValFromColName("wife"));//红颜次数
+			
+			rowVip=tableData.vip.getRowFromColName("level",user.vip);
+			if(!empty(rowVip))//是否为vip
+			{
+				randomFuck=number(rowVip.getValFromColName("randomFuck"));
+				wifeCount+=randomFuck;//VIP等级红颜次数（上限加成）
+			}
+		
+			nowTime=time_milli();//现在的时间
+			json.wifeRandomFuck.beginTime=nowTime-wifeCount*1000*1800;//红颜随机宠幸开始时间//恢复最大次数
+			
+			//道具使用次数字典itemID=4
+			if(exist(useItemMap,itemID))
+			{
+				useItemMap[itemID]+=1;
+			}
+			else
+			{
+				useItemMap[itemID]=1;
+			}
+		}
+		else if(type==1 || type==3)
+		{
+			wifeDict=json.wife;
+			wifeID=int(netMsg[4]);//红颜ID
+			
+			if(!exist(wifeDict,wifeID))//红颜ID无效
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-2)
+				);
+				return(0);//不修改
+			}
+
+			wife=wifeDict[wifeID];
+			intimateU=wife.intimate;
+			beautyU=wife.beauty;
+			
+			rowW=tableData.wifeConfigure.getRow(0);
+			intimateMax=number(rowW.getValFromColName("intimateMax"));//亲密度上限
+			charmMax=number(rowW.getValFromColName("charmMax"));//魅力上限
+			
+			intimate=number(row.getValFromColName("intimate"));//道具亲密度
+			beauty=number(row.getValFromColName("beauty"));//道具魅力
+			if(type==1)
+			{
+				if(intimateU<intimateMax)
+				{
+					intimateU+=intimate;//红颜亲密度
+					beautyU+=beauty;//红颜魅力
+					intimateU=limit(intimateU,0,intimateMax);
+					beautyU=limit(beautyU,0,charmMax);
+				}
+				else//亲密度已达到上限
+				{
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",2)
+					);
+					return(0);//修改
+				}
+			}
+			else if(type==3)
+			{
+				if(beautyU<charmMax)
+				{
+					intimateU+=intimate;//红颜亲密度
+					beautyU+=beauty;//红颜魅力
+					intimateU=limit(intimateU,0,intimateMax);
+					beautyU=limit(beautyU,0,charmMax);
+				}
+				else
+				{
+					//魅力值已达到上限
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",3)
+					);
+					return(0);//修改
+				}
+			}
+			
+			wife.intimate=intimateU;
+			wife.beauty=beautyU;
+			
+			numMgr.computeUserWifeProperty(user,wifeDict);//计算user红颜数值
+			//红颜技能加成计算
+			hero=json.hero[0];
+			numMgr.computeHero(hero,json);
+			numMgr.computeUser(user,json);
+		}
+
+		//保存
+		wifePlus=json.wifePlus;
+		
+		power=user.power;
+		strength=user.strength;
+		wisdom=user.wisdom;
+		charm=user.charm;
+		politics=user.politics;
+		
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,intimate,beauty,num,json.wifeRandomFuck.beginTime,limitTask.useItem4,useItemMap,hero,wifePlus,power,strength,wisdom,charm,politics)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

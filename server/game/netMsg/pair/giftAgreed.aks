@@ -1,0 +1,241 @@
+//赐亲
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+myChildID=netMsg[3];//我的孩子id
+
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+
+
+	//修改行数据
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link methodName,sessionID,userID,myChildID;
+			
+			json=json_decode(user.json);
+			achievement=ref(json.achievement);
+			jsonExt=json_decode(user.jsonExt);
+			pairSys=ref(jsonExt.pairSys);
+			childArr=ref(pairSys.children);
+			pairArr=ref(pairSys.pairArr);
+	
+			hadChild=0;
+			
+			
+			
+			
+			c=size(childArr);
+			i=0;while(i<c){
+				if(childArr[i].id==myChildID)
+				{
+					hadChild=1;
+					if(childArr[i].targetUserID!=-1)
+					{
+						//回复已提过亲不能赐亲
+						game.sendMsg
+						(
+							sessionID,
+							arr(methodName+"Result",-2)
+						);
+						return(0);	
+					}
+					
+					
+					// childConfigureTable=game.table.childConfigure.getRow(0);
+					// itemID=childConfigureTable.getValFromColName("talentMarrigeCost"+childArr[i].grows);
+					
+					// if(game.numMgr.subItem(itemID,1,itemDict)==-1)
+					// {
+						// //道具不足
+						// game.sendMsg
+						// (
+							// sessionID,
+							// arr(methodName+"Result",5)
+						// );
+						// return(0);	
+						
+					// }
+					grows=clone(childArr[i].grows);
+					if(grows+1<=6)
+					{
+						grows++;
+					}
+					
+					childConfigureTable=game.table.childConfigure.getRow(0);
+					needGold=childConfigureTable.getValFromColName("goldMarrigeCost"+childArr[i].grows);
+					
+					gold=ref(user.gold);
+					gold2=ref(user.gold2);
+					
+					if(number(gold)+number(gold2)<needGold)
+					{
+						//回复
+						game.sendMsg
+						(
+							sessionID,
+							arr(methodName+"Result",-5)//gold不足
+						);
+						return(0);//不修改
+						
+					}
+					
+					if(number(gold)<number(needGold))
+					{
+						gold2=number(gold2)-(number(needGold)-number(gold));
+						gold=0;
+					}else
+					{
+						gold=number(gold)-number(needGold);
+					}
+					
+					maxNum=number(childConfigureTable.getValFromColName("goldMarrigeMax"+grows));
+					minNum=number(childConfigureTable.getValFromColName("goldMarrigeMin"+grows));
+					add_strength=random(maxNum,minNum);
+					add_wisdom=random(maxNum,minNum);
+					add_charm=random(maxNum,minNum);
+					add_politics=random(maxNum,minNum);
+				
+					user.strengthAdd3=number(user.strengthAdd3)+add_strength;
+					user.wisdomAdd3=number(user.wisdomAdd3)+add_wisdom;
+					user.charmAdd3=number(user.charmAdd3)+add_charm;
+					user.politicsAdd3=number(user.politicsAdd3)+add_politics;	
+					
+					
+					
+				
+					
+					table=game.table;
+					name1Table=table.name1;
+					name1Num=name1Table.size();
+					name1=rand()%name1Num;
+					surname=name1Table.getRow(name1).getValFromColName("name1");//姓
+					surname2="大人";
+					
+					pairChild2=dict(); //对方
+					
+					
+					if(number(childArr[i].sex)==0)
+					{
+						
+						name2Table=table.name2;
+						name2Num=name2Table.size();
+						name2=rand()%name2Num;
+						name=name2Table.getRow(name2).getValFromColName("male");//男名
+						
+						pairChild2["name2"]="公子 "+name;
+						pairChild2["sex2"]=1;
+						
+						// name2=rand()%name2Num;
+						// surname2=name2Table.getRow(name2).getValFromColName("male");//男名
+					}else
+					{
+						name3Table=table.name3;
+						name3Num=name3Table.size();
+						name3=rand()%name3Num;
+						name=name3Table.getRow(name3).getValFromColName("female");//女名
+						
+						pairChild2["name2"]="千金 "+name;
+						pairChild2["sex2"]=0;
+						
+						// name3=rand()%name3Num;
+						// surname2=name3Table.getRow(name3).getValFromColName("female");//女名
+					}
+					
+					pairChild2["grows2"]=grows;
+					pairChild2["num2"]=add_strength+add_wisdom+add_charm+add_politics;
+					
+					pairChild2["name"]=childArr[i].name;
+					pairChild2["sex"]=childArr[i].sex;
+					pairChild2["grows"]=childArr[i].grows;
+					pairChild2["num"]=number(childArr[i].strengthTotal)+number(childArr[i].wisdomTotal)+number(childArr[i].charmTotal)+number(childArr[i].politicsTotal);
+					pairChild2["nickname"]=surname+surname2;
+					pairChild2["time"]=time();
+					
+					
+						
+					
+					push(pairArr,pairChild2);
+					remove(childArr,i);
+					achievement.marryCount+=1;
+					
+					//增加联姻次数和刷新联姻冲榜
+					addAndUpdateMarryRank(game,user);
+					
+					break;
+				}		
+				i++;			
+			}	
+			if(hadChild==0)
+			{
+				//回复孩子不存在
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",4)
+				);
+				return(0);
+				
+			}
+			game.numMgr.computeUser(user,json);
+			
+			//限时任务//联姻次数
+			limitTask=json.limitTask;
+			limitTask.pairCount+=1;
+			
+			//保存
+			user.json=json_encode(json);
+			user.jsonExt=json_encode(jsonExt);
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,achievement.marryCount,limitTask.pairCount,user.power,pairArr,pairChild2,gold,gold2)
+			);
+			
+			return(1);//修改
+		
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	
+		
+
+
+
+
+
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}

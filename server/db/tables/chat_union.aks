@@ -1,0 +1,13 @@
+//联盟聊天日志表（每天一个表）
+mysqlCol("key","id");
+mysqlCol("datetime","genTime");//生成时间
+mysqlCol("int","userID",0);//用户ID（0=系统信息）
+mysqlCol("int","type",0);//类型：0=普通；1=开启BOSS；2=杀死BOSS；
+mysqlCol("varchar","nickname");//玩家昵称
+mysqlCol("int","vip",0);//vip
+mysqlCol("int","level",0);//等级
+mysqlCol("int","fashionID",0);//时装ID
+mysqlCol("int","head",0);//头像
+mysqlCol("varchar","txt");//聊天文本
+mysqlCol("int","unionID",0);//联盟ID
+mysqlCol("int","titleID",0);//称号

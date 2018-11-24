@@ -1,0 +1,81 @@
+//获取用户信息
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//获取全局变量
+var=game.rd.getRow(game.cnn,"global_var","name","gameServer","*",1000);
+varJson=json_decode(var.json);
+startServerBT=strtotime(varJson.bt);//开服时间
+
+
+// //修改行数据
+// user=game.rd.updateRow
+// (
+	// game.cnn,"user","id",userID,"*",
+	// //修改回调
+	// ##<user,game>
+		// modifSign=0;
+		// jsonVer=ref(user.jsonVer);
+		// if(jsonVer!=game.structVer)//json需要升级
+		// {
+			// modifSign=1;
+			// json=json_decode(user.json);
+			// structMgr_upgradeObj(game.structMgr,"Json",json);
+			// jsonExtStr=user.jsonExt;
+			// if(jsonExtStr=="")jsonExtStr="{}";
+			// jsonExt=json_decode(jsonExtStr);
+			// structMgr_upgradeObj(game.structMgr,"JsonExt",jsonExt);
+			// //保存
+			// user.json=json_encode(json);
+			// user.jsonExt=json_encode(jsonExt);
+			// jsonVer=game.structVer;
+		// }
+		// return(modifSign);
+	// ##.,
+	// //修改完成回调
+	// ##<user,userData>
+		// //...
+	// ##.,
+	// //解锁后回调
+	// ##<row,userData>
+		// //...
+	// ##.,
+	// game,//自定义数据userData
+	// 1000//加锁时间（毫秒），例如：1000
+// );
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}
+
+//删除user中一些不需要的数据
+// remove(user,"genTime");
+remove(user,"jsonExt");
+//..
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,user,time_milli(),startServerBT)
+);

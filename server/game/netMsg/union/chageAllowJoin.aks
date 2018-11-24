@@ -1,0 +1,83 @@
+//更改加入状态® -联萌工会
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+change=netMsg[3];//状态0 5允许 1允许
+
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+if(change>1||change<0)
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)//非法参数
+	);
+	exit();
+}
+	
+rd=game.rd;
+cnn=game.cnn;
+
+
+targetUser=rd.getRow(cnn,"user","id",userID,"*",1000);
+unionID=number(targetUser.unionID);
+//修改行数据
+unionX=rd.updateRow
+(
+	cnn,"union","id",unionID,"*",
+	//修改回调
+	##<unionX,game>
+		@link methodName,sessionID,change;
+		if(change==0)
+		{
+			unionX.allowJoin=0;
+		}
+		if(change==1)
+		{
+			unionX.allowJoin=1;
+		}
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+
+if(empty(unionX))//联萌不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}
+
+
+
+

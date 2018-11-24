@@ -1,0 +1,134 @@
+//福利-签到®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID;
+		signCount=number(user.signCount);//天数
+		signDate=user.signDate;//时间
+		nowTime=now();//今天时间
+		t=split(arr(),now()," ");
+		nowTime=t[0];
+		json=json_decode(user.json);
+		if(signDate==nowTime)
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)//已签过
+			);
+			return(0);
+		}
+		dayId=(signCount%30)+1;
+		table=game.table;
+		signTable=table.cardSignIn;
+		signRow=signTable.getRowFromColName("day",dayId);
+		money=number(signRow.getValFromColName("money"));//money
+		
+		food=number(signRow.getValFromColName("food"));//food
+		
+		soldier=number(signRow.getValFromColName("soldier"));//soldier
+		
+		gold=number(signRow.getValFromColName("gold"));//gold
+		
+		item=signRow.getValFromColName("item");//item
+		
+		//保存
+		signCount+=1;
+		user.signCount=signCount;
+		user.signDate=nowTime;
+		if(money!=0)
+		{
+			myMoney=number(user.money);
+			myMoney+=money;
+			user.money=myMoney;
+		}
+		if(food!=0)
+		{
+			myFood=number(user.food);
+			myFood+=food;
+			user.food=myFood;
+		}
+		if(soldier!=0)
+		{
+			mySoldier=number(user.soldier);
+			mySoldier+=soldier;
+			user.soldier=mySoldier;
+		}
+		if(gold!=0)
+		{
+			myGold=number(user.gold2);
+			myGold+=gold;
+			if(myGold!=0)
+			{
+				user.gold2=myGold;
+			}
+			
+
+			allGold=number(user.gold)+myGold;//元宝余额
+			game.saveResIO(userID,34,0,1,gold,allGold);//七天签到(type,itemID,（0=消耗，1=获得）,count,allGold)
+		}
+		if(item!="")
+		{
+			arr=split(arr(),item,",");
+			itemDic=json.item;
+			i=0;c=size(arr);
+			numMgr=game.numMgr;
+			while(i<c)
+			{
+				itemID=arr[i];
+				itemCount=number(arr[i+1]);
+				numMgr.addItem(itemID,itemCount,itemDic);
+				i+=2;
+			}	
+		}
+		user.json=json_encode(json);
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,signCount,nowTime)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

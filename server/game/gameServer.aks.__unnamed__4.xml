@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t35">21</v>
+<v t="n" n="__sys__t34">21</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="n" n="__sys__t4">0</v>
+<v t="n" n="__sys__t5">0</v>
+<v t="s" n="__sys__t6">.disconnect .</v>
+<o n="input"><o>__sys__t7</o><i>__sys__t1</i></o>
+<o n="="><o>server</o><i>__sys__t7</i></o>
+<o n="input"><o>__sys__t9</o><i>__sys__t2</i></o>
+<o n="="><o>serverSession</o><i>__sys__t9</i></o>
+<o n="input"><o>__sys__t11</o><i>__sys__t3</i></o>
+<o n="="><o>game</o><i>__sys__t11</i></o>
+<v t="s" n="__sys__t14">.sessionMap.</v>
+<o n="." r="92"><o>__sys__t13</o><i>game</i><i>__sys__t14</i></o>
+<o n="=" r="92"><o>sessionMap</o><i>__sys__t13</i></o>
+<v t="s" n="__sys__t18">.id.</v>
+<o n="." r="93"><o>__sys__t17</o><i>serverSession</i><i>__sys__t18</i></o>
+<o n="[]" r="93"><o>__sys__t20</o><i>sessionMap</i><i>__sys__t17</i></o>
+<o n="=" r="93"><o>session</o><i>__sys__t20</i></o>
+<o n="try" r="95"><o>__sys__t22</o></o>
+<v t="s" n="__sys__t24">.saveLogin.</v>
+<o n="." r="97"><o>__sys__t23</o><i>game</i><i>__sys__t24</i></o>
+<o n="__sys__t23" r="97"><o>__sys__t26</o><i>game</i><i>session</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t4</i></o>
+<o n="=="><o>__sys__t28</o><i>__sys__rt</i><i>__sys__t5</i></o>
+<o n="if_goto"><o>__sys__t29</o><i>__sys__t28</i><i>__sys__t34</i></o>
+<o n="catch" r="98"><o>__sys__t30</o></o>
+<o n="error" r="99"><o>__sys__t31</o></o>
+<o n="trace" r="99"><o>__sys__t32</o><i>__sys__t31</i></o>
+<o n="goto"><o>__sys__t33</o><i>__sys__t35</i></o>
+<v t="s" n="__sys__t37">.userSessionMap.</v>
+<o n="." r="102"><o>__sys__t36</o><i>game</i><i>__sys__t37</i></o>
+<o n="=" r="102"><o>userSessionMap</o><i>__sys__t36</i></o>
+<v t="s" n="__sys__t41">.userID.</v>
+<o n="." r="103"><o>__sys__t40</o><i>session</i><i>__sys__t41</i></o>
+<o n="remove" r="103"><o>__sys__t43</o><i>userSessionMap</i><i>__sys__t40</i></o>
+<v t="s" n="__sys__t45">.id.</v>
+<o n="." r="104"><o>__sys__t44</o><i>serverSession</i><i>__sys__t45</i></o>
+<o n="remove" r="104"><o>__sys__t47</o><i>sessionMap</i><i>__sys__t44</i></o>
+<v t="s" n="__sys__t49">.id.</v>
+<o n="." r="105"><o>__sys__t48</o><i>serverSession</i><i>__sys__t49</i></o>
+<o n="+" r="105"><o>__sys__t51</o><i>__sys__t6</i><i>__sys__t48</i></o>
+<o n="trace" r="105"><o>__sys__t52</o><i>__sys__t51</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t11" />
+<v n="__sys__t13" />
+<v n="__sys__t17" />
+<v n="__sys__t20" />
+<v n="__sys__t22" />
+<v n="__sys__t23" />
+<v n="__sys__t26" />
+<v n="__sys__t28" />
+<v n="__sys__t29" />
+<v n="__sys__t30" />
+<v n="__sys__t31" />
+<v n="__sys__t32" />
+<v n="__sys__t33" />
+<v n="__sys__t36" />
+<v n="__sys__t40" />
+<v n="__sys__t43" />
+<v n="__sys__t44" />
+<v n="__sys__t47" />
+<v n="__sys__t48" />
+<v n="__sys__t51" />
+<v n="__sys__t52" />
+<v n="__sys__t7" />
+<v n="__sys__t9" />
+<v n="game" />
+<v n="server" />
+<v n="serverSession" />
+<v n="session" />
+<v n="sessionMap" />
+<v n="userSessionMap" />
+</script>

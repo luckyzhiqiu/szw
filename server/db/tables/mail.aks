@@ -1,0 +1,14 @@
+//邮件表（每用户一个表）
+mysqlCol("key","id");
+mysqlCol("datetime","genTime");//生成时间
+mysqlCol("bigint","modifTime",0);//修改时间（秒）
+mysqlCol("varchar","title");//标题
+mysqlCol("varchar","body");//正文
+mysqlCol("int","read",0);//读标记：0=未读；1=已读
+//奖励
+mysqlCol("bigint","soldier",0);//兵力
+mysqlCol("bigint","money",0);//银两
+mysqlCol("bigint","food",0);//粮草
+mysqlCol("bigint","gold",0);//元宝（充值，优先使用）
+mysqlCol("bigint","gold2",0);//元宝（赠送）
+mysqlCol("blob","item");//物品奖励:itemID1,num1,itemID2,num2,...

@@ -1,0 +1,185 @@
+//日常任务领取活跃点数奖励
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+rewardID=netMsg[3];//奖励等级
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+if(rewardID<=0 || rewardID>=5)//奖励等级无效
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-5)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link sessionID,methodName,rewardID,userID;
+		json=json_decode(user.json);
+		dailyTask=json.dailyTask;//日常任务
+		dailyTaskRewardTable=game.table.dailyTaskReward;//表数据
+		active=dailyTask.active;//拥有活跃度
+		activeCount=dailyTask.activeCount;//活跃点数领取次数
+		dailyTaskRewardIDMap=dailyTask.dailyTaskRewardIDMap;//（key为领取过的成就ID，val=1）
+		if(exist(dailyTaskRewardIDMap,rewardID))//已领取此活跃度奖励
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);
+		}
+		
+		row=dailyTaskRewardTable.getRowFromColName("id",rewardID);//行数据
+		money=0;food=0;soldier=0;gold2=0;itemOddsArr=arr();
+		if(!empty(row))//返回行数据
+		{
+			if(rewardID==1 && active>=100)
+			{
+				moneyMin=number(row.getValFromColName("moneyMin"));//银两奖励最小值
+				moneyMax=number(row.getValFromColName("moneyMax"));//银两奖励最大值
+				money=moneyMin+rand()%(moneyMax-moneyMin);//具体奖励银两数量
+				userMoney=number(user.money);
+				
+				user.money=userMoney+money;//增加银两
+			}
+			else if(rewardID==2 && active>=400)
+			{
+				foodMin=number(row.getValFromColName("foodMin"));//粮草奖励最小值
+				foodMax=number(row.getValFromColName("foodMax"));//粮草奖励最大值
+				food=foodMin+rand()%(foodMax-foodMin);//具体奖励粮草数量
+				userFood=number(user.food);
+				
+				user.food=userFood+food;//增加粮草
+			}
+			else if(rewardID==3 && active>=700)
+			{
+				soldierMin=number(row.getValFromColName("soldierMin"));//士兵奖励最小值
+				soldierMax=number(row.getValFromColName("soldierMax"));//士兵奖励最大值
+				soldier=soldierMin+rand()%(soldierMax-soldierMin);//具体奖励士兵数量
+				userSoldier=number(user.soldier);
+				
+				user.soldier=userSoldier+soldier;//增加士兵
+			}
+			else if(rewardID==4 && active>=1000)
+			{
+				goldRate=number(row.getValFromColName("goldRate"));//元宝奖励几率
+				num = rand()%10000;//随机数
+				if(goldRate>=num)//元宝奖励几率
+				{
+					goldMin=number(row.getValFromColName("goldMin"));//元宝奖励最小值
+					goldMax=number(row.getValFromColName("goldMax"));//元宝奖励最大值
+					gold2=goldMin+rand()%(goldMax-goldMin);//具体奖励元宝数量
+					userGold2=number(user.gold2);
+					newGold2=userGold2+gold2;
+					if(newGold2!=0)
+					{
+						user.gold2=newGold2;//元宝（赠送）
+					}
+					
+					
+					//流水
+					allGold=number(user.gold)+number(user.gold2);//元宝余额
+					game.saveResIO(userID,9,0,1,gold2,allGold);//日常(type,itemID,（0=消耗，1=获得）,count,allGold)
+				}
+			}
+			else//活跃度不足或已领取
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)
+				);
+				return(0);
+			}
+		}
+		else//数据为空
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);
+		}
+		
+		itemStr=row.getValFromColName("item");
+		numMgr=game.numMgr;
+		addItemArr=split(arr(),itemStr,",");
+		itemDict=json.item;
+		i=0;j=0;count=size(addItemArr)/3;
+		if(count>=1)
+		{
+			while(i<count)
+			{
+				itemID=number(addItemArr[j]);//道具ID
+				itemCount=number(addItemArr[j+1]);//道具数量
+				itemOdds=number(addItemArr[j+2]);//道具中奖几率
+				num = rand()%10000;//随机数
+				if(itemOdds>=num)//中奖
+				{
+					push(itemOddsArr,itemID,itemCount);
+					numMgr.addItem(itemID,itemCount,itemDict);//道具奖励
+				}
+				j+=3;
+				++i;
+			}
+		}
+				
+		//保存
+		dailyTask.activeCount++;
+		dailyTask.dailyTaskRewardIDMap[rewardID]=1;//已领取此活跃度奖励
+		user.json=json_encode(json);
+
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,dailyTask.activeCount,money,food,soldier,gold2,itemOddsArr)
+		);
+		
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

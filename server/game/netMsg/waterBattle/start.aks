@@ -1,0 +1,129 @@
+//开始议政
+/*
+开始论战：
+（1）判断条件：阶段、间隔时间
+（2）匹配对手玩家，从议政榜中选出前后3个对手，并进行随机匹配
+（3）计算我方血量
+（4）计算我方豪杰数据，封装numMgr.computeWaterBattleHero
+（5）随机三个敌方豪杰，并放入数组enemyHeroIDArr
+（6）重置可购买BUFF数组buffArr，buyBuff=0;
+（7）计算敌方豪杰数据，并放入数组heroArr
+（8）battleCount=0;
+*/
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID;
+		json=json_decode(user.json);
+		numMgr=game.numMgr;
+
+		waterBattleStep=number(user.waterBattleStep);//论战阶段
+		if(waterBattleStep==0)//未开始
+		{
+			waterBattle=json.waterBattle;
+			heroIndex=waterBattle.heroIndex;
+			enemyUserID=waterBattle.enemyUserID;
+			if(enemyUserID==0)//敌方不存在
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)
+				);
+				return(0);
+			}
+
+			normalUseHeroIndexMap=waterBattle.normalUseHeroIndexMap;
+			//（3）计算我方血量
+			heroArr=json.hero;
+			hero=heroArr[heroIndex];
+			fightHero=numMgr.computeWaterBattleHero(hero,json.wifePlus);//获取论战豪杰信息
+			
+			waterBattle.hp=fightHero.hp;//我方血量
+			waterBattle.me=fightHero;//我方豪杰数据
+			waterBattle.winCount=0;//击败敌方豪杰数量
+			waterBattle.attackPlus=0;//攻击加成
+			waterBattle.skillPlus=0;//技能加成
+			waterBattle.battleCount=0;//对战次数
+			waterBattle.buyBuff=0;//购买BUFF标记ID
+			numMgr.getWaterBattleBuffArr(0,waterBattle.buffArr);//重置可购买BUFF数组
+			
+			//豪杰使用字典（记录：正常议政所使用的heroIndex）//normalUseHeroIndexMap[heroIndex]=1;
+			type=waterBattle.type;
+			if(type==1)
+			{
+				normalUseHeroIndexMap[heroIndex]=1;
+			}
+
+			//保存
+			// achievement=json.achievement;
+			// achievement.waterCount+=1;
+			
+			// type=json.waterBattle.type;
+			// dailyTask=json.dailyTask;
+			// if(type==1)
+			// {
+				// dailyTask.waterCount+=1;
+			// }
+
+			user.waterBattleStep=1;//论战阶段:0=未开始;1=准备（买药）;2=抽奖；
+			user.json=json_encode(json);
+			
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,waterBattle,user.waterBattleStep)
+			);
+			return(1);
+		}
+		else//论战已开始
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

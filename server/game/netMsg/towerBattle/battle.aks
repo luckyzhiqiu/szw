@@ -1,0 +1,457 @@
+//过关斩将-战斗®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+enemyHeroID=netMsg[3];//敌方豪杰ID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	eoutcomeit();
+}
+
+//获取敌方豪杰位置
+getEnemyHeroIndeoutcome=##<enemyHeroArr,heroID>
+	i=0;c=size(enemyHeroArr);
+	while(i<c)
+	{
+		enemyHero=enemyHeroArr[i];
+		if(enemyHero.heroID==heroID)return(i);
+		++i;
+	}
+	return(-1);
+##.;
+
+//获取血量
+getHp=##
+<
+	attack,attackC,critRate,crit,isCrit,//攻击力 攻击力倍数 爆击率 爆击系数 是否爆击标记 
+	attackPlus,skillPlus//攻击加成 技能加成
+>
+	if((rand()%10000)<(critRate+skillPlus))//有暴击
+	{
+		subHP=attack*attackC/10000*(1+crit/10000);
+		isCrit=1;
+	}
+	else//无暴击
+	{
+		subHP=attack*attackC/10000;
+		isCrit=0;
+	}
+	subHP+=random(-100,100);
+	subHP*=1+attackPlus/10000;
+	
+	return(arr(subHP,isCrit));
+##.;
+//固定获取血量
+getFixedHp=##
+<
+	attack,attackC,critRate,crit,//攻击力 攻击力倍数 爆击率 爆击系数
+	attackPlus,skillPlus//攻击加成 技能加成
+>
+	subHP=attack+(attack*attackC/10000*critRate/10000*(1+crit/10000));
+	subHP*=1+attackPlus/10000;
+	
+	return(subHP);
+##.;
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+	   @link methodName,sessionID,enemyHeroID,getEnemyHeroIndeoutcome,getHp,getFixedHp,userID;//,updateEnemyUser;
+	   json=json_decode(user.json);
+	   jsonExt=json_decode(user.jsonExt);
+	   isBattle=number(user.towerBattleStep);//状态条件
+	   
+		if(isBattle!=1)
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2) //不再战斗状态
+			);
+			return(0);
+		}
+		towerBattle=json.towerBattle;
+		towerBattleExt=jsonExt.towerBattleExt;
+		enemyHeroIDArr=towerBattle.enemyHeroIDArr;//随机3个敌方豪杰ID
+		enemyHeroArr=towerBattleExt.enemyHeroArr;//敌方豪杰数组
+		if(arrFindNumberKey(enemyHeroIDArr,enemyHeroID) <0)//敌方豪杰不存在
+		{
+			// 回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);
+		}
+		enemyHeroIndeoutcome=getEnemyHeroIndeoutcome(enemyHeroArr,enemyHeroID);
+		if(enemyHeroIndeoutcome<0)//敌方豪杰不存在
+		{
+			// 回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);
+		}
+		//敌方豪杰
+		enemyHero=enemyHeroArr[enemyHeroIndeoutcome];
+		enemyHeroHP=enemyHero.hp;//hp
+		enemyHeroHpAdd=enemyHeroHP;//敌方总血量
+		enemyHeroCritRate=enemyHero.critRate;//爆击率
+		enemyHeroCrit=enemyHero.crit;//爆击系数
+		enemyHeroAttackC=enemyHero.attackC;//攻击力倍数
+		enemyHeroAttack=enemyHero.attack;//攻击力
+		
+		//我方豪杰
+		myHero=towerBattle.me;
+		myHeroHP=towerBattle.hp;//hp
+		if(myHeroHP==0)//我方已死亡状态
+		{
+			// 回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-5)
+			);
+			return(0);
+		}
+		// timeS=split(arr(),nowTime," ")[0];
+		// date=towerBattle.date;//当前关卡开始日期
+		// if(timeS!=date)//跨日重置
+		// {
+			// if()
+			// // 回复
+			// game.sendMsg
+			// (
+				// sessionID,
+				// arr(methodName+"Result",-6)
+			// );
+			// return(0);
+		// }
+		
+		myHeroCritRate=myHero.critRate;//爆击率
+		myHeroCrit=myHero.crit;//爆击系数
+		myHeroAttackC=myHero.attackC;//攻击力倍数
+		myHeroAttack=myHero.attack;//攻击力
+		myHeroAttackPlus=towerBattle.attackPlus;//攻击加成
+		myHeroSkillPlus=towerBattle.skillPlus;//技能加成
+		
+		numMgr=game.numMgr;
+		
+		//战斗次数
+		battleCount=towerBattle.battleCount;
+		//击败敌方豪杰数量
+		winCount=towerBattle.winCount;
+		//
+		isCritSign=0; //是否爆击标记
+		//生成战报
+		battleInfo=arr();
+		outcome=0;
+		myAttArr=arr();
+		enemyAttArr=arr();
+		myHpArr=arr();
+		meIsCritSignArr=arr();//我方暴击数组
+		enemyIsCritSignArr=arr();//对方暴击数组
+		enemyHpArr=arr();
+		i=0;
+		isWin=0;//是否胜率 0：我方 1:敌方
+		while((enemyHeroHP>0 && myHeroHP>0) &&(i<20))
+		{
+			
+			if(outcome==0)//我方攻击
+			{
+				hp=getHp
+				(
+					myHeroAttack,myHeroAttackC,myHeroCritRate,myHeroCrit,isCritSign,
+					myHeroAttackPlus,myHeroSkillPlus
+				);
+				
+				HP2=round(hp[0]);
+				enemyHeroHP-=HP2;
+				hp2=round(enemyHeroHP);
+				enemyHeroHP=hp2;
+				if(enemyHeroHP<=0)
+				{
+					enemyHeroHP=0;
+				}
+				outcome=1;
+				// if(HP2!=0)
+				// {
+					push(myHpArr,HP2);
+				// }
+				push(meIsCritSignArr,hp[1]);
+				isWin=0;
+			}
+			else 
+			{
+				HP=getHp(enemyHeroAttack,enemyHeroAttackC,enemyHeroCritRate,enemyHeroCrit,isCritSign,0,0);
+				HP2=round(HP[0]);
+				myHeroHP-=HP2;
+				hp2=round(myHeroHP);
+				myHeroHP=hp2;
+				if(myHeroHP<=0)
+				{
+					myHeroHP=0;
+				}
+				outcome=0;
+				// if(HP2!=0)
+				// {
+					push(enemyHpArr,HP2);
+				// }
+				push(enemyIsCritSignArr,HP[1]);
+				isWin=1;
+			}
+			i++;
+		}
+		
+		if(enemyHeroHP>0&&myHeroHP>0)
+		{
+			meAtt=getFixedHp(myHeroAttack,myHeroAttackC,myHeroCritRate,myHeroCrit,myHeroAttackPlus,myHeroSkillPlus);//我固定输出成吨伤害
+			tagetAtt=getFixedHp(enemyHeroAttack,enemyHeroAttackC,enemyHeroCritRate,enemyHeroCrit,0,0);//对面固定输出成吨伤害
+			meCount=ceil(enemyHeroHP/meAtt); //我回合数
+			tagetCount=ceil(myHeroHP/tagetAtt); //对面回合数
+			if(meCount==0)
+			{
+				meCount=1;
+			}
+			if(tagetCount/meCount>=1)//我方胜
+			{
+				
+				myHeroHP=myHeroHP-((meCount-1)*tagetAtt);
+				if(myHeroHP==0)
+				{
+					myHeroHP=1;
+				}
+				if(myHeroHP<0)
+				{
+					myHeroHP=abs(myHeroHP);
+				}
+				isWin=0;
+			}
+			else
+			{
+				newtagetCount=tagetCount-1;
+				newenemyHeroHP=newtagetCount*meAtt;
+				enemyHeroHP=round(enemyHeroHP-newenemyHeroHP);
+				if(enemyHeroHP<=0)
+				{
+					enemyHeroHP=1;
+				}
+				isWin=1;
+			}
+			
+		}
+
+		push(myAttArr,myHpArr,meIsCritSignArr);
+		push(enemyAttArr,enemyHpArr,enemyIsCritSignArr);
+		push(battleInfo,myAttArr,enemyAttArr,enemyHeroHpAdd);
+		
+		talbeData=game.table;
+		row=talbeData.towerConfig.getRow(0);
+		winReward=number (row.getValFromColName("winReward"));//胜利每轮获得资质经验
+		lottery=number(row.getValFromColName("lottery"));//连胜需求场次
+		towerMaxID=number(user.towerMaxID);//历史通过的塔ID 
+		towerID=number(user.towerID);//当前通过的塔ID
+		
+		
+		heroIndex=towerBattle.heroIndex;//豪杰索引
+		hero=json.hero[heroIndex];//我的豪杰
+		growsExp=hero.growsExp;//我的资质经验
+		buffArr=towerBattle.buffArr;//buffArr
+		//buff=arr();
+		buff=buffArr;
+		if(isWin==0)//打死对面一只
+		{
+			battleCount+=1;
+			numMgr=game.numMgr;
+			
+			buff=numMgr.getWaterBattleBuffArr(battleCount,buffArr);
+			growsExp+=winReward;
+			outcome=2;
+			winCount+=1;
+		}
+		else
+		{
+			outcome=-1;
+		}
+		
+		nowTime=now();//当前时间
+		
+		cnn=game.cnn;
+		towerBattleExt=jsonExt.towerBattleExt;
+		towerBattleToken=number(user.towerBattleToken);
+		useHeroIndexMap=towerBattle.useHeroIndexMap;//豪杰使用字典
+		//保存
+		towerBattle.hp=round(myHeroHP);
+		hpEd=round(towerBattle.hp);//前端临时数据 计算后血量
+		item="0";
+		isBursttable=1;//是否爆表
+		if(isWin==0)//胜
+		{
+			
+			enemyHeroHP=0;
+			enemyHero.hp=enemyHeroHP;
+			i=0;enemyArrLength=size(enemyHeroArr);//数组移除一个豪杰
+			while(i<enemyArrLength)
+			{
+				if(enemyHeroArr[i].heroID==enemyHeroID) 
+				{
+					remove(enemyHeroArr,i);
+					break;
+				}
+				i++;
+			}
+			towerBattleExt.enemyHeroArr=enemyHeroArr;
+			
+			
+			enemyHeroIDArr=numMgr.getThreeenemyHeroIDArr(enemyHeroArr,0,towerBattle);
+			
+			// towerID+=1;
+			towerBattle.enemyHeroIDArr=enemyHeroIDArr;//随机3个敌方豪杰ID
+			
+			towerBattleToken+=1;
+			
+			
+			
+			
+			if(arrSize(enemyHeroIDArr)!=0)//未打完
+			{
+				user.towerBattleStep=1;
+			}
+			else if(arrSize(enemyHeroIDArr)==0)//ace 通关
+			{
+				user.towerBattleStep=1;
+				// battleCount=0; //？？
+				towerID+=1;
+				winCount=0;
+				if(towerID>towerMaxID)//历史记录
+				{
+					towerMaxID=towerID;
+				}
+				
+				// isBattle=0;
+				towerBattle.enemyHeroIDArr=arr();//清空对方数组
+				towerBattleExt.enemyHeroArr=arr();//??
+					
+				itemDict=json.item;
+				towerTal=talbeData.tower;
+				towerTalLength=towerTal.size();//表长度
+				if(towerID>=towerTalLength)
+				{
+					isBursttable=0;
+					towerID=towerTalLength;
+				}					
+				towerRow=towerTal.getRowFromColName("tiny",towerID);
+				
+				item=towerRow.getValFromColName("item");
+				arr=split(arr(),item,",");
+				getItem=size(arr);//物品
+				if(getItem>=2)
+				{
+					i=0;while(i<getItem)
+					{
+						itemID=arr[i];
+						itemCount=number(arr[i+1]);
+						numMgr.addItem(itemID,itemCount,itemDict);
+						i+=2;
+					}
+				}
+				if(towerID!=0 && towerID%10==0)
+				{
+					useHeroIndexMap=dict();
+					user.towerBattleStep=0;
+					battleCount=0;
+					towerBattle.hp=0;// 我方血量置0 
+				}
+			}
+			//论战阶段
+			if(lottery!=0)
+			{
+				if(battleCount!=0 && battleCount%lottery==0)//抽奖
+				{
+					// isBattle=2;
+					user.towerBattleStep=2;
+					
+				}
+			}
+			
+			
+		}
+		else//败
+		{
+			towerBattle.hp=0;// 我方血量置0 
+			enemyHero.hp=round(enemyHeroHP);// 对方血量置
+			battleCount=0;
+			useHeroIndexMap[heroIndex]=1;
+			user.towerBattleStep=1;
+			
+		}
+		// timeS=split(arr(),nowTime," ")[0];
+		// date=towerBattle.date;//当前关卡开始日期
+		// if(timeS!=date)//跨日重置
+		// {
+			// battleCount=0;
+			// winCount=0;
+			// towerID-=(towerID%10);
+			// towerBattle.enemyHeroIDArr=arr();//清空对方数组
+			// towerBattleExt.enemyHeroArr=arr();//??
+			// user.towerBattleStep=0;
+			// useHeroIndexMap=dict();
+			// towerBattle.date=timeS;
+		// }
+		towerBattle.winCount=winCount;//击败敌方豪杰数量
+		towerBattle.useHeroIndexMap=useHeroIndexMap;
+		user.towerBattleToken=towerBattleToken;
+		user.towerID=towerID;//当前通过的塔ID
+		user.towerMaxID=towerMaxID;//通过的塔ID Max
+		json.hero[heroIndex].growsExp=growsExp;
+		heroGrowsExp=json.hero[heroIndex].growsExp;
+		towerBattle.buyBuff=0;//购买BUFF ID
+		towerBattle.battleCount=battleCount;
+		towerBattle.buffArr=buff;
+		user.jsonExt=json_encode(jsonExt);
+		user.json=json_encode(json);
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,battleInfo,enemyHeroIDArr,battleCount,nowTime,enemyHero,winCount,buff,towerBattle.enemyHeroPromotionArr,growsExp,towerBattle.hp,isWin,enemyHeroHP,towerMaxID,towerID,user.towerBattleStep,item,towerBattleToken,hpEd,isBursttable)
+  			                          //2战报   3敌方豪杰ID数组 4战斗次数   5时间    6敌方豪杰    7击败数      8可购买BUFF数组   9提拔等级数组 10豪杰资质 11我方血量  12胜负 13敌方剩余血量 14通关历史记录 15当前通关id 16状态 17item 18塔战代币 19临时血量 20是否最后一关
+		);
+		return(1);//修改
+		
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

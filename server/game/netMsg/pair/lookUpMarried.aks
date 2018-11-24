@@ -1,0 +1,63 @@
+//联姻-查看以婚列表®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+page=netMsg[3];//页
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+jsonExt=json_decode(user.jsonExt);
+pairSys=jsonExt.pairSys;
+pairArr=pairSys.pairArr;//以婚孩子数组
+pairArrLength=size(pairArr);
+pairsArr=arr();
+pageNum=10;
+startCount=pageNum*page;
+endCount=pageNum*page+pageNum;
+if(pairArrLength!=0)
+{
+	// i=0;
+	while(startCount<endCount)
+	{
+		if(startCount<=pairArrLength)
+		{	
+			push(pairsArr,pairArr[startCount]);
+		}
+		else
+		{
+			break;
+		}
+		startCount++;
+	}
+}
+//保存
+user.json=json_encode(jsonExt);
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,pairsArr)
+);
+
+
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

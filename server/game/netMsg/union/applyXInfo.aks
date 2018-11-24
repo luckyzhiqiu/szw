@@ -1,0 +1,85 @@
+//申请列表信息® -联萌工会
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+cnn=game.cnn;
+rd=game.rd;
+unionUser=rd.getRow(cnn,"user","id",userID,"*",1000);
+unionID=unionUser.unionID;//联萌id
+if(unionID==0)
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)//联萌不存在
+	);
+	exit();
+}
+//修改行数据
+unionX=rd.getRow(cnn,"union","id",unionID,"*",1000);
+leaderUserID=unionX.leaderUserID;//萌主ID
+unionXJson=json_decode(unionX.json);
+viceLeaderUserIDMap=unionXJson.viceLeaderUserIDMap;//副萌主
+if(userID!=leaderUserID )
+{
+	if(!exist(viceLeaderUserIDMap,userID))
+	{
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",-3)//非本人操作
+		);
+		return(0);//不修改	
+	}
+	
+			}	
+reqUserIDMap=unionXJson.reqUserIDMap;//申请+入联萌列表 userId
+
+userArr=arr();
+it=dictIt();
+dictItBegin(reqUserIDMap,it);
+while(!dictItEmpty(it))
+{
+	arr=arr();
+	playerUserID=dictItKey(it);
+	playerUser=rd.getRow(cnn,"user","id",playerUserID,"*",1000);
+	playerName=playerUser.nickname;
+	playerVip=playerUser.vip;
+	playerLevel=playerUser.level;
+	playerPower=playerUser.power;
+	push(arr,playerUserID,playerName,playerVip,playerLevel,playerPower);
+	push(userArr,arr);
+	dictItNext(it);
+}
+unionX.json=json_encode(unionXJson);
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,userArr,unionX.allowJoin);
+);
+return(1);
+
+if(empty(unionX))//联萌不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

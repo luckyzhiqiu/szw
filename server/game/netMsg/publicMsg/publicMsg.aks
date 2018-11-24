@@ -1,0 +1,45 @@
+//公告-府内®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+cnn=game.cnn;
+//userInstTableName=createIDTable(cnn,"pubic_msg");
+sql="select genTime,title,body from public_msg order by id limit 10";
+rs=mysqlCreateRs(cnn,sql);
+info=arr();
+
+while(mysqlNextRow(rs))
+{
+	//mailID=int(mysqlGetColVal(rs,0));
+	push
+	(
+		info,
+		arr(
+		mysqlGetColVal(rs,0),//genTime
+		mysqlGetColVal(rs,1),//title
+		mysqlGetColVal(rs,2),//body
+		)
+	);
+}
+
+mysqlDestroyRs(rs);
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,info)
+);

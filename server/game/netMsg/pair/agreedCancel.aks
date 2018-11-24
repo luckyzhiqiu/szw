@@ -1,0 +1,294 @@
+//取消提亲
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+childID=netMsg[3];//孩子id
+hisID=netMsg[4];//对方玩家ID
+type=netMsg[5];//选亲类型 0:向全服提亲1:向玩家提亲 
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+if(userID==hisID)
+{
+	//不能向自己取消
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",2)
+	);
+	exit();
+}
+
+//update对方
+updateHisUser=##<game,userID,childID,hisUserID>
+	returnType=1;
+	
+	//修改行数据
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link methodName,sessionID,childID,returnType,hisUserID;
+			
+				
+			jsonExt=json_decode(user.jsonExt);
+			pairSys=ref(jsonExt.pairSys);
+
+			pairReqArr=ref(pairSys.pairReqArr);
+			hadChild=0;
+			c=size(pairReqArr);
+			i=0;while(i<c){
+				if(pairReqArr[i].userID==hisUserID &&pairReqArr[i].childID==childID)
+				{
+					hadChild=1;
+					
+					remove(pairReqArr,i);
+					returnType=1;	
+					
+					//保存
+					user.jsonExt=json_encode(jsonExt);		
+					
+					return(1);//修改
+					
+					break;
+				}
+				i++;
+			}
+			if(hadChild==0)
+			{
+				//没有这请求
+
+				returnType=-5;
+				
+				//不保存
+				return(0);
+				
+			}
+			
+			
+		
+		
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	
+	if(empty(user))
+	{
+		//对方不存在
+		return(-7);	
+	}
+	else
+	{
+		return(returnType);
+	}
+	
+##.;
+
+
+
+	//修改行数据
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link methodName,sessionID,childID,hisID,userID,type,updateHisUser;
+			
+			json=json_decode(user.json);
+			itemDict=ref(json.item);
+			itemID=0;
+			jsonExt=json_decode(user.jsonExt);
+			pairSys=ref(jsonExt.pairSys);
+			childArr=ref(pairSys.children);
+			
+			hadChild=0;
+			c=size(childArr);
+			i=0;while(i<c){
+				if(childArr[i].id==childID)
+				{
+					hadChild=1;
+					
+			
+					if(type==1)
+					{		
+						if(childArr[i].targetUserID<1)
+						{
+							//已提过亲类型不对
+							game.sendMsg
+							(
+								sessionID,
+								arr(methodName+"Result",-2)
+							);
+							return(0);	
+						}
+					
+										
+						hisUser=updateHisUser(game,hisID,childID,userID);
+						
+						if(hisUser==1){//对方已更新
+							childArr[i].targetUserID=-1;
+							
+							childConfigureTable=game.table.childConfigure.getRow(0);
+							itemID=childConfigureTable.getValFromColName("talentMarrigeCost"+childArr[i].grows);
+							
+							game.numMgr.addItem(itemID,1,itemDict);
+							
+							
+						}else if(hisUser==-5)
+						{
+							//没有这请求
+							game.sendMsg
+							(
+								sessionID,
+								arr(methodName+"Result",-5)
+							);
+							return(0);
+						}			
+									
+						else if(hisUser==-7)//对方用户不存在
+						{
+							//回复
+							game.sendMsg
+							(
+								sessionID,
+								arr(methodName+"Result",-7)
+							);
+							return(0);
+						}	
+						
+						
+						
+					}else if(type==0)
+					{
+						if(childArr[i].targetUserID!=0)
+						{
+							//已提过亲类型不对
+							game.sendMsg
+							(
+								sessionID,
+								arr(methodName+"Result",-2)
+							);
+							return(0);	
+						}
+						sql="select id from unmarry_child where childID="+childID+" and userID= "+userID;
+						rs=mysqlCreateRs(game.cnn,sql);
+						existSign=mysqlNextRow(rs);
+						mysqlDestroyRs(rs);
+						if(existSign)
+						{
+							sql="delete from unmarry_child where childID="+childID+" and userID= "+userID;
+							rs=mysqlCreateRs(game.cnn,sql);
+							mysqlDestroyRs(rs);
+						
+							childArr[i].targetUserID=-1;
+							
+							childConfigureTable=game.table.childConfigure.getRow(0);
+							itemID=childConfigureTable.getValFromColName("talentMarrigeCost"+childArr[i].grows);
+							
+							game.numMgr.addItem(itemID,1,itemDict);
+							
+						}else
+						{	//没这条提亲
+							game.sendMsg
+							(
+								sessionID,
+								arr(methodName+"Result",-4)
+							);
+							return(0);
+						}
+						
+						
+						
+						
+					}else
+					{
+						//类型不存在
+						game.sendMsg
+						(
+							sessionID,
+							arr(methodName+"Result",-3)
+						);
+						return(0);
+						
+						
+					}
+				
+					
+						
+					
+					
+					break;
+				}
+				i++;
+			}
+			if(hadChild==0)
+			{
+				//回复孩子不存在
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",4)
+				);
+				return(0);
+				
+			}
+			//保存
+			user.json=json_encode(json);
+			user.jsonExt=json_encode(jsonExt);
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,json.item,itemID)
+			);
+			
+			return(1);//修改
+		
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	
+	
+
+
+
+
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}

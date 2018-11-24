@@ -1,0 +1,87 @@
+//修改联盟信息
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+qq=netMsg[3];//QQ群
+private_msg=netMsg[4];//对内公告
+remark=netMsg[5];//宣言
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+unionID=number(user.unionID);
+if(unionID==0)//未加入联盟
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-3)
+	);
+	exit();
+}
+
+unionData=game.rd.updateRow
+(
+	game.cnn,"union","id",unionID,"*",
+	//修改回调
+	##<unionData,game>
+		@link sessionID,methodName,userID,qq,private_msg,remark;
+		leaderUserID=number(unionData.leaderUserID);
+		unionJson=json_decode(unionData.json);
+		viceLeaderUserIDMap=unionJson.viceLeaderUserIDMap;
+		if(exist(viceLeaderUserIDMap,userID) || leaderUserID==userID)
+		{
+			unionData.qq=qq;
+			unionData.private_msg=private_msg;
+			unionData.remark=remark;
+			unionData.json=json_encode(unionJson);
+
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1)
+			);
+			return(1);//修改
+		}
+		else//无权限修改
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(unionData))//联盟不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}
+	

@@ -1,0 +1,185 @@
+//膜拜
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+type=netMsg[3];//类型：1=势力榜;2=亲密榜;3=关卡榜;
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+if(type<1||type>3)//类型无效
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID,type;
+		json=json_decode(user.json);
+		dailyTask=json.dailyTask;
+		
+		yetWorship=0;//未膜拜
+		if(type==1)//势力榜
+		{
+			//检查膜拜次数是否足够
+			knee=ref(dailyTask.knee1);
+			if(knee==0)
+			{	
+				yetWorship=1;
+				rankName=game.gameConfig.name+"_powerRank";//排行榜名称
+			}
+		}
+		else if(type==2)//亲密榜
+		{
+			//检查膜拜次数是否足够
+			knee=ref(dailyTask.knee2);
+			if(knee==0)
+			{	
+				yetWorship=1;
+				rankName=game.gameConfig.name+"_intimateRank";//排行榜名称
+			}
+		}
+		else if(type==3)//关卡榜
+		{
+			//检查膜拜次数是否足够
+			knee=ref(dailyTask.knee3);
+			if(knee==0)
+			{	
+				yetWorship=1;
+				rankName=game.gameConfig.name+"_chapterRank";//排行榜名称
+			}
+		}
+		
+		if(yetWorship)//未膜拜
+		{
+			rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+			count=limit(redis_zcard(rd,rankName),0,99);//排行榜数量
+			if(count==0)//排行榜无数据
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)
+				);
+				return(0);//不修改
+			}
+			index=rand()%count;//随机选择100名内玩家
+			redis_zrevrange(rd,rankName,index,index,0,userIDArr=arr());
+			kneeUserID=number(userIDArr[0]);//膜拜玩家ID
+			if(kneeUserID!=userID)
+			{
+				kneeUser=game.rd.getRow(game.cnn,"user","id",kneeUserID,"*",1000);//膜拜对象
+			}
+			else
+			{
+				kneeUser=user;
+			}
+
+			head=kneeUser.head;//头像
+			level=kneeUser.level;//官阶
+			nickname=kneeUser.nickname;//昵称
+			
+			tableData=game.table;
+			//奖励元宝
+			rowR=tableData.rankReward.getRow(0);
+			goldMin=number(rowR.getValFromColName("goldMin"));//元宝最小值
+			goldMax=number(rowR.getValFromColName("goldMax"));//元宝最大值
+			
+			giveGold2=rand()%(goldMax-goldMin+1)+goldMin;//赠送元宝数量
+			
+			vipData=json.vip;
+			skyCount=vipData.skyCount;
+			
+			vipLevel=number(user.vip);
+			rowV=tableData.vip.getRowFromColName("level",vipLevel);
+			miricle4=number(rowV.getValFromColName("miricle4"));//天赐元宝每日次数
+			if(skyCount<miricle4)//有次数
+			{
+				rate4=number(rowV.getValFromColName("rate4"));//概率4
+				num=rand()%10001;
+				if(num<=rate4)//天赐成功
+				{
+					miricleAdd=number(rowR.getValFromColName("miricleAdd"));//天赐元宝增加
+					giveGold2+=miricleAdd;
+					
+					vipData.skyCount+=1;
+				}
+			}
+			
+			gold2=number(user.gold2);
+			gold2+=giveGold2;//增加100元宝
+			
+			//保存
+			achievement=json.achievement;
+			achievement.kneeCount+=1;
+			if(gold2!=0)
+			{
+				user.gold2=gold2;
+			}
+			knee=1;//一天一次
+			user.json=json_encode(json);
+			
+			//流水记录
+			gold=number(user.gold);
+			allGold=gold+gold2;//元宝余额
+			game.saveResIO(userID,5,0,1,giveGold2,allGold);//膜拜(type,itemID,（0=消耗，1=获得）,count,allGold)
+			
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,giveGold2,head,level,nickname,achievement.kneeCount,vipData.skyCount,kneeUser.fashionID)
+			);
+			return(1);//修改
+		}
+		else//已膜拜
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

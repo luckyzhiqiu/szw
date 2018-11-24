@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t201">113</v>
+<v t="n" n="__sys__t200">113</v>
+<v t="n" n="__sys__t198">112</v>
+<v t="n" n="__sys__t197">112</v>
+<v t="n" n="__sys__t195">111</v>
+<v t="n" n="__sys__t194">111</v>
+<v t="n" n="__sys__t192">110</v>
+<v t="n" n="__sys__t191">110</v>
+<v t="n" n="__sys__t180">102</v>
+<v t="n" n="__sys__t179">102</v>
+<v t="n" n="__sys__t146">80</v>
+<v t="n" n="__sys__t145">80</v>
+<v t="n" n="__sys__t89">35</v>
+<v t="n" n="__sys__t88">35</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="s" n="__sys__t3">.powerTotal.</v>
+<v t="s" n="__sys__t4">.curDate.</v>
+<v t="s" n="__sys__t5">.unionID.</v>
+<v t="s" n="__sys__t6">.cnn.</v>
+<v t="s" n="__sys__t7">.rd.</v>
+<v t="n" n="__sys__t8">0</v>
+<v t="n" n="__sys__t9">0</v>
+<v t="n" n="__sys__t10">0</v>
+<v t="s" n="__sys__t11">.user.</v>
+<v t="s" n="__sys__t12">.id.</v>
+<v t="s" n="__sys__t13">.*.</v>
+<v t="n" n="__sys__t14">1000</v>
+<v t="n" n="__sys__t15">0</v>
+<v t="n" n="__sys__t16">1</v>
+<v t="n" n="__sys__t17">7</v>
+<v t="n" n="__sys__t18">24</v>
+<v t="n" n="__sys__t19">60</v>
+<v t="n" n="__sys__t20">60</v>
+<v t="n" n="__sys__t21">0</v>
+<v t="s" n="__sys__t22">.select id from user where unionID=.</v>
+<v t="s" n="__sys__t23">. and id!=.</v>
+<v t="s" n="__sys__t24">. order by devoteTotal desc limit 1.</v>
+<v t="n" n="__sys__t25">0</v>
+<v t="n" n="__sys__t26">0</v>
+<v t="n" n="__sys__t27">0</v>
+<v t="n" n="__sys__t28">0</v>
+<v t="n" n="__sys__t29">0</v>
+<v t="s" n="__sys__t30">.user.</v>
+<v t="s" n="__sys__t31">.id.</v>
+<v t="s" n="__sys__t32">.*.</v>
+<v t="n" n="__sys__t33">1000</v>
+<v t="n" n="__sys__t34">0</v>
+<v t="n" n="__sys__t35">0</v>
+<v t="n" n="__sys__t36">1</v>
+<o n="input"><o>__sys__t37</o><i>__sys__t1</i></o>
+<o n="="><o>row</o><i>__sys__t37</i></o>
+<o n="input"><o>__sys__t39</o><i>__sys__t2</i></o>
+<o n="="><o>userData</o><i>__sys__t39</i></o>
+<o n="link" r="2553"><o>__sys__t41</o><i>__sys__t3</i></o>
+<o n="=" r="2553"><o>powerTotal</o><i>__sys__t41</i></o>
+<o n="link" r="2553"><o>__sys__t43</o><i>__sys__t4</i></o>
+<o n="=" r="2553"><o>curDate</o><i>__sys__t43</i></o>
+<o n="link" r="2553"><o>__sys__t45</o><i>__sys__t5</i></o>
+<o n="=" r="2553"><o>unionID</o><i>__sys__t45</i></o>
+<o n="link" r="2553"><o>__sys__t47</o><i>__sys__t6</i></o>
+<o n="=" r="2553"><o>cnn</o><i>__sys__t47</i></o>
+<o n="link" r="2553"><o>__sys__t49</o><i>__sys__t7</i></o>
+<o n="=" r="2553"><o>rd</o><i>__sys__t49</i></o>
+<v t="s" n="__sys__t52">.json.</v>
+<o n="." r="2554"><o>__sys__t51</o><i>row</i><i>__sys__t52</i></o>
+<o n="json_decode" r="2554"><o>__sys__t54</o><i>__sys__t51</i></o>
+<o n="=" r="2554"><o>unionJson</o><i>__sys__t54</i></o>
+<v t="s" n="__sys__t57">.power.</v>
+<o n="." r="2555"><o>__sys__t56</o><i>row</i><i>__sys__t57</i></o>
+<o n="=" r="2555"><o>__sys__t56</o><i>powerTotal</i></o>
+<v t="s" n="__sys__t61">.updateDate.</v>
+<o n="." r="2556"><o>__sys__t60</o><i>row</i><i>__sys__t61</i></o>
+<o n="!=" r="2556"><o>__sys__t63</o><i>__sys__t60</i><i>curDate</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t63</i></o>
+<o n="=="><o>__sys__t65</o><i>__sys__rt</i><i>__sys__t8</i></o>
+<o n="if_goto"><o>__sys__t66</o><i>__sys__t65</i><i>__sys__t88</i></o>
+<v t="s" n="__sys__t68">.updateDate.</v>
+<o n="." r="2559"><o>__sys__t67</o><i>row</i><i>__sys__t68</i></o>
+<o n="=" r="2559"><o>__sys__t67</o><i>curDate</i></o>
+<v t="s" n="__sys__t72">.catchCount.</v>
+<o n="." r="2560"><o>__sys__t71</o><i>row</i><i>__sys__t72</i></o>
+<o n="=" r="2560"><o>__sys__t71</o><i>__sys__t9</i></o>
+<v t="s" n="__sys__t76">.buildCount.</v>
+<o n="." r="2561"><o>__sys__t75</o><i>row</i><i>__sys__t76</i></o>
+<o n="=" r="2561"><o>__sys__t75</o><i>__sys__t10</i></o>
+<v t="s" n="__sys__t80">.reqUserIDMap.</v>
+<o n="." r="2562"><o>__sys__t79</o><i>unionJson</i><i>__sys__t80</i></o>
+<o n="clean" r="2562"><o>__sys__t82</o><i>__sys__t79</i></o>
+<v t="s" n="__sys__t84">.bossMap.</v>
+<o n="." r="2563"><o>__sys__t83</o><i>unionJson</i><i>__sys__t84</i></o>
+<o n="clean" r="2563"><o>__sys__t86</o><i>__sys__t83</i></o>
+<o n="goto"><o>__sys__t87</o><i>__sys__t89</i></o>
+<v t="s" n="__sys__t91">.leaderUserID.</v>
+<o n="." r="2567"><o>__sys__t90</o><i>row</i><i>__sys__t91</i></o>
+<o n="int" r="2567"><o>__sys__t93</o><i>__sys__t90</i></o>
+<o n="=" r="2567"><o>leaderUserID</o><i>__sys__t93</i></o>
+<v t="s" n="__sys__t96">.getRow.</v>
+<o n="." r="2568"><o>__sys__t95</o><i>rd</i><i>__sys__t96</i></o>
+<o n="__sys__t95" r="2568"><o>__sys__t98</o><i>rd</i><i>cnn</i><i>__sys__t11</i><i>__sys__t12</i><i>leaderUserID</i><i>__sys__t13</i><i>__sys__t14</i></o>
+<o n="=" r="2568"><o>leaderUser</o><i>__sys__t98</i></o>
+<o n="empty" r="2569"><o>__sys__t100</o><i>leaderUser</i></o>
+<o n="!" r="2569"><o>__sys__t101</o><i>__sys__t100</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t101</i></o>
+<o n="=="><o>__sys__t103</o><i>__sys__rt</i><i>__sys__t15</i></o>
+<o n="if_goto"><o>__sys__t104</o><i>__sys__t103</i><i>__sys__t200</i></o>
+<v t="s" n="__sys__t106">.logoutTime.</v>
+<o n="." r="2571"><o>__sys__t105</o><i>leaderUser</i><i>__sys__t106</i></o>
+<o n="trace" r="2571"><o>__sys__t108</o><i>__sys__t105</i></o>
+<v t="s" n="__sys__t110">.logoutTime.</v>
+<o n="." r="2572"><o>__sys__t109</o><i>leaderUser</i><i>__sys__t110</i></o>
+<o n="time" r="2572"><o>__sys__t112</o></o>
+<o n="strtotime" r="2572"><o>__sys__t113</o><i>__sys__t109</i></o>
+<o n="-" r="2572"><o>__sys__t114</o><i>__sys__t112</i><i>__sys__t113</i></o>
+<o n="=" r="2572"><o>dt</o><i>__sys__t114</i></o>
+<v t="s" n="__sys__t117">.online.</v>
+<o n="." r="2574"><o>__sys__t116</o><i>leaderUser</i><i>__sys__t117</i></o>
+<o n="int" r="2574"><o>__sys__t119</o><i>__sys__t116</i></o>
+<o n="*" r="2575"><o>__sys__t120</o><i>__sys__t17</i><i>__sys__t18</i></o>
+<o n="*" r="2575"><o>__sys__t121</o><i>__sys__t120</i><i>__sys__t19</i></o>
+<o n="*" r="2575"><o>__sys__t122</o><i>__sys__t121</i><i>__sys__t20</i></o>
+<o n=">=" r="2575"><o>__sys__t123</o><i>dt</i><i>__sys__t122</i></o>
+<o n="!=" r="2574"><o>__sys__t124</o><i>__sys__t119</i><i>__sys__t16</i></o>
+<o n="&&" r="2574"><o>__sys__t125</o><i>__sys__t124</i><i>__sys__t123</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t125</i></o>
+<o n="=="><o>__sys__t127</o><i>__sys__rt</i><i>__sys__t21</i></o>
+<o n="if_goto"><o>__sys__t128</o><i>__sys__t127</i><i>__sys__t197</i></o>
+<o n="+" r="2580"><o>__sys__t129</o><i>__sys__t22</i><i>unionID</i></o>
+<o n="+" r="2580"><o>__sys__t130</o><i>__sys__t129</i><i>__sys__t23</i></o>
+<o n="+" r="2580"><o>__sys__t131</o><i>__sys__t130</i><i>leaderUserID</i></o>
+<o n="+" r="2580"><o>__sys__t132</o><i>__sys__t131</i><i>__sys__t24</i></o>
+<o n="=" r="2580"><o>sql</o><i>__sys__t132</i></o>
+<o n="=" r="2581"><o>newLeaderUserID</o><i>__sys__t25</i></o>
+<o n="mysqlCreateRs" r="2582"><o>__sys__t135</o><i>cnn</i><i>sql</i></o>
+<o n="=" r="2582"><o>rs</o><i>__sys__t135</i></o>
+<o n="mysqlNextRow" r="2583"><o>__sys__t137</o><i>rs</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t137</i></o>
+<o n="=="><o>__sys__t139</o><i>__sys__rt</i><i>__sys__t26</i></o>
+<o n="if_goto"><o>__sys__t140</o><i>__sys__t139</i><i>__sys__t145</i></o>
+<o n="mysqlGetColVal" r="2585"><o>__sys__t141</o><i>rs</i><i>__sys__t27</i></o>
+<o n="int" r="2585"><o>__sys__t142</o><i>__sys__t141</i></o>
+<o n="=" r="2585"><o>newLeaderUserID</o><i>__sys__t142</i></o>
+<o n="goto"><o>__sys__t144</o><i>__sys__t146</i></o>
+<o n="mysqlDestroyRs" r="2587"><o>__sys__t147</o><i>rs</i></o>
+<o n=">" r="2588"><o>__sys__t148</o><i>newLeaderUserID</i><i>__sys__t28</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t148</i></o>
+<o n="=="><o>__sys__t150</o><i>__sys__rt</i><i>__sys__t29</i></o>
+<o n="if_goto"><o>__sys__t151</o><i>__sys__t150</i><i>__sys__t194</i></o>
+<v t="s" n="__sys__t153">.getRow.</v>
+<o n="." r="2590"><o>__sys__t152</o><i>rd</i><i>__sys__t153</i></o>
+<o n="__sys__t152" r="2590"><o>__sys__t155</o><i>rd</i><i>cnn</i><i>__sys__t30</i><i>__sys__t31</i><i>newLeaderUserID</i><i>__sys__t32</i><i>__sys__t33</i></o>
+<o n="=" r="2590"><o>targetXuser</o><i>__sys__t155</i></o>
+<v t="s" n="__sys__t158">.nickname.</v>
+<o n="." r="2591"><o>__sys__t157</o><i>targetXuser</i><i>__sys__t158</i></o>
+<o n="=" r="2591"><o>xName</o><i>__sys__t157</i></o>
+<v t="s" n="__sys__t162">.leaderUserID.</v>
+<o n="." r="2592"><o>__sys__t161</o><i>row</i><i>__sys__t162</i></o>
+<o n="=" r="2592"><o>__sys__t161</o><i>newLeaderUserID</i></o>
+<v t="s" n="__sys__t166">.leaderNickname.</v>
+<o n="." r="2593"><o>__sys__t165</o><i>row</i><i>__sys__t166</i></o>
+<o n="=" r="2593"><o>__sys__t165</o><i>xName</i></o>
+<v t="s" n="__sys__t170">.viceLeaderUserIDMap.</v>
+<o n="." r="2594"><o>__sys__t169</o><i>unionJson</i><i>__sys__t170</i></o>
+<o n="=" r="2594"><o>viceLeaderUserIDMap</o><i>__sys__t169</i></o>
+<o n="exist" r="2595"><o>__sys__t173</o><i>viceLeaderUserIDMap</i><i>newLeaderUserID</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t173</i></o>
+<o n="=="><o>__sys__t175</o><i>__sys__rt</i><i>__sys__t34</i></o>
+<o n="if_goto"><o>__sys__t176</o><i>__sys__t175</i><i>__sys__t179</i></o>
+<o n="remove" r="2597"><o>__sys__t177</o><i>viceLeaderUserIDMap</i><i>newLeaderUserID</i></o>
+<o n="goto"><o>__sys__t178</o><i>__sys__t180</i></o>
+<v t="s" n="__sys__t182">.pickUserIDMap.</v>
+<o n="." r="2599"><o>__sys__t181</o><i>unionJson</i><i>__sys__t182</i></o>
+<o n="=" r="2599"><o>pickUserIDMap</o><i>__sys__t181</i></o>
+<o n="exist" r="2600"><o>__sys__t185</o><i>pickUserIDMap</i><i>newLeaderUserID</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t185</i></o>
+<o n="=="><o>__sys__t187</o><i>__sys__rt</i><i>__sys__t35</i></o>
+<o n="if_goto"><o>__sys__t188</o><i>__sys__t187</i><i>__sys__t191</i></o>
+<o n="remove" r="2602"><o>__sys__t189</o><i>pickUserIDMap</i><i>newLeaderUserID</i></o>
+<o n="goto"><o>__sys__t190</o><i>__sys__t192</i></o>
+<o n="goto"><o>__sys__t193</o><i>__sys__t195</i></o>
+<o n="goto"><o>__sys__t196</o><i>__sys__t198</i></o>
+<o n="goto"><o>__sys__t199</o><i>__sys__t201</i></o>
+<v t="s" n="__sys__t203">.json.</v>
+<o n="." r="2610"><o>__sys__t202</o><i>row</i><i>__sys__t203</i></o>
+<o n="json_encode" r="2610"><o>__sys__t205</o><i>unionJson</i></o>
+<o n="=" r="2610"><o>__sys__t202</o><i>__sys__t205</i></o>
+<o n="return" r="2611"><o>__sys__t207</o><i>__sys__t36</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t100" />
+<v n="__sys__t101" />
+<v n="__sys__t103" />
+<v n="__sys__t104" />
+<v n="__sys__t105" />
+<v n="__sys__t108" />
+<v n="__sys__t109" />
+<v n="__sys__t112" />
+<v n="__sys__t113" />
+<v n="__sys__t114" />
+<v n="__sys__t116" />
+<v n="__sys__t119" />
+<v n="__sys__t120" />
+<v n="__sys__t121" />
+<v n="__sys__t122" />
+<v n="__sys__t123" />
+<v n="__sys__t124" />
+<v n="__sys__t125" />
+<v n="__sys__t127" />
+<v n="__sys__t128" />
+<v n="__sys__t129" />
+<v n="__sys__t130" />
+<v n="__sys__t131" />
+<v n="__sys__t132" />
+<v n="__sys__t135" />
+<v n="__sys__t137" />
+<v n="__sys__t139" />
+<v n="__sys__t140" />
+<v n="__sys__t141" />
+<v n="__sys__t142" />
+<v n="__sys__t144" />
+<v n="__sys__t147" />
+<v n="__sys__t148" />
+<v n="__sys__t150" />
+<v n="__sys__t151" />
+<v n="__sys__t152" />
+<v n="__sys__t155" />
+<v n="__sys__t157" />
+<v n="__sys__t161" />
+<v n="__sys__t165" />
+<v n="__sys__t169" />
+<v n="__sys__t173" />
+<v n="__sys__t175" />
+<v n="__sys__t176" />
+<v n="__sys__t177" />
+<v n="__sys__t178" />
+<v n="__sys__t181" />
+<v n="__sys__t185" />
+<v n="__sys__t187" />
+<v n="__sys__t188" />
+<v n="__sys__t189" />
+<v n="__sys__t190" />
+<v n="__sys__t193" />
+<v n="__sys__t196" />
+<v n="__sys__t199" />
+<v n="__sys__t202" />
+<v n="__sys__t205" />
+<v n="__sys__t207" />
+<v n="__sys__t37" />
+<v n="__sys__t39" />
+<v n="__sys__t41" />
+<v n="__sys__t43" />
+<v n="__sys__t45" />
+<v n="__sys__t47" />
+<v n="__sys__t49" />
+<v n="__sys__t51" />
+<v n="__sys__t54" />
+<v n="__sys__t56" />
+<v n="__sys__t60" />
+<v n="__sys__t63" />
+<v n="__sys__t65" />
+<v n="__sys__t66" />
+<v n="__sys__t67" />
+<v n="__sys__t71" />
+<v n="__sys__t75" />
+<v n="__sys__t79" />
+<v n="__sys__t82" />
+<v n="__sys__t83" />
+<v n="__sys__t86" />
+<v n="__sys__t87" />
+<v n="__sys__t90" />
+<v n="__sys__t93" />
+<v n="__sys__t95" />
+<v n="__sys__t98" />
+<v n="cnn" />
+<v n="curDate" />
+<v n="dt" />
+<v n="leaderUser" />
+<v n="leaderUserID" />
+<v n="newLeaderUserID" />
+<v n="pickUserIDMap" />
+<v n="powerTotal" />
+<v n="rd" />
+<v n="row" />
+<v n="rs" />
+<v n="sql" />
+<v n="targetXuser" />
+<v n="unionID" />
+<v n="unionJson" />
+<v n="userData" />
+<v n="viceLeaderUserIDMap" />
+<v n="xName" />
+</script>

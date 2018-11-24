@@ -1,0 +1,34 @@
+//邮件-发现未知邮件®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+cnn=game.cnn;
+//tabName="mail"+userID;
+tabName=createIDTable(cnn,"mail",userID);
+sql="select id from `"+tabName+"` where `read`=0 limit 1";
+rs=mysqlCreateRs(cnn,sql);
+id=-1;
+while(mysqlNextRow(rs))
+{
+	id=int(mysqlGetColVal(rs,0));
+}
+mysqlDestroyRs(rs);
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,id)
+);

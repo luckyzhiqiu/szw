@@ -1,0 +1,326 @@
+//攻击
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+heroIndex=netMsg[3];//豪杰下标
+bossId=netMsg[4];
+
+
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+updateFuc=##<game,damage,userID,pNickname,head,level,unionID,bossId,heroID,fashionID>
+	backArr=arr();//[0]:类型[1]:血量[2]:积分[3]:userID[4]:pNickname
+	push(backArr,-3);
+
+	
+	
+	unionRow=game.rd.updateRow
+	(
+		game.cnn,"union","id",unionID,"*",
+		//修改回调
+		##<unionRow,game>
+			@link methodName,sessionID,backArr,damage,userID,pNickname,head,level,unionID,bossId,heroID,fashionID;
+			
+			//
+			json=json_decode(unionRow.json);
+			bossMap=ref(json.bossMap);
+			
+			if(!exist(bossMap,bossId))
+			{
+				backArr[0]=-4; //没有boss
+				return(0);
+			}
+			
+			hpMax=ref(bossMap[bossId].hpMax);
+			point=ref(bossMap[bossId].point);
+			hp=ref(bossMap[bossId].hp);
+			killerUserID=ref(bossMap[bossId].killerUserID);
+			nickname=ref(bossMap[bossId].nickname);
+			killerLevel=ref(bossMap[bossId].killerLevel);
+			killerHead=ref(bossMap[bossId].killerHead);
+			killerFashionID=ref(bossMap[bossId].killerFashionID);
+		
+			if(number(hp)<=0)
+			{
+				//已被打败
+				backArr[0]=-2;
+				push(backArr,0);
+				push(backArr,0);
+				push(backArr,killerUserID);
+				push(backArr,nickname);
+				push(backArr,hpMax);
+				push(backArr,killerHead);
+				push(backArr,killerLevel);
+				push(backArr,0);
+				push(backArr,killerFashionID);
+				return(0);
+			}else if(number(hp)<=number(damage))
+			{
+				//补刀
+				killerUserID=userID;
+				nickname=pNickname;
+				killerHead=head;
+				killerLevel=level;
+				killerFashionID=fashionID;
+				
+				backArr[0]=2;
+				push(backArr,0);
+				push(backArr,floor(number(point)*number(hp)/number(hpMax)));
+				push(backArr,killerUserID);
+				push(backArr,nickname);
+				push(backArr,hpMax);
+				push(backArr,killerHead);
+				push(backArr,killerLevel);
+				push(backArr,number(hp));
+				push(backArr,killerFashionID);
+				
+				
+				effect=ref(unionRow.effect);
+				rowWB=game.table.allianceBarrier.getRowFromColName("id",bossId);
+
+				influence=rowWB.getValFromColName("influence");
+				exp=rowWB.getValFromColName("exp");
+				
+				effect=number(effect)+number(influence);
+				game.numMgr.addUnionExp(unionRow,number(exp));
+
+				
+				
+				tableName=createIDTable(game.cnn,"union_hurt",unionID);
+				sql="INSERT INTO "+tableName+" (nickname,userID,genTime,heroID,hurt,bossID) VALUES ('"+pNickname+"',"+userID+",'"+now()+"',"+heroID+","+hp+","+bossId+")";
+				mysqlExec(game.cnn,sql);
+				
+				hp=0;
+				
+				textTable=game.table.text;
+				rowT=textTable.getRowFromColName("id",407);
+				str=rowT.getValFromColName("text");//
+				outStr=sprintf(str,nickname,rowWB.getValFromColName("name"));
+			
+				//nickname:用户昵称;outStr:输出文本
+				userType=0;//user:0;
+				unionSendMsg(game,userType,nickname,outStr,json.userIDMap,unionRow.id,1);
+				
+			}else 
+			{
+				hp=number(hp)-number(damage);	
+				backArr[0]=1;
+				push(backArr,hp);
+				push(backArr,floor(number(point)*number(damage)/number(hpMax)));
+				push(backArr,killerUserID);
+				push(backArr,nickname);
+				push(backArr,hpMax);
+				push(backArr,killerHead);
+				push(backArr,killerLevel);
+				push(backArr,number(damage));
+				push(backArr,killerFashionID);
+				
+				tableName=createIDTable(game.cnn,"union_hurt",unionID);
+				sql="INSERT INTO "+tableName+" (nickname,userID,genTime,heroID,hurt,bossID) VALUES ('"+pNickname+"',"+userID+",'"+now()+"',"+heroID+","+damage+","+bossId+")";
+				mysqlExec(game.cnn,sql);
+			}
+			
+			
+			//保存
+			unionRow.json=json_encode(json);
+			return(1);//修改
+			
+			
+	
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	
+	return(backArr);
+	
+	
+##.;
+
+
+
+	//修改行数据
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link methodName,sessionID,updateFuc,heroIndex,userID,bossId;
+			
+			json=json_decode(user.json);
+			heroArr=ref(json.hero);
+			heroInfo=heroArr[heroIndex];
+			
+			
+			if(empty(heroInfo))
+			{
+				//豪杰不存在
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)
+				);
+				return(0);//不修改
+				
+			}
+					
+
+			dailyTask=json.dailyTask;
+			unionBossHeroMap=ref(dailyTask.unionBossHeroMap);
+			
+
+			
+			if(exist(unionBossHeroMap,heroIndex))
+			{
+				//已打过
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-5)
+				);
+				return(0);//不修改
+			}
+			push(unionBossHeroMap,heroIndex,1);
+			
+			
+			nowTime=now();//今天时间
+			currentTime=strtotime(nowTime);
+			t=split(arr(),nowTime," ");
+			t_a=t[0];
+			rowWB=game.table.allianceConfigure.getRow(0);
+
+			closeTime=strtotime(t_a+" "+rowWB.getValFromColName("closeTime"));
+			if(number(currentTime)>number(closeTime))
+			{
+				//不在开放时间
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-89)
+				);
+				return(0);//不修改
+				
+			}
+			
+			unionID=number(user.unionID);
+			if(unionID==0)//没有联盟
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-6)
+				);
+				return(0);//不修改
+			}
+			
+			//战斗力=武力资质*5000*等级+武力总
+			damage=game.numMgr.getHeroAttack(heroInfo,json);
+			//damage=number(heroInfo.strengthGrows)*5000*number(heroInfo.level)+number(heroInfo.strengthTotal);
+			limitTask=json.limitTask;
+			unionBossHit=limitTask.unionBossHit;
+			unionBossHit+=damage;
+			limitTask.unionBossHit=unionBossHit;
+	
+			devote=ref(user.devote);
+			devoteTotal=ref(user.devoteTotal);
+			
+			backArr=updateFuc(game,damage,userID,user.nickname,user.head,user.level,unionID,bossId,heroInfo.heroID,user.fashionID);
+		
+
+			if(backArr[0]==-3)
+			{
+				//union数据错误
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)
+				);
+				return(0);//不修改
+				
+			}else if(backArr[0]==-2)
+			{
+				// //已被打败
+				// game.sendMsg
+				// (
+					// sessionID,
+					// arr(methodName+"Result",-2)
+				// );
+				// return(0);//不修改
+	
+			}else if(backArr[0]==-4)
+			{
+				//没有boss
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-7)
+				);
+				return(0);//不修改
+	
+			}else if(backArr[0]==2)
+			{
+				//限时任务//击杀秘境boss
+				limitTask.killUnionBoss+=1;
+			}				
+			devote=number(devote)+number(backArr[2]);
+			devoteTotal=number(devoteTotal)+number(backArr[2]);
+		
+			//保存
+			user.json=json_encode(json);
+			
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,backArr[1],backArr[5],devote,unionBossHeroMap,backArr[3],backArr[4],backArr[6],backArr[7],devoteTotal,backArr[9],unionBossHit,limitTask.killUnionBoss)
+			);
+			
+			return(1);//修改
+		
+		##.,
+		//修改完成回调
+		##<row,game>
+		
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	
+
+
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}

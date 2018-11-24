@@ -1,0 +1,1 @@
+akserver db/global.aks

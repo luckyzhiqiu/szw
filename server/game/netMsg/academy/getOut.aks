@@ -1,0 +1,190 @@
+//下课
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+index=int(netMsg[3]);//位置
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		// oldPower=number(user.power);
+	
+		@link methodName,sessionID,userID,index;
+		json=json_decode(user.json);	
+		bookHouse=json.bookHouse;
+		seatCount=bookHouse.seatCount;
+		heroArrB=bookHouse.heroArr;
+		getOutInfo=heroArrB[index];
+
+		table=game.table;
+		schoolTable=table.school;
+		rowS=schoolTable.getRow(0);
+		timeCost=number(rowS.getValFromColName("timeCost"));//每次培养时间分钟
+		
+		bt=getOutInfo.bt;
+		nowTime=time();
+		passTime=floor((nowTime-bt)/60);
+		if(passTime<timeCost)//时间未到
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);
+		}
+		
+		heroIndex=getOutInfo.heroIndex;
+		heroArr=json.hero;
+		hero=heroArr[heroIndex];
+		
+		strengthGrows=hero.strengthGrows;
+		wisdomGrows=hero.wisdomGrows;
+		charmGrows=hero.charmGrows;
+		politicsGrows=hero.politicsGrows;
+		if(heroIndex==0)
+		{
+			wifePlus=json.wifePlus;
+			strengthGrows+=wifePlus.strengthGrows;
+			wisdomGrows+=wifePlus.wisdomGrows;
+			charmGrows+=wifePlus.charmGrows;
+			politicsGrows+=wifePlus.politicsGrows;
+		}
+		numArr=arr();
+		push(numArr,strengthGrows,wisdomGrows,charmGrows,politicsGrows);
+		indexS=randSelect(numArr);
+		
+		doubleExp=getOutInfo.doubleExp;
+		grows=number(rowS.getValFromColName("grows"));//属性增长
+		skillEXPMin=number(rowS.getValFromColName("skillEXPMin"));//技能经验最小值
+		skillEXPMax=number(rowS.getValFromColName("skillEXPMax"));//技能经验最大值
+		skillExp=rand()%(skillEXPMax-skillEXPMin)+skillEXPMin+1;
+		
+		if(doubleExp==1)//加倍
+		{
+			skillExp*=2;
+			grows*=2;
+		}
+		
+		hero.skillExp+=skillExp;
+		if(indexS==0)
+		{
+			hero.strength+=grows;
+		}
+		else if(indexS==1)
+		{
+			hero.wisdom+=grows;
+		}
+		else if(indexS==2)
+		{
+			hero.charm+=grows;
+		}
+		else if(indexS==3)
+		{
+			hero.politics+=grows;
+		}
+		
+		heroType=arr("strength","wisdom","charm","politics");
+		addType=arr();
+		push(addType,heroIndex,heroType[indexS],grows,skillExp,doubleExp);
+		
+		//重新计算加成
+		numMgr=game.numMgr;
+		numMgr.computeHeroArr(json);
+		numMgr.computeUser(user,json);
+	
+		//保存
+		heroArrB[index].heroIndex=-1;
+		heroArrB[index].doubleExp=0;
+		user.json=json_encode(json);
+		
+		power=number(user.power);
+		strength=number(user.strength);
+		wisdom=number(user.wisdom);
+		charm=number(user.charm);
+		politics=number(user.politics);
+		
+		//刷新国子监冲榜
+		activityMgr=game.activityMgr;
+		activityID=204;//国子监冲榜
+		if(activityMgr.getActivityStatus(activityID)==1)//活动进行中
+		{
+			dPower=grows;//power-oldPower;//势力涨幅
+			global_var=game.global_var;
+			rushLoop=global_var.rushLoop;
+			rushLoopBt=rushLoop.bt;//阶段开始时间
+		
+			bookHouseAddBT=number(user.bookHouseAddBT);
+			bookHouseAdd=number(user.bookHouseAdd);
+			score=dPower;
+			if(bookHouseAddBT!=rushLoopBt)//重置活动积分
+			{
+				user.bookHouseAddBT=rushLoopBt;
+				bookHouseAdd=score;
+				user.bookHouseAddReward=0;
+			}
+			else//累计活动积分
+			{
+				bookHouseAdd+=score;
+			}
+			user.bookHouseAdd=bookHouseAdd;
+			//刷新榜
+			score=bookHouseAdd;
+			rankName=game.gameConfig.name+"_bookHouseAddRank";//排行榜名称
+			rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+			userID=user.id;
+			redis_zadd(rd,rankName,score,userID);//更新榜单
+			//国子监势力涨幅返回
+			userSessionMap=game.userSessionMap;
+			if(exist(userSessionMap,userID))
+			{
+				session=userSessionMap[userID];
+				msg=arr("bookHouseAddResult",bookHouseAdd);
+				game.sendMsg(session.id,msg);
+			}
+		}
+			
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,heroArrB,heroIndex,hero,strength,wisdom,charm,politics,power,addType)
+		);
+		
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

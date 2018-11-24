@@ -1,0 +1,35 @@
+//获取未发货订单列表
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+cnn=game.cnn;
+
+orderNumArr=arr();
+sql="select num from `order` where userID="+userID+" and status=1 and `get`=0";
+rs=mysqlCreateRs(cnn,sql);
+while(mysqlNextRow(rs))
+{
+	orderNum=mysqlGetColVal(rs,0);
+	push(orderNumArr,orderNum);
+}
+mysqlDestroyRs(rs);
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,orderNumArr)
+);

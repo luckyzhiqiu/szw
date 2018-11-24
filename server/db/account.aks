@@ -1,0 +1,16 @@
+//批量创建数据库和表格
+"api/init.aks"();
+
+//redis连接
+redisConfig=json(file_get_contents("config/account_redis.json"));
+rd=AKRedis(redisConfig);
+//清理所有redis节点缓存
+rd.clean();
+
+db=readDBConfig("config/db.json","define/db_table.json");//读取数据库配置
+cnnPool=AKMysqlCnnPool();//mysql连接池
+dbMaker=AKDatabaseMaker(cnnPool);//数据库创建器
+dbMaker.make(db.cnn_account,db.db_account);//创建或升级数据库
+
+trace("ok");
+quitSystem();

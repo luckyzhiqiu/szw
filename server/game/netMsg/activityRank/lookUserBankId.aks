@@ -1,0 +1,126 @@
+//查看自己活动榜信息-®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+rankId=netMsg[3];//榜ID
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+if((rankId<1&&rankId>208)&&(rankId<200&&rankId>4))//非法参数
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}
+//获取
+if(rankId==1)
+{
+	rankName=game.gameConfig.name+"_activityPowerRank";//势力排行榜名称
+}
+else if(rankId==2)
+{
+	rankName=game.gameConfig.name+"_activityIntimateRank";//亲密排行榜名称
+}
+else if(rankId==3)
+{
+	rankName=game.gameConfig.name+"_activityWaterRank";//论战排行榜名称
+}
+else if(rankId==4)
+{
+	rankName=game.gameConfig.name+"_activityUnionRank";//联萌排行榜名称
+}
+else if(rankId==201)
+{
+	rankName=game.gameConfig.name+"_moneySubRank";//银两排行榜名称
+}
+else if(rankId==202)
+{
+	rankName=game.gameConfig.name+"_soldierSubRank";//士兵排行榜名称
+}
+else if(rankId==203)
+{
+	rankName=game.gameConfig.name+"_barrierAddRank";//关卡排行榜名称
+}
+else if(rankId==204)
+{
+	rankName=game.gameConfig.name+"_bookHouseAddRank";//国子监排行榜名称
+}
+else if(rankId==205)
+{
+	rankName=game.gameConfig.name+"_childAddRank";//子嗣排行榜名称
+}
+else if(rankId==206)
+{
+	rankName=game.gameConfig.name+"_fuckAddRank";//召唤排行榜名称
+}
+else if(rankId==207)
+{
+	rankName=game.gameConfig.name+"_marryAddRank";//联姻排行榜名称
+}
+else if(rankId==208)
+{
+	rankName=game.gameConfig.name+"_searchAddRank";//寻访排行榜名称
+}
+
+
+rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+//自己的排名
+rankID=-1;
+isRead=-1;//是否领取
+expAdd="";
+name="";
+if(rankId!=4)
+{
+	@try
+		rankID=redis_zrevrank(rd,rankName,userID);
+	@catch
+		rankID=-1;//未上榜
+	@catch.
+}
+else //联萌排名
+{
+	unknownUser=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+	unionID=number(unknownUser.unionID);
+	rankID=-2;//没联萌
+	if(unionID!=0)
+	{
+		unknownUnion=game.rd.getRow(game.cnn,"union","id",unionID,"*",1000);
+		unknownUnionJson=json_decode(unknownUnion.json);
+		expAdd=unknownUnion.expAdd;//经验
+		name=unknownUnion.name;//名称
+		rewardUserIDMap=unknownUnionJson.rewardUserIDMap;
+		if(exist(rewardUserIDMap,userID))
+		{
+			isRead=1;
+		}
+		else
+		{
+			isRead=0;
+		}
+		unknownUnion.json=json_encode(unknownUnionJson);
+		@try
+			rankID=redis_zrevrank(rd,rankName,unionID);
+		@catch
+			rankID=-1;//未上榜
+		@catch.
+	}
+	
+}
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,rankID,name,expAdd,isRead)
+);

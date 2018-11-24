@@ -1,0 +1,169 @@
+//创建宴会
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+type=netMsg[3];//类型：0=家宴；1=官宴（必须公开）；
+partyOpen=netMsg[4];//宴会公开标记：0=否；1=是；
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link sessionID,methodName,type,partyOpen,userID;
+		json=json_decode(user.json);
+		partyBt=number(user.partyBt);//宴会开始时间
+		if(partyBt!=0)//宴会已开始
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//修改
+		}
+		
+		tableData=game.table;
+		dinnerTable=tableData.dinner;
+		rowD=dinnerTable.getRowFromColName("type",type);
+		needGold=number(rowD.getValFromColName("gold"));//消耗元宝
+		
+		//扣减元宝
+		gold=number(user.gold);//元宝（充值，优先使用）
+		gold2=number(user.gold2);//元宝（赠送）
+		if(needGold>(gold+gold2))//元宝不足
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+
+		if(needGold>gold)
+		{
+			needGold-=gold;
+			gold=0;
+			gold2-=needGold;
+		}
+		else
+		{
+			gold-=needGold;
+		}
+		
+		if(needGold>0)
+		{
+			//流水
+			allGold=gold+gold2;//元宝余额
+			game.saveResIO(userID,51,0,0,needGold,allGold);//开宴会(type,itemID,（0=消耗，1=获得）,count,allGold)
+		}
+
+		//扣除道具
+		itemDict=json.item;
+		numMgr=game.numMgr;
+		item=rowD.getValFromColName("item");//消耗道具
+		addItemArr=split(arr(),item,",");
+		addIDCount=size(addItemArr);
+		if(addIDCount>=2)
+		{
+			i=0;j=0;addCount=addIDCount/2;
+			while(i<addCount)
+			{
+				itemID=number(addItemArr[j]);
+				itemCount=number(addItemArr[j+1]);
+				itemCount=numMgr.subItem(itemID,itemCount,itemDict);//消耗道具
+				if(itemCount==-1)//道具不足
+				{
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-4)
+					);
+					return(0);
+				}
+
+				j+=2;
+				++i;
+			}
+		}
+		
+		structMgr=game.structMgr;
+		nowTime=time();
+		jsonExt=json_decode(user.jsonExt);
+		numMax=number(rowD.getValFromColName("numMax"));//最多赴宴人数
+		time=number(rowD.getValFromColName("time"));//持续时间（分钟）
+		point=number(rowD.getValFromColName("point"));//初始分数
+		
+		party=jsonExt.party;
+		party.score=point;//分数（主办方结算时所得分数）
+		
+		seatArr=party.seatArr;
+		clean(seatArr);
+		i=0;partySeat=structMgr_upgradeObj(structMgr,"PartySeat",dict());
+		while(i<numMax)
+		{
+			push(seatArr,partySeat);
+			++i;
+		}
+		
+		partyOpenS=user.partyOpen;
+		if(type==0)
+		{
+			partyOpenS=partyOpen;
+		}
+		
+		//数据初始化
+		user.partyBt=nowTime;//宴会开始时间
+		user.partyType=type;//宴会类型：0=家宴；1=官宴（必须公开）；
+		user.partyNum=numMax;//宴会人数（能加入的人数）
+		user.partyOpen=partyOpenS;//宴会公开标记：0=否；1=是；
+		
+		//保存
+		user.gold=gold;
+		user.gold2=gold2;
+		user.json=json_encode(json);
+		user.jsonExt=json_encode(jsonExt);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,gold,gold2,nowTime,type,numMax,partyOpenS,party,time(),itemDict)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

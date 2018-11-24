@@ -1,0 +1,54 @@
+//排行榜（议政日榜）
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+page=int(netMsg[3]);//页码（从0开始）page=-1代表只请求第一条数据
+
+countPerPage=10;//每页条数
+begin=page*countPerPage;
+
+if(page==-1)
+{
+	begin=0;
+	countPerPage=1;
+}
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+cnn=game.cnn;
+
+tableName=createDayTable(cnn,"water_battle");//创建表
+infoArr=arr();
+
+sql="select genTime,userID,userName,heroID,enemyUserID,enemyUserName,killCount,enemyCount,winCount from "+tableName+" order by id desc limit "+begin+","+countPerPage;
+
+rs=mysqlCreateRs(cnn,sql);
+while(mysqlNextRow(rs))
+{
+	info=arr();
+	cols=mysqlGetCols(rs);
+	i=0;while(i<cols)
+	{
+		push(info,mysqlGetColVal(rs,i));
+		++i;
+	}
+	push(infoArr,info);
+}
+mysqlDestroyRs(rs);
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,infoArr)
+);

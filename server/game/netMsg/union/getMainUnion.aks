@@ -1,0 +1,80 @@
+//获取联盟主页面信息
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+unionID=number(user.unionID);
+if(unionID==0)//未加入联盟
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+//联盟ID
+unionData=game.rd.getRow(game.cnn,"union","id",unionID,"*",1000);
+if(empty(unionData))//联盟不存在
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}
+
+infoDict=dict();
+
+password=unionData.password;
+leaderUserID=number(unionData.leaderUserID);
+if(password=="")
+{
+	if(leaderUserID==userID)//密码需要重置
+	{
+		infoDict["password"]=1;
+	}
+	else
+	{
+		infoDict["password"]=0;
+	}
+}
+
+infoDict["name"]=unionData.name;//联盟名称
+infoDict["peopleNum"]=number(unionData.peopleNum);//联盟人数
+infoDict["peopleNumMax"]=number(unionData.peopleNumMax);//联盟最大人数
+infoDict["effect"]=number(unionData.effect);//联盟影响力
+infoDict["level"]=number(unionData.level);//联盟等级
+infoDict["exp"]=number(unionData.exp);//联盟经验
+infoDict["targetRichmanID"]=number(unionData.targetRichmanID);//目标权贵ID
+infoDict["leaderUserID"]=leaderUserID;//盟主ID
+infoDict["catchCount"]=number(unionData.catchCount);//当天拉拢次数
+
+uJson=json_decode(unionData.json);
+infoDict["viceLeaderUserIDMap"]=uJson.viceLeaderUserIDMap;//副盟主ID
+infoDict["private_msg"]=unionData.private_msg;//联盟公告
+
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,infoDict,unionID)
+);
+	
+	

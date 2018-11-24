@@ -1,0 +1,269 @@
+//建设
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+itemIDUse=netMsg[3];//道具ID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//backArr=arr();
+buildNumTotal=0;
+
+passResulf=0;
+//增加建设度
+updateGlobal_var=##<game,user,bulidNum,point>
+	global=game.rd.updateRow
+	(
+		game.cnn,"global_var","name","buildActivity","*",
+		//修改回调
+		##<global,game>
+			@link methodName,sessionID,bulidNum,buildNumTotal,user,point,passResulf;
+			
+			//获取全局变量
+			globalJson=json_decode(global.json);
+			buildVal=globalJson.buildVal;
+			
+			rowBE=game.table.buildEvent.getRow(0);
+			buildNumAll=number(rowBE.getValFromColName("buildNumAll"));//建设度总值
+			if(buildVal>=buildNumAll)//建设度总值已满
+			{
+				passResulf=-4;
+				return(0);//不修改
+			}
+			
+			buildVal+=bulidNum;
+			buildNumTotal=limit(buildVal,0,buildNumAll);
+			globalJson.buildVal=buildNumTotal;
+			
+			//增加联盟建设值
+			unionID=int(user.unionID);
+			if(unionID>0)
+			{
+				game.rd.updateRow
+				(
+					game.cnn,"union","id",unionID,"*",
+					//修改回调
+					##<union,game>
+						@link bulidNum,unionID,point;
+						buildValTotal=number(union.buildValTotal);
+						buildValTotal+=point;
+						
+						//更新榜
+						rankName=game.gameConfig.name+"_unionBuildActivityRank";//排行榜名称
+						rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+						//score=buildValTotal;
+						redis_zadd(rd,rankName,buildValTotal,unionID);
+						
+						//保存
+						union.buildValTotal=buildValTotal;
+						
+						return(1);//修改
+					##.,
+					//修改完成回调
+					##<row,userData>
+						//...
+					##.,
+					//解锁后回调
+					##<row,userData>
+						//...
+					##.,
+					game,//自定义数据userData
+					1000//加锁时间（毫秒），例如：1000
+				);
+			}
+			
+			//保存
+			global.json=json_encode(globalJson);
+			return(1);//修改
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+##.;
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,itemIDUse,updateGlobal_var,buildNumTotal,userID,passResulf;
+		json=json_decode(user.json);
+		tabelData=game.table;
+		
+		rowBE=tabelData.buildEvent.getRow(0);
+		btEveryday=rowBE.getValFromColName("btEveryday");//每日开启时间
+		dtEveryday=rowBE.getValFromColName("dtEveryday");//每日持续时间
+		
+		dayBt=strtotime(split(arr(),now()," ")[0]);//今天的开始时间（秒）
+		bt=dateStrToSeconds(btEveryday);
+		dt=dateStrToSeconds(dtEveryday);
+		ct=time();
+		if(ct<(dayBt+bt) || ct>(dayBt+dt))//不在建设时间内
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-5)
+			);
+			return(0);//不修改
+		}
+
+		rowB=tabelData.buildEventShop.getRowFromColName("itemID",itemIDUse);
+		if(empty(rowB))//没有此项道具ID
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+	
+		itemDict=json.item;
+		numMgr=game.numMgr;
+		num=numMgr.subItem(itemIDUse,1,itemDict);
+		if(num==-1)//数量不足扣除失败
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		bulidNum=number(rowB.getValFromColName("bulidNum"));//建设度
+		point=number(rowB.getValFromColName("point"));//积分
+		itemStr=rowB.getValFromColName("item");//道具
+		
+		buildActivityScoreTotal=number(user.buildActivityScoreTotal)+point;//百废待兴累积积分（用于排行榜）
+		buildActivityScore=number(user.buildActivityScore)+point;//百废待兴兑换积分
+		updateGlobal_var(game,user,bulidNum,point);//增加建设度
+		if(passResulf)
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",passResulf)
+			);
+			return(0);//不修改
+		}
+		
+		itemaArr=arr();
+		getIDArr=arr();
+		addItemArr=split(arr(),itemStr,",");
+		addIDCount=size(addItemArr);
+		if(addIDCount>=3)
+		{
+			i=0;j=0;addCount=addIDCount/3;
+			while(i<addCount)
+			{
+				itemID=number(addItemArr[j]);
+				itemCount=number(addItemArr[j+1]);
+				probability=number(addItemArr[j+2]);
+				randNum=rand()%10000;
+				if(randNum<probability)//中奖
+				{
+					push(itemaArr,itemID,itemCount);
+					numMgr.addItem(itemID,itemCount,itemDict);//奖励道具
+					if(itemID==72 || itemID==13 || itemID==3)
+					{
+						push(getIDArr,itemID);
+					}
+				}
+				j+=3;
+				++i;
+			}
+		}
+		
+		nickname=user.nickname;//玩家名字
+		
+		//群发
+		rtMsg=arr("chat/useConstruction",nickname,itemIDUse,itemaArr);
+		game.sendMsgToAllExceptUserID(rtMsg,0);
+
+		//发给hub
+		game.sendMsgToHub(rtMsg);
+		
+		itemTable=tabelData.item;
+		str_get="获得了";
+		c=size(getIDArr);
+		pass=0;
+		i=0;while(i<c)
+		{
+			//奖励道具公告
+			itemID=getIDArr[i];
+			pass=1;
+			itemName=itemTable.getRowFromColName("id",itemID).getValFromColName("name");
+			if(i==(c-1))
+			{
+				str_get+="<font color=\"#33CC00\">"+itemName+"</font>";
+			}	
+			else
+			{
+				str_get+="<font color=\"#33CC00\">"+itemName+"</font>，";
+			}	
+			
+			++i;
+		}
+		str_all="<font color=\"#33CC00\">"+nickname+"</font>在百废待兴中使用了<font color=\"#33CC00\"> "+itemTable.getRowFromColName("id",itemIDUse).getValFromColName("name")+"，</font>"+str_get+"";
+		
+		if(pass)//公告群发
+		{
+			worldSendMsg(game,0,nickname,0,0,0,str_all,0,1);
+		}
+
+		//保存
+		user.buildActivityScoreTotal=buildActivityScoreTotal;
+		user.buildActivityScore=buildActivityScore;
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,buildNumTotal,buildActivityScore,itemaArr,itemDict,buildActivityScoreTotal,bulidNum)
+		);
+		
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<user,game>
+		
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+	
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

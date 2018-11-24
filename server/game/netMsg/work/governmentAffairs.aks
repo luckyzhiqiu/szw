@@ -1,0 +1,241 @@
+//政务®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,netMsg;
+		json=json_decode(user.json);
+		work=json.work;	
+		politics=work.politicsID;//政务奖励
+		table=game.table;
+		politicsTable=table.politics;//选项表
+		if(politics==0)
+		{
+			rateArr=arr();//机率
+			i=0;
+			tableLength=politicsTable.size();
+			while(i<tableLength)
+			{
+				rateRow=politicsTable.getRowFromColName("id",i+1);
+				rate=number(rateRow.getValFromColName("rate"));//机率数
+				push(rateArr,rate);
+				i++;
+			}
+			rateId=randSelect(rateArr);//机率
+			rateId+=1;
+			//保存
+			work.politicsID=rateId;
+			user.json=json_encode(json);
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,rateId)
+			);
+			return(1);//修改
+		}
+		
+		optionType=netMsg[3];
+		if(optionType<1&&optionType>2)//非法参数
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);
+		}
+		if(optionType==1||optionType==2)
+		{
+			optionOne=0;
+			level=number(user.level);
+			levelTable=table.level;//等级表
+			levelRow=levelTable.getRowFromColName("level",level);
+			politicCount=number(levelRow.getValFromColName("politicMax"));//获得政绩次数
+			beginTime=work.beginTime;//政务开始时间
+			workTime=beginTime;
+			nowTime=time_milli();//现在的时间
+			num=floor((nowTime-beginTime)/1000/1800);
+			num=limit(num,0,politicCount);//次数
+			if(num>=1)
+			{
+				num--;
+				remain=nowTime-beginTime;//经过多长时间
+				maxTime=politicCount*1000*1800;//最大保存时间
+				remain=limit(remain,0,maxTime);//时间范围
+				min=1000*1800;//一次时间
+				newBeginTime=nowTime-remain+min;//新的时间
+				rateRow=politicsTable.getRowFromColName("id",politics);
+				if(optionType==1)//选项1
+				{
+					type=number(rateRow.getValFromColName("option1Reward"));//选项1奖励类型
+				}
+				else//选项2
+				{
+					type=number(rateRow.getValFromColName("option2Reward"));//选项2奖励类型
+					
+				}	
+				politicsConfigureTable=table.politicsConfigure;//政务比率表
+				politicsConfigureRow=politicsConfigureTable.getRow(0);
+				
+				if(type==1)//money
+				{
+					money=number(user.money);//银两
+					wisdom=number(user.wisdom);//势力智力
+					moneyPercent=number(politicsConfigureRow.getValFromColName("money"));//
+					moneyRatio=moneyPercent/10000;
+					optionOne=round(wisdom*moneyRatio);
+					money+=optionOne;
+					//keep
+					user.money=money;
+				}
+				else if(type==2)//food
+				{
+					food=number(user.food);//粮草
+					userPolitics=number(user.politics);//势力政治
+					foodPercent=number(politicsConfigureRow.getValFromColName("food"));//
+					foodRatio=foodPercent/10000;
+					optionOne=round(userPolitics*foodRatio);
+					food+=optionOne;
+					//keep
+					user.food=food;
+				}
+				else if(type==3)//soldier
+				{
+					soldier=number(user.soldier);//兵力
+					charm=number(user.charm);//势力魅力
+					soldierPercent=number(politicsConfigureRow.getValFromColName("soldier"));//
+					soldierRatio=soldierPercent/10000;
+					optionOne=round(charm*soldierRatio);
+					soldier+=optionOne;
+					//keep
+					user.soldier=soldier;
+				}
+				else if(type==4)//score
+				{
+					score=number(user.score);
+					politicsGet=number(levelRow.getValFromColName("politicsGet"));//获得政积s
+					score+=politicsGet;
+					//keep
+					user.score=score;
+				}
+				else if(type==5)//item
+				{
+					item="";
+					if(optionType==1)//选项1
+					{
+						item=rateRow.getValFromColName("item1");//item
+					}
+					else
+					{
+						item=rateRow.getValFromColName("item2");//item
+					}
+					itemDict=json.item;
+					numMgr=game.numMgr;
+					itemsArr=split(arr(),item,",");
+					i=0;c=size(itemsArr);
+					while(i<c)
+					{
+						itemID=itemsArr[i];
+						itemCount=number(itemsArr[i+1]);
+						numMgr.addItem(itemID,itemCount,itemDict);
+						i+=2;
+					}
+				}
+				rateArr=arr();//机率
+				i=0;
+				tableLength=politicsTable.size();
+				while(i<tableLength)
+				{
+					rateRow=politicsTable.getRowFromColName("id",i+1);
+					rate=number(rateRow.getValFromColName("rate"));//机率数
+					push(rateArr,rate);
+					i++;
+				}
+				rateId=randSelect(rateArr);//机率;
+				rateId+=1;
+				//保存
+				work.politicsID=rateId;
+				work.beginTime=newBeginTime;//更新时间
+				
+				limitTask=json.limitTask;
+				activityMgr=game.activityMgr;
+				activityMgr.updateLimitTask(limitTask);//更新限时任务数据
+				limitTask.workCount+=1;//限时任务//政务次数
+				
+				//成就
+				achievement=json.achievement;
+				achievement.workCount+=1;
+				
+				user.json=json_encode(json);
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,newBeginTime,politics,rateId,limitTask.workCount,achievement.workCount)
+				);
+				return(1);//修改
+			}
+			else//次数已尽
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)
+				);
+				return(0);//修改
+			}
+		}
+		else//非法操作
+		{
+			//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-5)
+				);
+				return(0);//修改
+		}
+		
+		
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

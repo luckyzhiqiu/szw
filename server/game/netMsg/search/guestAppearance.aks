@@ -1,0 +1,390 @@
+//拜访®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+buildId=netMsg[3];//建筑id
+itemId=netMsg[4];//itemID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,buildId,itemId,userID;
+		json=json_decode(user.json);
+		table=game.table;
+		search=json.search;//寻访系统
+		eventXTable=table.searchBuilding;//Building
+		buildingRow=eventXTable.getRowFromColName("id",buildId);
+		itemDict=json.item;
+		if(!exist(itemDict,itemId))//物品不存在
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+		numMgr=game.numMgr;
+		count=numMgr.subItem(itemId,1,itemDict);
+		if(count<0)
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-5)//资源不足
+			);
+			return(0);//不修改
+		}
+		itemTable=table.item;//道具表格.
+		idRow=itemTable.getRowFromColName("id",itemId);
+		id=number(idRow.getValFromColName("id"));
+		type=number(idRow.getValFromColName("type"));
+		if(type==56)
+		{
+			if(itemId==id)
+			{
+				if(empty(buildingRow))
+				{
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-3)//id错误
+					);
+					return(0);//修改
+				}
+				roleIDMap=dict
+				(
+					int(buildingRow.getValFromColName("character1")),int(buildingRow.getValFromColName("rate1")),
+					int(buildingRow.getValFromColName("character2")),int(buildingRow.getValFromColName("rate2")),
+					int(buildingRow.getValFromColName("character3")),int(buildingRow.getValFromColName("rate3")),
+					int(buildingRow.getValFromColName("character4")),int(buildingRow.getValFromColName("rate4")),
+					int(buildingRow.getValFromColName("character5")),int(buildingRow.getValFromColName("rate5")),
+					int(buildingRow.getValFromColName("character6")),int(buildingRow.getValFromColName("rate6")),
+				);
+				//角色数组
+				searchCharacterTab=table.searchCharacter;//Character
+				i=0;c=searchCharacterTab.size();
+				while(i<c)
+				{
+					roleRow=searchCharacterTab.getRow(i);
+					roleID=int(roleRow.getValFromColName("id"));
+					if(exist(roleIDMap,roleID))
+					{
+						roleType=int(roleRow.getValFromColName("type"));
+						if(roleType==4)//隐藏角色
+						{
+							wifeMap=json.wife;
+							wifeID=int(roleRow.getValFromColName("wifeID"));
+							if(!exist(wifeMap,wifeID))//非解锁红颜不存在
+							{
+								roleIDMap[roleID]=0;//概率为0
+							}
+						}
+					}
+					i++;
+				}
+				
+				roleArr=arr();
+				foreach(roleIDMap,##<roleID,num>
+					@link roleArr;
+					push(roleArr,roleID,num);
+				##.);
+
+				//概率数组
+				numArr=arr();
+				i=0;c=size(roleArr);
+				while(i<c)
+				{
+					num=roleArr[i+1];
+					push(numArr,num);
+					i+=2;
+				}
+				index=randSelect(numArr);
+				roleID=roleArr[index*2];
+				xCharacterRow=searchCharacterTab.getRowFromColName("id",roleID);
+				xCharacterType=number(xCharacterRow.getValFromColName("type"));//type 1=寻访红颜，2=资源，3=豪杰，4=非寻访红颜，如果未获得该红颜，则不能被随机到
+				roleMap=search.roleMap;//寻访角色信息
+				max=number(xCharacterRow.getValFromColName("getNum"));//熟悉值
+				dicArr=arr();
+				if(xCharacterType==1)//红颜
+				{
+					if(exist(roleMap,roleID))//好友还存在
+					{
+						friendDegree=roleMap[roleID].friend;
+						if(friendDegree<max)//熟度未满
+						{
+							friendDegree+=1;
+						}
+						if(friendDegree>=max)//满熟悉度
+						{
+							wifeDic=json.wife;//红颜
+							wifeID=number(xCharacterRow.getValFromColName("wifeID"));
+							if(exist(wifeDic,wifeID))//已获得红颜
+							{
+								rowW=table.wifeConfigure.getRow(0);
+								intimateMax=number(rowW.getValFromColName("intimateMax"));//亲密度上限
+								intimate=wifeDic[wifeID].intimate;//亲密度
+								if(intimate<intimateMax)
+								{
+									intimate+=1;
+									//保存
+									json.wife[wifeID].intimate=intimate;
+								}
+								
+							}
+							else//红颜不存在
+							{
+								heroArr=json.hero;
+								heroZero=heroArr[0];//主角
+								//创建红颜
+								push(dicArr,numMgr.createWife(wifeID,wifeDic));//
+								numMgr.computeHero(heroZero,json);
+								numMgr.computeUser(user,json);
+								numMgr.computeUserWifeProperty(user,wifeDic);
+								push(dicArr,heroZero,user.power,user.strength,user.wisdom,user.charm,user.politics,user.intimate,user.beauty,json.wifePlus);
+								
+								//公告群发
+								nickname=user.nickname;
+								str="<font color=\"#33CC00\">"+nickname+"</font>在寻访路途中获得<font color=\"#33CC00\">"+table.wife.getRowFromColName("id",wifeID).getValFromColName("name")+"</font>的青睐，并喜结良缘。";
+								worldSendMsg(game,0,nickname,0,0,0,str,0,6);
+							}
+						}
+						//保存
+						json.search.roleMap[roleID].friend=friendDegree;
+						
+						
+					}
+					else//好友不存在
+					{
+						searchRole=structMgr_upgradeObj(game.structMgr,"SearchRole",dict());
+						searchRole.friend=1;
+						roleMap[roleID]=searchRole;
+						//保存
+						json.search.roleMap[roleID].friend=1;
+					}
+				}
+				if(xCharacterType==3)//豪杰
+				{
+					info=dict();
+					if(exist(roleMap,roleID))//好友还存在
+					{
+						friendDegree=roleMap[roleID].friend;
+						if(friendDegree>=max)//满熟悉度
+						{
+							heroArr=json.hero;
+							hero=numMgr.createHero(roleID,heroArr,json);
+							if(!empty(hero))//创建豪杰成功
+							{
+								info.hero=heroArr;
+								
+								//重新计算加成
+								numMgr.computeHero(hero,json);
+								numMgr.computeUser(user,json);
+								push(dicArr,hero,user.power,user.strength,user.wisdom,user.charm,user.politics);
+								//保存
+								user.json=json_encode(json);
+								
+							}
+							
+						}
+						else
+						{
+							friendDegree+=1;
+							//保存
+							json.search.roleMap[roleID].friend=friendDegree;
+						}
+					}
+				}
+				if(xCharacterType==4)//隐藏角色
+				{
+					wifeDic=json.wife;//红颜
+					wifeID=number(xCharacterRow.getValFromColName("wifeID"));
+					intimate=wifeDic[wifeID].intimate;//亲密度
+					intimate+=1;
+					//保存
+					json.wife[wifeID].intimate=intimate;
+				}
+				debrisDic=dict();
+				moneyMin=number(xCharacterRow.getValFromColName("moneyMin"));
+				moneyMax=number(xCharacterRow.getValFromColName("moneyMax"));
+				getMoney=0;
+				if(moneyMin!=0 && moneyMax!=0)
+				{
+					wisdom=number(user.wisdom);//势力智力
+					moneyMax*=wisdom;
+					moneyMin*=wisdom;
+					getMoney=round(rand()%(moneyMax-moneyMin)+moneyMin);
+					myMoney=number(user.money);
+					myMoney+=getMoney;
+					debrisDic.money=getMoney;
+					//保存
+					user.money=myMoney;
+					
+				}
+				
+				getFood=0;
+				foodMin=number(xCharacterRow.getValFromColName("foodMin"));
+				foodMax=number(xCharacterRow.getValFromColName("foodMax"));
+				if(foodMin!=0 && foodMax!=0)
+				{
+					politics=number(user.politics);//势力政治
+					foodMax*=politics;
+					foodMin*=politics;
+					getFood=round(rand()%(foodMin-foodMax)+moneyMin);
+					myFood=number(user.food);
+					myFood+=getFood;
+					debrisDic.food=getFood;
+					//保存
+					user.food=myFood;
+				}
+				
+				soldierMin=number(xCharacterRow.getValFromColName("soldierMin"));
+				soldierMax=number(xCharacterRow.getValFromColName("soldierMax"));
+				getSoldier=0;
+				if(soldierMin!=0 && soldierMax!=0)
+				{
+					politics=number(user.politics);//势力政治
+					soldierMax*=politics;
+					soldierMin*=politics;
+					getSoldier=round(rand()%(soldierMax-soldierMin)+soldierMin);
+					mySoldier=number(user.soldier);
+					mySoldier+=getSoldier;
+					debrisDic.soldier=getSoldier;
+					//保存
+					user.soldier=mySoldier;
+				}
+				
+				goldMin=number(xCharacterRow.getValFromColName("goldMin"));
+				goldMax=number(xCharacterRow.getValFromColName("goldMax"));
+				getGold=0;
+				if(goldMin!=0 && goldMax!=0)
+				{
+					getGold=round(rand()%(goldMax-goldMin)+goldMin);
+					myGold=number(user.gold2);
+					myGold+=getGold;
+					debrisDic.gold=getGold;
+					//保存
+					if(myGold!=0)
+					{
+						user.gold2=myGold;
+					}
+					if(getGold>0)
+					{
+						allGold=number(user.gold)+myGold;//元宝余额
+						game.saveResIO(userID,32,0,1,getGold,allGold);//拜访获得(type,itemID,（0=消耗，1=获得）,count,allGold)
+					}
+				}
+				itemStr=xCharacterRow.getValFromColName("item");
+				arr=split(arr(),itemStr,",");
+				c=size(arr);
+				if(c!=0)
+				{
+					
+					i=0;randNum=rand()%10000;
+					while(i<c)
+					{
+						probability=arr[i+2];
+						if(randNum<probability)//中奖
+						{
+							itemID=arr[i];
+							itemCount=number(arr[i+1]);
+							//push(rewardArr,itemID,itemCount);
+							if(exist(itemDict,itemID))
+							{
+								itemDict[itemID]+=itemCount;
+							}
+							else
+							{
+								itemDict[itemID]=itemCount;
+							}
+							numMgr.addItem(itemID,itemCount,itemDict);
+							debrisDic.item=arr(itemID,itemCount);
+						}
+						i+=3;
+					}
+				}
+			}
+			else
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-7)//itemID出错
+				);
+				return(0);//bu修改	
+			}
+		}
+		else
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-6)//item类型出错
+			);
+			return(0);//bu修改	
+		}
+		
+		dailyTask=json.dailyTask;
+		dailyTaskVisitCount=dailyTask.visitCount;
+		dailyTaskVisitCount+=1;//微服私访次数
+		
+		achievement=json.achievement;
+		achievementVisitCount=achievement.visitCount;
+		achievementVisitCount+=1;//完成寻访次数
+		
+		limitTask=json.limitTask;
+		limitTaskVisitCount=limitTask.visitCount;
+		limitTaskVisitCount+=1;//完成寻访次数
+		
+		//保存
+		json.achievement.visitCount=achievementVisitCount;//完成寻访次数
+		json.dailyTask.visitCount=dailyTaskVisitCount;//微服私访次数
+		json.limitTask.visitCount=limitTaskVisitCount;//微服私访次数
+		user.json=json_encode(json);
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,roleID,debrisDic,dicArr)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

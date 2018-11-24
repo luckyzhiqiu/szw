@@ -1,0 +1,78 @@
+//获取关卡信息
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID;
+		barrierSign=number(user.barrierSign);//章节标记:0=未看;1=已看;
+		//
+		if(barrierSign==0)//未看
+		{
+			chapterID=number(user.chapterID);//章节ID
+			barrierID=number(user.barrierID);//关卡ID
+			//章节信息
+			chapterInfo=game.storyMgr.chapterArr[chapterID];
+			//关卡信息
+			barrierArr=chapterInfo.barrierArr;
+			barrier=barrierArr[barrierID];
+			storyID=int(barrier.row.getValFromColName("storyID"));//故事ID
+			//故事信息
+			storyInfo=game.storyMgr.storyMap[storyID];
+			//标记为已看
+			user.barrierSign=1;
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,storyInfo)
+			);
+			return(1);//修改
+		}
+		else//已看
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1)
+			);
+			return(1);//不修改
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

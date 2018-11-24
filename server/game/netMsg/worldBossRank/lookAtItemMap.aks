@@ -1,0 +1,29 @@
+//白夜缉凶[世界Boss]-查看积分兑换物品®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+jsonExt=json_decode(user.jsonExt);
+worldBoss=jsonExt.worldBoss;
+itemMap=worldBoss.itemMap;//兑换信息字典
+user.jsonExt=json_encode(jsonExt);
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,itemMap)
+);

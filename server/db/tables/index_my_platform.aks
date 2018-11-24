@@ -1,0 +1,5 @@
+//自有平台帐号索引
+mysqlCol("key","id");
+mysqlCol("datetime","genTime");//生成时间
+mysqlCol("varchar","uid");//平台唯一ID
+mysqlCol("int","userID",0);//用户ID

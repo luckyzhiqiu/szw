@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="s" n="__sys__t3">.bulidNum.</v>
+<v t="s" n="__sys__t4">.unionID.</v>
+<v t="s" n="__sys__t5">.point.</v>
+<v t="s" n="__sys__t6">._unionBuildActivityRank.</v>
+<v t="n" n="__sys__t7">1</v>
+<o n="input"><o>__sys__t8</o><i>__sys__t1</i></o>
+<o n="="><o>union</o><i>__sys__t8</i></o>
+<o n="input"><o>__sys__t10</o><i>__sys__t2</i></o>
+<o n="="><o>game</o><i>__sys__t10</i></o>
+<o n="link" r="57"><o>__sys__t12</o><i>__sys__t3</i></o>
+<o n="=" r="57"><o>bulidNum</o><i>__sys__t12</i></o>
+<o n="link" r="57"><o>__sys__t14</o><i>__sys__t4</i></o>
+<o n="=" r="57"><o>unionID</o><i>__sys__t14</i></o>
+<o n="link" r="57"><o>__sys__t16</o><i>__sys__t5</i></o>
+<o n="=" r="57"><o>point</o><i>__sys__t16</i></o>
+<v t="s" n="__sys__t19">.buildValTotal.</v>
+<o n="." r="58"><o>__sys__t18</o><i>union</i><i>__sys__t19</i></o>
+<o n="number" r="58"><o>__sys__t21</o><i>__sys__t18</i></o>
+<o n="=" r="58"><o>buildValTotal</o><i>__sys__t21</i></o>
+<o n="+=" r="59"><o>buildValTotal</o><i>point</i></o>
+<v t="s" n="__sys__t25">.gameConfig.</v>
+<o n="." r="62"><o>__sys__t24</o><i>game</i><i>__sys__t25</i></o>
+<v t="s" n="__sys__t28">.name.</v>
+<o n="." r="62"><o>__sys__t27</o><i>__sys__t24</i><i>__sys__t28</i></o>
+<o n="+" r="62"><o>__sys__t30</o><i>__sys__t27</i><i>__sys__t6</i></o>
+<o n="=" r="62"><o>rankName</o><i>__sys__t30</i></o>
+<v t="s" n="__sys__t33">.rd.</v>
+<o n="." r="63"><o>__sys__t32</o><i>game</i><i>__sys__t33</i></o>
+<v t="s" n="__sys__t36">.getRedisObj.</v>
+<o n="." r="63"><o>__sys__t35</o><i>__sys__t32</i><i>__sys__t36</i></o>
+<o n="__sys__t35" r="63"><o>__sys__t38</o><i>__sys__t32</i><i>rankName</i></o>
+<o n="=" r="63"><o>rd</o><i>__sys__t38</i></o>
+<o n="redis_zadd" r="65"><o>__sys__t40</o><i>rd</i><i>rankName</i><i>buildValTotal</i><i>unionID</i></o>
+<v t="s" n="__sys__t42">.buildValTotal.</v>
+<o n="." r="68"><o>__sys__t41</o><i>union</i><i>__sys__t42</i></o>
+<o n="=" r="68"><o>__sys__t41</o><i>buildValTotal</i></o>
+<o n="return" r="70"><o>__sys__t45</o><i>__sys__t7</i></o>
+<v n="__sys__t10" />
+<v n="__sys__t12" />
+<v n="__sys__t14" />
+<v n="__sys__t16" />
+<v n="__sys__t18" />
+<v n="__sys__t21" />
+<v n="__sys__t24" />
+<v n="__sys__t27" />
+<v n="__sys__t30" />
+<v n="__sys__t32" />
+<v n="__sys__t35" />
+<v n="__sys__t38" />
+<v n="__sys__t40" />
+<v n="__sys__t41" />
+<v n="__sys__t45" />
+<v n="__sys__t8" />
+<v n="buildValTotal" />
+<v n="bulidNum" />
+<v n="game" />
+<v n="point" />
+<v n="rankName" />
+<v n="rd" />
+<v n="union" />
+<v n="unionID" />
+</script>

@@ -1,0 +1,202 @@
+//
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+hisID=netMsg[3];//
+
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}
+unionID=user.unionID;
+nickname=user.nickname;
+if(unionID==0)//没有联盟
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-4)
+	);
+	exit();
+}
+
+
+//update对方
+updateHisUser=##<game,userID>
+	returnType="";
+	//修改行数据
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link methodName,sessionID,returnType;	
+				
+			devote=ref(user.devote);
+			devote=number(devote)/2;
+			user.devoteTotal=0;
+			user.unionID=0;
+			returnType=user.nickname;
+			user.unionBuildID=0;
+			//保存		
+			return(1);//修改
+		
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	
+return(returnType);
+	
+##.;
+
+
+
+
+	unionRow=game.rd.updateRow
+	(
+		game.cnn,"union","id",unionID,"*",
+		//修改回调
+		##<unionRow,game>
+			@link methodName,sessionID,hisID,userID,updateHisUser,nickname;
+			
+			//
+			json=json_decode(unionRow.json);
+			viceLeaderUserIDMap=ref(json.viceLeaderUserIDMap);
+			pickUserIDMap=ref(json.pickUserIDMap);
+			userIDMap=ref(json.userIDMap);
+			leaderUserID=unionRow.leaderUserID;
+			
+			mypower=0; //1,2,3   0为普通成员
+			hispower=0;
+			
+			if(leaderUserID==userID)
+				mypower=3;
+			if(exist(viceLeaderUserIDMap,userID))
+				mypower=2;
+			if(exist(pickUserIDMap,userID))
+				mypower=1;
+			
+			if(leaderUserID==hisID)
+				hispower=3;
+			if(exist(viceLeaderUserIDMap,hisID))
+				hispower=2;
+			if(exist(pickUserIDMap,hisID))
+				hispower=1;
+			
+			if(hispower>=mypower || mypower<2)
+			{
+				//权限不足
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-99)
+				);
+				return(0);//不修改
+			}
+			
+			if(hispower==2)
+			{
+				remove(viceLeaderUserIDMap,hisID);
+			}else if(hispower==1)
+			{
+				remove(pickUserIDMap,hisID);
+			}
+			remove(userIDMap,hisID);
+			peopleNum=ref(unionRow.peopleNum);
+			peopleNum=number(peopleNum)-1;
+			returnType=updateHisUser(game,hisID);
+			
+			if(returnType=="")
+			{
+				//对方不存在
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-89)
+				);
+				return(0);//不修改
+				
+			}
+			
+			//被T联盟聊天记录
+			textTable=game.table.text;
+			rowT=textTable.getRowFromColName("id",406);
+			str=rowT.getValFromColName("text");//%0退出了联盟
+			outStr=sprintf(str,returnType,nickname);
+		
+			//nickname:用户昵称;outStr:输出文本
+			userType=0;//user:0=退出联盟;
+			unionSendMsg(game,userType,returnType,outStr,userIDMap,unionRow.id,0);
+			
+			
+			//保存
+			unionRow.json=json_encode(json);
+			
+			
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1)
+			);
+			
+			return(1);//修改
+			
+			
+	
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	
+
+
+if(empty(unionRow))//
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}

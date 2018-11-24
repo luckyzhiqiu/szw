@@ -1,0 +1,35 @@
+<style>
+#settingUI_pannel{
+	position:fixed;
+	width:100%;
+	top:25px;
+}
+#settingUI_numListView{
+	position:fixed;
+	width:100%;
+	top:50px;
+	bottom:25px;
+	overflow:auto;
+}
+</style>
+
+<div id="settingUI">
+	<div id="settingUI_pannel">
+    	<button id="settingUI_modifPasswordBtn">重置密码</button>
+    </div>
+</div>
+
+
+
+<div id="modifPasswordUI" class="am-modal am-modal-loading am-modal-no-btn" tabindex="-1">
+  <div class="am-modal-dialog">
+    <div class="am-modal-hd">重置密码
+      <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+    </div>
+    <div class="am-modal-bd">
+    	<input id="modifPasswordUI_password" type="text" placeholder="新的密码" />
+	<br />
+	<button id="modifPasswordUI_modifBtn">确定</button>
+    </div>
+  </div>
+</div>

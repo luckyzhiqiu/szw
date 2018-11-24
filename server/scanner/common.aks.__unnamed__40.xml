@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t46">32</v>
+<v t="n" n="__sys__t36">23</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="n" n="__sys__t4">3</v>
+<v t="n" n="__sys__t5">4</v>
+<v t="n" n="__sys__t6">5</v>
+<v t="n" n="__sys__t7">6</v>
+<v t="n" n="__sys__t8">7</v>
+<v t="n" n="__sys__t9">8</v>
+<v t="n" n="__sys__t10">9</v>
+<v t="n" n="__sys__t11">0</v>
+<v t="n" n="__sys__t12">0</v>
+<o n="input"><o>__sys__t13</o><i>__sys__t1</i></o>
+<o n="="><o>cnn</o><i>__sys__t13</i></o>
+<o n="input"><o>__sys__t15</o><i>__sys__t2</i></o>
+<o n="="><o>userIDArr</o><i>__sys__t15</i></o>
+<o n="input"><o>__sys__t17</o><i>__sys__t3</i></o>
+<o n="="><o>title</o><i>__sys__t17</i></o>
+<o n="input"><o>__sys__t19</o><i>__sys__t4</i></o>
+<o n="="><o>body</o><i>__sys__t19</i></o>
+<o n="input"><o>__sys__t21</o><i>__sys__t5</i></o>
+<o n="="><o>soldier</o><i>__sys__t21</i></o>
+<o n="input"><o>__sys__t23</o><i>__sys__t6</i></o>
+<o n="="><o>money</o><i>__sys__t23</i></o>
+<o n="input"><o>__sys__t25</o><i>__sys__t7</i></o>
+<o n="="><o>food</o><i>__sys__t25</i></o>
+<o n="input"><o>__sys__t27</o><i>__sys__t8</i></o>
+<o n="="><o>gold</o><i>__sys__t27</i></o>
+<o n="input"><o>__sys__t29</o><i>__sys__t9</i></o>
+<o n="="><o>gold2</o><i>__sys__t29</i></o>
+<o n="input"><o>__sys__t31</o><i>__sys__t10</i></o>
+<o n="="><o>itemArr</o><i>__sys__t31</i></o>
+<o n="=" r="861"><o>i</o><i>__sys__t11</i></o>
+<o n="size" r="861"><o>__sys__t34</o><i>userIDArr</i></o>
+<o n="=" r="861"><o>c</o><i>__sys__t34</i></o>
+<o n="&lt;" r="862"><o>__sys__t37</o><i>i</i><i>c</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t37</i></o>
+<o n="=="><o>__sys__t39</o><i>__sys__rt</i><i>__sys__t12</i></o>
+<o n="if_goto"><o>__sys__t40</o><i>__sys__t39</i><i>__sys__t46</i></o>
+<o n="[]" r="864"><o>__sys__t41</o><i>userIDArr</i><i>i</i></o>
+<o n="=" r="864"><o>userID</o><i>__sys__t41</i></o>
+<o n="sendMailToPrivate" r="865"><o>__sys__t43</o><i>cnn</i><i>userID</i><i>title</i><i>body</i><i>soldier</i><i>money</i><i>food</i><i>gold</i><i>gold2</i><i>itemArr</i></o>
+<o n="++" r="866"><o>i</o><i>i</i></o>
+<o n="goto"><o>__sys__t45</o><i>__sys__t36</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t13" />
+<v n="__sys__t15" />
+<v n="__sys__t17" />
+<v n="__sys__t19" />
+<v n="__sys__t21" />
+<v n="__sys__t23" />
+<v n="__sys__t25" />
+<v n="__sys__t27" />
+<v n="__sys__t29" />
+<v n="__sys__t31" />
+<v n="__sys__t34" />
+<v n="__sys__t37" />
+<v n="__sys__t39" />
+<v n="__sys__t40" />
+<v n="__sys__t41" />
+<v n="__sys__t43" />
+<v n="__sys__t45" />
+<v n="body" />
+<v n="c" />
+<v n="cnn" />
+<v n="food" />
+<v n="gold" />
+<v n="gold2" />
+<v n="i" />
+<v n="itemArr" />
+<v n="money" />
+<v n="soldier" />
+<v n="title" />
+<v n="userID" />
+<v n="userIDArr" />
+</script>

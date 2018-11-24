@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="n" n="__sys__t4">3</v>
+<v t="n" n="__sys__t5">4</v>
+<o n="input"><o>__sys__t6</o><i>__sys__t1</i></o>
+<o n="="><o>cnn</o><i>__sys__t6</i></o>
+<o n="input"><o>__sys__t8</o><i>__sys__t2</i></o>
+<o n="="><o>rd</o><i>__sys__t8</i></o>
+<o n="input"><o>__sys__t10</o><i>__sys__t3</i></o>
+<o n="="><o>table</o><i>__sys__t10</i></o>
+<o n="input"><o>__sys__t12</o><i>__sys__t4</i></o>
+<o n="="><o>gameConfig</o><i>__sys__t12</i></o>
+<o n="input"><o>__sys__t14</o><i>__sys__t5</i></o>
+<o n="="><o>game</o><i>__sys__t14</i></o>
+<o n="updateIntimateActivityReward" r="792"><o>__sys__t16</o><i>cnn</i><i>rd</i><i>table</i><i>gameConfig</i><i>game</i></o>
+<o n="updateBattleActivityReward" r="793"><o>__sys__t17</o><i>cnn</i><i>rd</i><i>table</i><i>gameConfig</i><i>game</i></o>
+<o n="updatePowerActivityReward" r="794"><o>__sys__t18</o><i>cnn</i><i>rd</i><i>table</i><i>gameConfig</i><i>game</i></o>
+<o n="updateUnionActivityReward" r="795"><o>__sys__t19</o><i>cnn</i><i>rd</i><i>table</i><i>gameConfig</i><i>game</i></o>
+<o n="updateWashMoneyActivityReward" r="797"><o>__sys__t20</o><i>cnn</i><i>rd</i><i>table</i><i>gameConfig</i><i>game</i></o>
+<o n="updateCasualtiesSoldierActivityReward" r="798"><o>__sys__t21</o><i>cnn</i><i>rd</i><i>table</i><i>gameConfig</i><i>game</i></o>
+<o n="updateBarrierActivityReward" r="799"><o>__sys__t22</o><i>cnn</i><i>rd</i><i>table</i><i>gameConfig</i><i>game</i></o>
+<o n="updateBookHouseActivityReward" r="800"><o>__sys__t23</o><i>cnn</i><i>rd</i><i>table</i><i>gameConfig</i><i>game</i></o>
+<o n="updateAddChildActivityReward" r="801"><o>__sys__t24</o><i>cnn</i><i>rd</i><i>table</i><i>gameConfig</i><i>game</i></o>
+<o n="updateBeckonActivityReward" r="802"><o>__sys__t25</o><i>cnn</i><i>rd</i><i>table</i><i>gameConfig</i><i>game</i></o>
+<o n="updateMarryActivityReward" r="803"><o>__sys__t26</o><i>cnn</i><i>rd</i><i>table</i><i>gameConfig</i><i>game</i></o>
+<o n="updateSearchActivityReward" r="804"><o>__sys__t27</o><i>cnn</i><i>rd</i><i>table</i><i>gameConfig</i><i>game</i></o>
+<v n="__sys__t10" />
+<v n="__sys__t12" />
+<v n="__sys__t14" />
+<v n="__sys__t16" />
+<v n="__sys__t17" />
+<v n="__sys__t18" />
+<v n="__sys__t19" />
+<v n="__sys__t20" />
+<v n="__sys__t21" />
+<v n="__sys__t22" />
+<v n="__sys__t23" />
+<v n="__sys__t24" />
+<v n="__sys__t25" />
+<v n="__sys__t26" />
+<v n="__sys__t27" />
+<v n="__sys__t6" />
+<v n="__sys__t8" />
+<v n="cnn" />
+<v n="game" />
+<v n="gameConfig" />
+<v n="rd" />
+<v n="table" />
+</script>

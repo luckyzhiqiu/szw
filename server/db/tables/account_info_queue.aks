@@ -1,0 +1,6 @@
+//帐号信息队列表
+mysqlCol("key","id");
+mysqlCol("varchar","uid");//平台帐号uid
+mysqlCol("int","platformID",0);//平台ID
+mysqlCol("int","serverID",0);//游戏服ID
+mysqlCol("varchar","nickname");//玩家昵称

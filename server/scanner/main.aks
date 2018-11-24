@@ -1,0 +1,117 @@
+//扫描程序
+"api/init.aks"();
+"game/common/api.aks"();
+"game/class/Game.aks"();
+"game/class/NumMgr.aks"();
+"game/class/StoryMgr.aks"();
+"game/class/ActivityMgr.aks"();
+"game/class/ChildMgr.aks"();
+"game/class/RebotMgr.aks"();
+"?common.aks"();
+
+srand(time());
+errorLog("scanner_error.log");
+
+//account_php
+account_php_config=json(file_get_contents("config/account_php.json"));
+
+//配置表
+rushLoopTable=AKJsonTable(file_get_contents("www/json_table/rushLoop.json"));
+
+//游戏对象
+game=Game();
+game.initJsonTable();
+game.initGame();
+game.initHubClient();
+game.initDB();
+game.initRedis();
+game.loadManyGlobalVar();
+//创建机器人
+game.createRebot();
+
+//游戏配置
+gameConfig=game.gameConfig;
+
+//
+cnn=game.cnn;
+rd=game.rd;
+table=game.table;
+
+//初始化各种榜单
+initActivityRank(cnn,rd,gameConfig);//初始化所有冲榜
+initTowerBattleRank(cnn,rd,gameConfig);//初始化塔战榜（过关斩将）
+initPowerRank(cnn,rd,gameConfig);//初始化势力榜
+initIntimateRank(cnn,rd,gameConfig);//初始化亲密榜
+initChapterRank(cnn,rd,gameConfig);//初始化关卡榜
+initWaterBattleRank(cnn,rd,gameConfig,table);//初始化论战积分榜
+initBuildActivityRank(cnn,rd,gameConfig);//初始化百废待兴积分榜
+initUnionBuildActivityRank(cnn,rd,gameConfig);//初始化百废待兴联盟建设榜
+initWorldBossRank(cnn,rd,gameConfig);//初始化日夜辑凶积分榜
+initWorldBossHurtRank(cnn,rd,gameConfig);//初始化日夜辑凶伤害积分榜
+initWaterBattleDayRank(cnn,rd,gameConfig);//初始化议政日涨幅榜
+initPartyRank(cnn,rd,gameConfig);//初始化宴会榜
+
+
+//
+updateUnionRankTimer=0;
+timer001=0;
+timer002=0;
+timer003=0;
+timer004=0;
+
+//主循环
+while(1)
+{
+	// mysqlExec(cnn,"set names utf8");
+	
+	if(isTimeout(game.timer,1000*30))
+	{
+		//加载环境变量
+		// game.loadVar();
+		
+		//加载若干全局变量
+		game.loadManyGlobalVar();
+	}
+	
+	if(isTimeout(timer001,1000*5))
+	{
+		//循环活动阶段计划更新
+		updateRushLoop(cnn,rd,gameConfig,rushLoopTable,game);
+		
+		//百废待兴活动更新
+		updateBuildActivity(cnn,rd,gameConfig);
+		
+		//世界BOSS系统更新
+		updateWorldBoss(cnn,rd,table);
+		updateWorldBossReward(cnn,rd,table,gameConfig);//世界BOSS系统发邮件奖励
+		// updateBuildActivityReward(cnn,rd,table,gameConfig,game);//百废待兴个人发邮件奖励
+		// updateUnionBuildActivityReward(cnn,rd,table,gameConfig,game);//百废待兴联萌发邮件奖励
+		
+		//议政日涨幅榜更新
+		updateWaterBattleDayRank(cnn,rd,table,gameConfig);
+	}
+	
+	if(isTimeout(timer002,1000*10))
+	{
+		//发送帐号信息队列
+		send_account_info_queue(cnn,account_php_config);
+	}
+	
+	if(isTimeout(updateUnionRankTimer,10*60*1000))
+	{
+		updateUnionInfo(cnn,rd);//刷新联盟信息
+		updateUnionRank(cnn,rd);//刷新联盟榜
+	}
+	
+	if(isTimeout(timer003,5*60*1000))
+	{
+		logOnlineCount(cnn);//记录在线人数日志
+	}
+	
+	if(isTimeout(timer004,5*60*1000))
+	{
+		rushLoopReward(cnn,rd,table,gameConfig,game);//循环冲榜发奖励邮件
+	}
+	
+	sleep(100);
+}

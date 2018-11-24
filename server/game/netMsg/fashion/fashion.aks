@@ -1,0 +1,89 @@
+//更换时装
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+fashionID=int(netMsg[3]);//时装ID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,fashionID;
+		json=json_decode(user.json);
+		itemDict=json.item;
+		if(exist(itemDict,fashionID))
+		{
+			titleID=number(user.titleID);
+			fashion=game.table.fashion;
+			
+			rowF=fashion.getRowFromColName("id",fashionID);
+			title=number(rowF.getValFromColName("title"));//关联称号id
+			
+			titleMap=json.titleMap;
+			
+			if(!exist(titleMap,title))//称号不对
+			{
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)
+				);
+				return(0);//修改
+			}
+			user.fashionID=fashionID;
+
+			//保存
+			user.json=json_encode(json);
+
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,fashionID)
+			);
+			return(1);//修改
+		}
+		else//没有此时装
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(1);//修改
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

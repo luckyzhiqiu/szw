@@ -1,0 +1,94 @@
+//为官之道初始化
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID;
+		genTime=user.genTime;
+		genTimeS=strtotime(genTime);//创建时间戳
+		nowTime=strtotime(now());//现在时间戳
+		passTimeDay=8;//经过多少天
+		passSecond=60*60*24*passTimeDay;//经过多少秒
+
+		if((nowTime-passSecond)>genTimeS)//时间已过
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);
+		}
+
+		json=json_decode(user.json);
+		myRoad=json.myRoad;
+		myRoadId=myRoad.id;
+		heroIndexMap=myRoad.heroIndexMap;
+		clean(heroIndexMap);//清理使用过的豪杰
+
+		tableData=game.table;
+		myRoadTable=tableData.myRoad;
+		
+		rowM=myRoadTable.getRowFromColName("id",myRoadId+1);
+		if(empty(rowM))//已达到最大关卡
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);
+		}
+		
+		life=number(rowM.getValFromColName("life"));//血量
+		myRoad.bossHP=life;
+					
+		//保存
+		user.json=json_encode(json);
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,myRoad)
+		);
+		
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

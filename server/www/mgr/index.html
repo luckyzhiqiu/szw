@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name='viewport' content='width=device-width,initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no' />
+<title>后台</title>
+<script src="../core/depend/jquery.min.js"></script>
+<script src="../core/loader.js"></script>
+</head>
+
+<body>
+</body>
+</html>
+
+<script>
+//此文件一般不作修改，逻辑请修改myLoader.js
+//每次修改逻辑后，请修改ver.txt里面的版本号
+$.ajax
+(
+	{
+		url:"ver.txt?"+new Date().getTime(),
+		success:function(data)
+		{
+			appVer=data;
+			AKLoadFileQueue
+			(
+				[
+					["../core/webpage/AKUIMgr.js"],
+					["js/myLoader.js"],
+					["../core/depend/jsoneditor/jsoneditor.min.css"],
+					["../core/depend/jsoneditor/jsoneditor.min.js"],
+				],
+				appVer
+			);
+		}
+	}
+);
+</script>

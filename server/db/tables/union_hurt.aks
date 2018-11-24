@@ -1,0 +1,8 @@
+//联盟BOSS伤害表（每个联盟一个表）
+mysqlCol("key","id");
+mysqlCol("datetime","genTime");//生成时间
+mysqlCol("int","userID",0);//玩家ID
+mysqlCol("varchar","nickname");//玩家昵称
+mysqlCol("int","heroID",0);//豪杰ID
+mysqlCol("int","hurt",0);//伤害
+mysqlCol("int","bossID",0);//BOSS ID

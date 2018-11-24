@@ -1,0 +1,46 @@
+//皇宫-历代王爷
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+kingId=netMsg[3];//王爺ＩＤ
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+if(kingId<1&&kingId>5)//非法ID
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+sql="select nickname,genTime from wang"+kingId+" order by id desc";
+wangArr=arr();
+rs=mysqlCreateRs(game.cnn,sql);
+while(mysqlNextRow(rs))
+{
+	test=arr();
+	push(test,mysqlGetColVal(rs,0));
+	push(test,mysqlGetColVal(rs,1));
+	push(wangArr,test);
+}
+mysqlDestroyRs(rs);
+		
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,wangArr)
+);

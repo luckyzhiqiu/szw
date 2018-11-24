@@ -1,0 +1,7 @@
+//登录日志表（每天一个表）
+mysqlCol("key","id");
+mysqlCol("int","platformID",0);//平台ID
+mysqlCol("int","userID",0);//用户ID
+mysqlCol("varchar","ip");//登录IP
+mysqlCol("datetime","beginTime");//上线时间
+mysqlCol("datetime","endTime");//下线时间

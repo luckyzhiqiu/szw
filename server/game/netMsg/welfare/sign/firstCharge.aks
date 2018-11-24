@@ -1,0 +1,127 @@
+//福利首充®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID;
+		rmb=number(user.rmb);//CNY
+		if(rmb<=0)
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)//未充值
+			);
+			return(0);//修改
+		}
+		firstRechageReward=number(user.firstRechageReward);////首充领奖标记：0=否；1=是
+		if(firstRechageReward!=0)
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)//已领取
+			);
+			return(0);//修改
+		}
+		table=game.table;
+		chargeTable=table.cardFirstCharge;
+		chargeRow=chargeTable.getRow(0);
+		heroID=number(chargeRow.getValFromColName("heroID"));//英雄
+		reward=chargeRow.getValFromColName("reward");//物品奖励
+		//level=number(chargeRow.getValFromColName("level"));//豪杰初始等级
+		arr=split(arr(),reward,",");
+		getItem=size(arr);//物品
+		numMgr=game.numMgr;
+		json=json_decode(user.json);
+		itemDict=json.item;
+		heroArr=json.hero;
+		hero=numMgr.createHero(heroID,heroArr,json);
+		//保存
+		user.firstRechageReward=1;
+		if(getItem!=0)
+		{
+			i=0;
+			while(i<getItem)
+			{
+				itemID=arr[i];
+				itemCount=number(arr[i+1]);
+				numMgr.addItem(itemID,itemCount,itemDict);
+				i+=2;
+			}
+		}
+		num=0;
+		if(!empty(hero))//英雄不存在--添加
+		{
+			//hero.level=level;
+			//重新计算加成
+			numMgr.computeHeroArr(json);
+			//numMgr.computeHero(hero,json);
+			numMgr.computeUser(user,json);
+			num=1;
+		}	
+		heroArr=json.hero;
+		user.json=json_encode(json);
+		
+		if(num>0)
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,hero,user.power,user.strength,user.wisdom,user.charm,user.politics,heroArr)
+			);
+		}
+		else
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,0,user.power,user.strength,user.wisdom,user.charm,user.politics)
+			);
+		}
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

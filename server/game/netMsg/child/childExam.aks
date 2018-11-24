@@ -1,0 +1,143 @@
+//子嗣科举
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+childID=netMsg[3];//子嗣ID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//孩子数组排序（根据ID从小到大）
+sortChildrenArr=##<arr>
+	c=size(arr);
+	i=0;while(i<c)
+	{
+		j=i+1;
+		while(j<c)
+		{
+			child1=arr[i];
+			child2=arr[j];
+			if(child2.id<child1.id)
+			{
+				arr[i]=child2;
+				arr[j]=child1;
+			}
+			++j;
+		}
+		++i;
+	}
+##.;
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,childID,sortChildrenArr;
+		json=json_decode(user.json);
+		
+		childSys=json.childSys;
+		childrenArr=childSys.children;
+		childrenCount=size(childrenArr);
+		
+		i=0;
+		while(i<childrenCount)
+		{
+			child=childrenArr[i];
+			cID=child.id;
+			if(cID==childID)
+			{
+				grows=child.grows;//资质
+				level=child.level;//等级
+				tableData=game.table;
+				rowC=tableData.childConfigure.getRow(0);
+				
+				sex=child.sex;//性别
+				if(sex==0)
+				{
+					figure=number(rowC.getValFromColName("talentLevelFemale"+grows));//资质*女童科举形象
+				}
+				else if(sex==1)
+				{
+					figure=number(rowC.getValFromColName("talentLevelMale"+grows));//资质*男童科举形象
+				}
+				child.skin=figure;//形象ID
+				
+				
+				talentLevel=number(rowC.getValFromColName("talentLevel"+grows));//资质N科举等级
+				if(level>=talentLevel)//已达到等级
+				{
+					jsonExt=json_decode(user.jsonExt);
+					pairSys=jsonExt.pairSys;
+					extChildrenArr=pairSys.children;
+					push(extChildrenArr,child);
+					remove(childrenArr,i);
+					//排序
+					sortChildrenArr(extChildrenArr);
+					
+					examCount=number(user.examCount);
+					examCount+=1;
+					//保存
+					user.examCount=examCount;
+					user.json=json_encode(json);
+					user.jsonExt=json_encode(jsonExt);
+					
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",1,childrenArr,extChildrenArr,examCount)
+					);
+					return(1);//修改
+				}
+				else//请继续培养子嗣
+				{
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",2)
+					);
+					return(1);//修改
+				}
+			}
+			++i;
+		}
+		
+		//无数据
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",-2)
+		);
+		return(0);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

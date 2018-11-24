@@ -1,0 +1,61 @@
+//邮件-打开邮件®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+mailId=netMsg[3];//mailID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+cnn=game.cnn;
+userInstTableName=createIDTable(cnn,"mail",userID);
+//修改行数据
+mail=game.rd.updateRow
+(
+	cnn,userInstTableName,"id",mailId,"*",
+	//修改回调
+	##<mail,game>
+		@link methodName,sessionID;
+		read=int(mail.read);
+		modifTime=mail.modifTime;
+		read=1;
+		//保存
+		mail.read=read;	
+		mail.modifTime=time();
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(mail))//邮件不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

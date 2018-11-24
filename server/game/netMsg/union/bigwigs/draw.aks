@@ -1,0 +1,444 @@
+//拉拢
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+richmanID=netMsg[3];//权贵ID
+type=netMsg[4];//类型：1=普通拉拢;2=元宝拉拢
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+myUnionID=number(user.unionID);
+if(myUnionID==0)//未入盟
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+updateUnionR=##<game,unionIDR,richmanID>
+	unionR=game.rd.updateRow
+	(
+		game.cnn,"union","id",unionIDR,"*",
+		//修改回调
+		##<unionR,game>
+			@link sessionID,methodName,richmanID;
+			uRJson=json_decode(unionR.json);
+			richmanIDMap=uRJson.richmanIDMap;
+			remove(richmanIDMap,richmanID);
+			
+			unionR.json=json_encode(uRJson);
+			return(1);
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+##.;
+
+richmanUpdateDict=dict();
+truncation=1;//-2未入盟;-3已拉拢所属我盟;-4未过保护时间;-5拉拢友好度需求不足;-6已达到当天拉拢次数上限;-7影响力不足;-8联盟财富不足;-9无权限拉拢;-10元宝不足;
+drawPass=0;//0=拉拢失败;1=拉拢成功;
+updateRichman=##<game,drawFavorNeed,drawIncrease,drawDecrease,richmanID,level>
+	richman=game.rd.updateRow
+	(
+		game.cnn,"union_richman","id",richmanID,"*",
+		//修改回调
+		##<richman,game>
+			@link sessionID,methodName,type,myUnionID,drawFavorNeed,drawIncrease,drawDecrease,drawPass,truncation,richmanUpdateDict,level,richmanID,updateUnionR;
+			unionIDR=number(richman.unionID);
+			if(unionIDR==myUnionID)//已拉拢所属我盟
+			{
+				truncation=-3;
+				return(0);
+			}
+			
+			catchTime=number(richman.catchTime);//拉拢时间
+			keepTime=number(richman.keepTime);//拉拢保护时间
+			allTime=catchTime+keepTime;
+			newTime=time();//现在的时间
+			if(newTime<allTime)//未过保护时间
+			{
+				truncation=-4;
+				return(0);
+			}
+			
+			//拉拢友好度需求
+			rJson=json_decode(richman.json);
+			unionFriendMap=rJson.unionFriendMap;
+			friendVal=0;
+			if(exist(unionFriendMap,myUnionID))//联盟是否已存在
+			{
+				friendVal=unionFriendMap[myUnionID];
+			}
+			else
+			{
+				unionFriendMap[myUnionID]=friendVal;
+			}
+			
+			if(friendVal<drawFavorNeed)//拉拢友好度需求不足 
+			{
+				truncation=-5;
+				return(0);
+			}
+			
+			//判断是否拉拢成功
+			allianceNobleRateTable=game.table.allianceNobleRate;
+			countANR=allianceNobleRateTable.size();
+			while(countANR!=0)
+			{
+				countANR-=1;
+				rowANR=allianceNobleRateTable.getRow(countANR);
+				favor=number(rowANR.getValFromColName("favor"));//好感度大于等于
+				if(friendVal>=favor)
+				{
+					drawRate=0;
+					if(type==1)
+					{
+						drawRate=number(rowANR.getValFromColName("drawRate"));//拉拢成功率
+					}
+					else if(type==2)
+					{
+						drawRate=number(rowANR.getValFromColName("goldDrawRate"));//元宝拉拢成功率
+					}
+					
+					num=rand()%10000+1;
+					if(num<=drawRate)//成功拉拢
+					{
+						drawPass=1;
+						//拉拢成功
+						richman.catchTime=newTime;
+						
+						//增加好感度
+						unionFriendMap[myUnionID]+=drawIncrease;
+						
+						//减少好感度
+						unionFriendMap[unionIDR]-=drawDecrease;
+						
+						//权贵变成我方所属联盟
+						richman.unionID=myUnionID;
+						
+						richmanUpdateDict["myFriend"]=unionFriendMap[myUnionID];//我盟好感度
+						richmanUpdateDict["frontMyFriend"]=unionFriendMap[unionIDR];//前所属方好感度
+						richmanUpdateDict["richmanUnionID"]=myUnionID;//现权贵所属方
+						
+						//保护时间
+						rowAT=game.table.alliance.getRowFromColName("level",level);
+						protectTime=rowAT.getValFromColName("protectTime");//保护时间
+						newKeepTime=dateStrToSeconds(protectTime);
+						richman.keepTime=newKeepTime;
+						richman.json=json_encode(rJson);
+
+						//权贵所属联盟不存在
+						if(unionIDR>=10000)
+						{
+							userIDArr=arr();
+							//拉拢成功发送邮件
+							allianceNobleTable=game.table.allianceNoble;
+							rowAN=allianceNobleTable.getRowFromColName("id",richmanID);
+							richmanName=rowAN.getValFromColName("name");//名称
+							
+							mailTable=game.table.mail;
+							rows=mailTable.getRowFromColName("id",12);
+							title=rows.getValFromColName("title");
+							body=rows.getValFromColName("body");
+							unionD=game.rd.getRow(game.cnn,"union","id",unionIDR,"*",1000);//权贵原所属方联盟
+							updateUnionR(game,unionIDR,richmanID);//更新原联盟拉拢权贵列表
+							
+							unJson=json_decode(unionD.json);
+							userIDMap=unJson.userIDMap;//联盟成员字典
+							it=dictIt();
+							dictItBegin(userIDMap,it);
+							while(!dictItEmpty(it))
+							{
+								sUserID=dictItKey(it);
+								push(userIDArr,sUserID);
+								dictItNext(it);
+							}
+							
+							unionX=game.rd.getRow(game.cnn,"union","id",myUnionID,"*",1000);//我方联盟
+							myUnionName=unionX.name;
+							str=sprintf(body,richmanName,myUnionName);
+							
+							game.sendMail(userIDArr,title,str,0,0,0,0,0,"");
+						}
+						
+						return(1);//修改
+					}
+					break;
+				}
+			}
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+##.;
+
+updateUser=##<game,userID,drawDevote,goldDrawCost>
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link sessionID,methodName,drawDevote,drawPass,type,goldDrawCost,userID;
+			gold=number(user.gold);
+			gold2=number(user.gold2);
+
+			if(type==2)//元宝消耗
+			{
+				if(goldDrawCost>(gold+gold2))//元宝不足
+				{
+					truncation=-10;
+					return(0);//不修改
+				}
+
+				//扣减元宝
+				if(goldDrawCost>gold)
+				{
+					goldDrawCost-=gold;
+					gold=0;
+					gold2-=goldDrawCost;
+				}
+				else
+				{
+					gold-=goldDrawCost;
+				}
+			}
+			
+			if(drawPass==1)
+			{
+				user.devote=drawDevote+number(user.devote);//增加贡献
+				user.devoteTotal=drawDevote+number(user.devoteTotal);//增加累计贡献
+			}
+			
+			if(goldDrawCost>0)
+			{
+				//流水
+				allGold=gold+gold2;//元宝余额
+				game.saveResIO(userID,19,0,0,goldDrawCost,allGold);//拉拢(type,itemID,（0=消耗，1=获得）,count,allGold)
+			}
+			
+			//保存
+			user.gold=gold;
+			user.gold2=gold2;
+			
+			return(1);
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	return(user);
+##.;
+
+unionData=game.rd.updateRow
+(
+	game.cnn,"union","id",myUnionID,"*",
+	//修改回调
+	##<unionData,game>
+		@link sessionID,methodName,userID,type,richmanID,updateRichman,drawPass,truncation,updateUser,richmanUpdateDict;
+		catchCount=number(unionData.catchCount);//当天拉拢次数
+		level=number(unionData.level);//联盟等级
+		allianceTable=game.table.alliance;
+		rowA=allianceTable.getRowFromColName("level",level);
+		drawNum=number(rowA.getValFromColName("drawNum"));//拉拢上限
+		if(catchCount>=drawNum)//已达到当天拉拢次数上限
+		{
+			truncation=-6;
+			return(0);
+		}
+		
+		money=number(unionData.money);//财富
+		effect=number(unionData.effect);//影响力
+		
+		allianceNobleTable=game.table.allianceNoble;
+		rowAN=allianceNobleTable.getRowFromColName("id",richmanID);
+		
+		drawFavorNeed=0;//拉拢友好度需求
+		drawInfluenceNeed=0;//拉拢影响力需求
+		goldDrawCost=0;//宝拉拢元宝消耗
+		drawWealthCost=0;//拉拢联盟财富消耗
+		drawIncrease=0;//拉拢增加好感
+		drawDecrease=0;//拉拢降低好感
+		drawInfluence=0;//拉拢增加影响力
+		drawDevote=0;//拉拢增加个人贡献
+		if(type==1)
+		{
+			drawFavorNeed=number(rowAN.getValFromColName("drawFavorNeed"));//拉拢友好度需求
+			drawInfluenceNeed=number(rowAN.getValFromColName("drawInfluenceNeed"));//拉拢影响力需求
+			drawWealthCost=number(rowAN.getValFromColName("drawWealthCost"));//拉拢联盟财富消耗
+			drawIncrease=number(rowAN.getValFromColName("drawIncrease"));//拉拢增加好感
+			drawDecrease=number(rowAN.getValFromColName("drawDecrease"));//拉拢降低好感
+			drawInfluence=number(rowAN.getValFromColName("drawInfluence"));//拉拢增加影响力
+			drawDevote=number(rowAN.getValFromColName("drawDevote"));//拉拢增加个人贡献
+		}
+		else if(type==2)
+		{
+			drawWealthCost=number(rowAN.getValFromColName("goldDrawWealthCost"));//元宝拉拢联盟财富消耗
+			goldDrawCost=number(rowAN.getValFromColName("goldDrawCost"));//元宝拉拢元宝消耗
+			drawIncrease=number(rowAN.getValFromColName("goldDrawIncrease"));//元宝拉拢增加好感
+			drawDecrease=number(rowAN.getValFromColName("goldDrawDecrease"));//元宝拉拢降低好感
+			drawInfluence=number(rowAN.getValFromColName("goldDrawInfluence"));//元宝拉拢增加影响力
+			drawDevote=number(rowAN.getValFromColName("goldDrawDevote"));//元宝拉拢增加个人贡献
+		}
+
+		if(effect<drawInfluenceNeed)//影响力不足
+		{
+			truncation=-7;
+			return(0);
+		}
+		
+		if(money<drawWealthCost)//联盟财富不足
+		{
+			truncation=-8;
+			return(0);
+		}
+
+		//只有盟主副盟主能拉拢
+		leaderUserID=number(unionData.leaderUserID);
+		unionJson=json_decode(unionData.json);
+		viceLeaderUserIDMap=unionJson.viceLeaderUserIDMap;
+		if(exist(viceLeaderUserIDMap,userID) || leaderUserID==userID)//有权限拉拢
+		{
+			richman=updateRichman(game,drawFavorNeed,drawIncrease,drawDecrease,richmanID,level);
+		}
+		else//无权限拉拢
+		{
+			truncation=-9;
+			return(0);
+		}
+		
+		
+		//个人信息更新
+		user=updateUser(game,userID,drawDevote,goldDrawCost);
+		
+		if(truncation==1)//条件满足
+		{
+			backInfoDict=dict();
+
+			//返回个人信息
+			userUpdateDict=dict();
+			userUpdateDict["devote"]=number(user.devote);
+			userUpdateDict["devoteTotal"]=number(user.devoteTotal);
+			userUpdateDict["gold"]=number(user.gold);
+			userUpdateDict["gold2"]=number(user.gold2);
+			backInfoDict["userUpdateDict"]=userUpdateDict;
+
+			//拉拢成功与失败
+			if(drawPass)
+			{
+				//增加影响力
+				effect+=drawInfluence;
+				unionData.effect=effect;
+				richmanIDMap=unionJson.richmanIDMap;
+				richmanIDMap[richmanID]=0;
+
+				//返回权贵信息
+				backInfoDict["richmanUpdateDict"]=richmanUpdateDict;
+				
+				//拉拢成功发送邮件
+				allianceNobleTable=game.table.allianceNoble;
+				rowAN=allianceNobleTable.getRowFromColName("id",richmanID);
+				richmanName=rowAN.getValFromColName("name");//名称
+				
+				mailTable=game.table.mail;
+				rows=mailTable.getRowFromColName("id",11);
+				title=rows.getValFromColName("title");
+				body=rows.getValFromColName("body");
+				str=sprintf(body,richmanName);
+				
+				userIDArr=arr();
+				userIDMap=unionJson.userIDMap;//联盟成员字典
+				it=dictIt();
+				dictItBegin(userIDMap,it);
+				while(!dictItEmpty(it))
+				{
+					sUserID=dictItKey(it);
+					push(userIDArr,sUserID);
+					dictItNext(it);
+				}
+				
+				game.sendMail(userIDArr,title,str,0,0,0,0,0,"");
+			}
+
+			//增加拉拢次数
+			catchCount+=1;
+			unionData.catchCount=catchCount;
+			
+			//返回联盟信息
+			money-=drawWealthCost;
+			unionUpdateDict=dict();
+			unionUpdateDict["effect"]=effect;//影响力
+			unionUpdateDict["money"]=money;//联盟财富
+			unionUpdateDict["catchCount"]=catchCount;//当天拉拢次数
+			backInfoDict["unionUpdateDict"]=unionUpdateDict;
+
+			//返回信息
+			backInfoDict["drawPass"]=drawPass;//是否拉拢成功
+
+			//保存
+			unionData.money=money;
+			unionData.json=json_encode(unionJson);
+
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,backInfoDict)
+			);
+			return(1);//修改
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(truncation!=1)//条件不满足
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",truncation)
+	);
+	exit();
+}

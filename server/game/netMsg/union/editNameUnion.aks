@@ -1,0 +1,162 @@
+//修改联盟名称信息
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+nameUnion=netMsg[3];//联盟名称
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//检查重名
+sql="select id from `union` where name='"+nameUnion+"'";
+rs=mysqlCreateRs(game.cnn,sql);
+hasRow=mysqlNextRow(rs);
+mysqlDestroyRs(rs);
+if(hasRow)//名称重名
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-5)
+	);
+	exit();
+}
+
+unionID=0;pass=1;gold=0;gold2=0;
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link sessionID,methodName,pass,gold,gold2,unionID,userID;
+		unionID=number(user.unionID);
+		if(unionID==0)//未加入联盟
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			exit();
+		}
+		
+		tableData=game.table;
+		rowAC=tableData.allianceConfigure.getRow(0);
+		changeNameCost=number(rowAC.getValFromColName("changeNameCost"));//修改名字消耗元宝
+		gold=number(user.gold);//元宝（充值，优先使用）
+		gold2=number(user.gold2);//元宝（赠送）
+		
+		if(changeNameCost>(gold+gold2))//元宝不足
+		{
+			pass=-4;
+			return(0);//不修改
+		}
+
+		//扣减元宝
+		if(changeNameCost>gold)
+		{
+			changeNameCost-=gold;
+			gold=0;
+			gold2-=changeNameCost;
+		}
+		else
+		{
+			gold-=changeNameCost;
+		}
+		
+		if(changeNameCost>0)
+		{
+			//流水
+			allGold=gold+gold2;//元宝余额
+			game.saveResIO(userID,24,0,0,changeNameCost,allGold);//联盟改名(type,itemID,（0=消耗，1=获得）,count,allGold)
+		}
+		
+		//保存
+		user.gold=gold;
+		user.gold2=gold2;
+		
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+
+if(pass==1)
+{
+	unionData=game.rd.updateRow
+	(
+		game.cnn,"union","id",unionID,"*",
+		//修改回调
+		##<unionData,game>
+			@link sessionID,methodName,userID,nameUnion,gold,gold2;
+			leaderUserID=number(unionData.leaderUserID);
+			unionJson=json_decode(unionData.json);
+			viceLeaderUserIDMap=unionJson.viceLeaderUserIDMap;
+			if(exist(viceLeaderUserIDMap,userID) || leaderUserID==userID)
+			{
+				unionData.name=nameUnion;
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,gold,gold2)
+				);
+				return(1);//修改
+			}
+			else//无权限修改
+			{
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-2)
+				);
+				return(0);
+			}
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	if(empty(unionData))//联盟不存在
+	{
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",-1)
+		);
+	}
+}
+else//条件为满足
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",pass)
+	);
+}

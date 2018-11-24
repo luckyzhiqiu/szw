@@ -1,0 +1,621 @@
+//议政战斗®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+enemyHeroID=netMsg[3];//敌方豪杰ID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	eoutcomeit();
+}
+
+//获取敌方豪杰位置
+getEnemyHeroIndeoutcome=##<enemyHeroArr,heroID>
+	i=0;c=size(enemyHeroArr);
+	while(i<c)
+	{
+		enemyHero=enemyHeroArr[i];
+		if(enemyHero.heroID==heroID)return(i);
+		++i;
+	}
+	return(-1);
+##.;
+
+//获取血量
+getHp=##
+<
+	attack,attackC,critRate,crit,isCrit,//攻击力 攻击力倍数 爆击率 爆击系数 是否爆击标记 
+	attackPlus,skillPlus,//攻击加成 技能加成
+	unionAddPercent//联盟权贵加成
+>
+	if((rand()%10000)<(critRate+skillPlus))//有暴击
+	{
+		subHP=attack*attackC/10000*(1+crit/10000);
+		isCrit=1;
+	}
+	else//无暴击
+	{
+		subHP=attack*attackC/10000;
+		isCrit=0;
+	}
+	subHP+=random(-100,100);
+	subHP*=1+attackPlus/10000;
+	subHP*=1+unionAddPercent/10000;
+	return(arr(subHP,isCrit));
+##.;
+//固定获取血量
+getFixedHp=##
+<
+	attack,attackC,critRate,crit,//攻击力 攻击力倍数 爆击率 爆击系数
+	attackPlus,skillPlus,//攻击加成 技能加成
+	unionAddPercent//联盟权贵加成
+>
+	subHP=attack+(attack*attackC/10000*critRate/10000*(1+crit/10000));
+	subHP*=1+attackPlus/10000;
+	subHP*=1+unionAddPercent/10000;
+	return(subHP);
+##.;
+
+
+//更新敌方
+updateEnemyUser=##<game,userID,waterBattleScore,enemysInfo,enemyInfo>
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link methodName,sessionID,waterBattleScore,enemysInfo,enemyInfo;
+			jsonExtEnemy=json_decode(user.jsonExt);
+			waterBattleExtEnemy=jsonExtEnemy.waterBattleExt;
+			hitArrExt=waterBattleExtEnemy.hitArr;
+			enemyArrExt=waterBattleExtEnemy.enemyArr;
+			enemysInfoCount=size(enemysInfo);
+			if(enemysInfoCount!=0)
+			{
+				enemyCount=size(enemyArrExt);
+				if(enemyCount==0)
+				{
+					push(enemyArrExt,enemysInfo);
+				}
+				else
+				{
+					enemyArrID=arr();
+					i=0;
+					while(i<enemyCount)
+					{
+						userID=number(enemyArrExt[i].userID);
+						push(enemyArrID,userID);
+						++i;
+					}
+					enemyCID=number(enemysInfo.userID);
+					if(inArr(enemyArrID,enemyCID))
+					{
+						j=0;
+						while(j<enemyCount)
+						{
+							userCID=number(enemyArrExt[j].userID);
+							if(userCID==enemyCID)
+							{
+								enemyArrExt[j].time=enemysInfo.time;
+							}
+							++j;
+						}
+					}
+					else
+					{
+						push(enemyArrExt,enemysInfo);
+					}
+				}
+			}
+			enemyInfoCount=size(enemyInfo);
+			if(enemyInfoCount!=0)
+			{
+				push(hitArrExt,enemyInfo);
+			}
+			
+			waterBattleExtEnemy.enemyArr=enemyArrExt;
+			waterBattleExtEnemy.hitArr=hitArrExt;
+			if(enemyInfoCount!=0)
+			{
+				waterBattleExtEnemy.hitUnreadCount=1;
+			}
+			user.waterBattleScore=waterBattleScore;
+			user.jsonExt=json_encode(jsonExtEnemy);
+			return(1);
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+##.;
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+	   @link methodName,sessionID,enemyHeroID,getEnemyHeroIndeoutcome,getHp,getFixedHp,userID,updateEnemyUser;
+	   json=json_decode(user.json);
+	   jsonExt=json_decode(user.jsonExt);
+	   isBattle=number( user.waterBattleStep);//状态条件
+	   waterBattleCount= number(user.waterBattleCount);//议政次数
+	   waterBattleCountExt= number(user.waterBattleCountExt);//额外议政次数
+	   talbeData=game.table;
+	   row=talbeData.waterBattleConfigure.getRow(0);
+	   count=number (row.getValFromColName("count"));//每日参与次数
+	   buyCount=number (row.getValFromColName("buyCount"));//每日额外次数
+	   
+	   if(waterBattleCount>=count && waterBattleCountExt>buyCount)
+	   {
+		   //回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4) //今日次数用晒
+			);
+			return(0);
+	   }
+	   if(isBattle==0 )
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2) //不再战斗状态
+			);
+			return(0);
+		}
+		waterBattle=json.waterBattle;
+		waterBattleExt=jsonExt.waterBattleExt;
+		enemyHeroIDArr=waterBattle.enemyHeroIDArr;//敌方英雄数组
+		enemyHeroArr=waterBattleExt.enemyHeroArr;
+		if(arrFindNumberKey(enemyHeroIDArr,enemyHeroID) <0)//敌方豪杰不存在
+		{
+			// 回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);
+		}
+		enemyHeroIndeoutcome=getEnemyHeroIndeoutcome(enemyHeroArr,enemyHeroID);
+		if(enemyHeroIndeoutcome<0)//敌方豪杰不存在
+		{
+			// 回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);
+		}
+		//敌方豪杰
+		enemyHero=enemyHeroArr[enemyHeroIndeoutcome];
+		enemyHeroHP=enemyHero.hp;//hp
+		enemyHeroHpAdd=enemyHeroHP;
+		enemyHeroCritRate=enemyHero.critRate;//爆击率
+		enemyHeroCrit=enemyHero.crit;//爆击系数
+		enemyHeroAttackC=enemyHero.attackC;//攻击力倍数
+		enemyHeroAttack=enemyHero.attack;//攻击力
+		
+		//我方豪杰
+		myHero=waterBattle.me;
+		myHeroHP=waterBattle.hp;//hp
+		myHeroCritRate=myHero.critRate;//爆击率
+		myHeroCrit=myHero.crit;//爆击系数
+		myHeroAttackC=myHero.attackC;//攻击力倍数
+		myHeroAttack=myHero.attack;//攻击力
+		myHeroAttackPlus=waterBattle.attackPlus;//攻击加成
+		myHeroSkillPlus=waterBattle.skillPlus;//技能加成
+		
+		numMgr=game.numMgr;
+		
+		//权贵势力万分比加成
+		unionID=int(user.unionID);
+		richmanIDArr=numMgr.getRichmanIDArr(unionID);//已拉拢权贵ID数组
+		unionAddPercent+=numMgr.getRichmanAddPercent(richmanIDArr,type=4);
+		
+		//战斗次数
+		battleCount=waterBattle.battleCount;
+		//击败敌方豪杰数量
+		winCount=waterBattle.winCount;
+		//
+		isCritSign=0;
+		//生成战报
+		battleInfo=arr();
+		outcome=0;
+		myAttArr=arr();
+		enemyAttArr=arr();
+		myHpArr=arr();
+		meIsCritSignArr=arr();
+		enemyIsCritSignArr=arr();
+		enemyHpArr=arr();
+		i=0;
+		isWin=0;//是否胜率 0：我方 1:敌方
+		while((enemyHeroHP>0 && myHeroHP>0) &&(i<20))
+		{
+			
+			if(outcome==0)//我方攻击
+			{
+				hp=getHp
+				(
+					myHeroAttack,myHeroAttackC,myHeroCritRate,myHeroCrit,isCritSign,
+					myHeroAttackPlus,myHeroSkillPlus,
+					unionAddPercent
+				);
+				
+				HP2=round(hp[0]);
+				enemyHeroHP-=HP2;
+				if(enemyHeroHP<=0)
+				{
+					enemyHeroHP=0;
+				}
+				hp2=round(enemyHeroHP);
+				enemyHeroHP=hp2;
+				outcome=1;
+				// if(HP2!=0)
+				// {
+					push(myHpArr,HP2);
+				// }
+				push(meIsCritSignArr,hp[1]);
+				isWin=0;
+			}
+			else 
+			{
+				HP=getHp(enemyHeroAttack,enemyHeroAttackC,enemyHeroCritRate,enemyHeroCrit,isCritSign,0,0,0);
+				
+				HP2=round(HP[0]);
+				myHeroHP-=HP2;
+				if(myHeroHP<=0)
+				{
+					myHeroHP=0;
+				}
+				hp2=round(myHeroHP);
+				myHeroHP=hp2;
+				outcome=0;
+				// if(HP2!=0)
+				// {
+					push(enemyHpArr,HP2);
+				// }
+				push(enemyIsCritSignArr,HP[1]);
+				isWin=1;
+			}
+			i++;
+		}
+		
+		if(enemyHeroHP>0&&myHeroHP>0)
+		{
+			meAtt=getFixedHp(myHeroAttack,myHeroAttackC,myHeroCritRate,myHeroCrit,myHeroAttackPlus,myHeroSkillPlus,unionAddPercent);//我固定输出成吨伤害
+			tagetAtt=getFixedHp(enemyHeroAttack,enemyHeroAttackC,enemyHeroCritRate,enemyHeroCrit,0,0,0);//对面固定输出成吨伤害
+			meCount=ceil(enemyHeroHP/meAtt); //我回合数
+			tagetCount=ceil(myHeroHP/tagetAtt); //对面回合数
+			if(meCount==0)
+			{
+				meCount=1;
+			}
+			if(tagetCount/meCount>=1)//我方胜
+			{
+				
+				myHeroHP=myHeroHP-((meCount-1)*tagetAtt);
+				if(myHeroHP==0)
+				{
+					myHeroHP=1;
+				}
+				if(myHeroHP<0)
+				{
+					myHeroHP=abs(myHeroHP);
+				}
+				isWin=0;
+			}
+			else
+			{
+				newtagetCount=tagetCount-1;
+				newenemyHeroHP=newtagetCount*meAtt;
+				enemyHeroHP=round(enemyHeroHP-newenemyHeroHP);
+				if(enemyHeroHP<=0)
+				{
+					enemyHeroHP=1;
+				}
+				isWin=1;
+			}
+			
+		}
+
+		push(myAttArr,myHpArr,meIsCritSignArr);
+		push(enemyAttArr,enemyHpArr,enemyIsCritSignArr);
+		push(battleInfo,myAttArr,enemyAttArr,enemyHeroHpAdd);
+		
+		winReward=number (row.getValFromColName("winReward"));//胜利每轮获得资质经验
+		winCent=number (row.getValFromColName("winCent"));//胜利每轮获得积分
+		loseCent=number (row.getValFromColName("loseCent"));//失败扣除积分
+		lottery=number (row.getValFromColName("lottery"));//连胜需求场次
+		waterBattleScore=number(user.waterBattleScore);//论战总积分
+		temporaryScore=0;//战斗临时等分
+		
+		heroIndex=waterBattle.heroIndex;//豪杰索引
+		hero=json.hero[heroIndex];//我的豪杰
+		growsExp=hero.growsExp;//我的资质经验
+		heroName=hero.name;//我的豪杰名字
+		heroID=hero.heroID;//我的豪杰id
+		buffArr=waterBattle.buffArr;//buffArr
+		buff=arr();
+		if(isWin==0)//enemyHeroHP<=0 && myHeroHP>0)//打死对面一只
+		{
+			battleCount+=1;
+			numMgr=game.numMgr;
+			enemyHeroIDArr=numMgr.getThreeenemyHeroIDArr(enemyHeroArr,enemyHeroID,waterBattle);
+			buff=numMgr.getWaterBattleBuffArr(battleCount,buffArr);
+			growsExp+=winReward;
+			waterBattleScore+=winCent;
+			outcome=2;;
+			winCount+=1;
+		}
+		else
+		{
+			outcome=-1;
+			if(waterBattleScore-loseCent<0)
+			{
+				waterBattleScore=0;
+			}
+			else
+			{
+				waterBattleScore-=loseCent;
+			}
+			
+		}
+		
+		nowTime=time_milli();//论战结束时间
+		
+		cnn=game.cnn;
+		
+		enemyUserID=waterBattle.enemyUserID;//对方user_id
+		enemyUser=game.rd.getRow(cnn,"user","id",enemyUserID,"*",1000);//指定对战玩家
+		enemyWaterBattleScore=number(enemyUser.waterBattleScore);//对方积分
+		enemyName=enemyUser.nickname;//对方名字
+		enemyUserJson=json_decode(enemyUser.json);
+		enemyUserJsonWifePlus=enemyUserJson.wifePlus;//敌方wifePlus
+		enemyUser.json=json_encode(enemyUserJson);
+		enemyHeroCount=waterBattle.enemyHeroCount;//对方hero数量
+		waterBattleExt=jsonExt.waterBattleExt;
+		enemyArr=waterBattleExt.enemyArr;//仇人数组
+		myuid=user.id;//我的user_id
+		name=user.nickname;//名称
+		curTime=now();//ace时间
+		tableName=createDayTable(cnn,"water_battle");
+		waterBattleType=waterBattle.type;//类型
+		//保存
+		waterBattle.hp=round(myHeroHP);
+		if(isWin==0)//enemyHeroHP<=0 && myHeroHP>0)//胜
+		{
+			user.waterBattleScore=waterBattleScore;//论战总积分
+			waterBattle.enemyHeroIDArr=enemyHeroIDArr;//随机3个敌方豪杰ID
+			waterBattle.winCount=winCount;//击败敌方豪杰数量
+			//论战阶段
+			if(battleCount!=0 && battleCount%lottery==0)//抽奖
+			{
+				isBattle=2;
+				user.waterBattleStep=2;
+				
+			}
+			else if(arrSize(enemyHeroIDArr)!=0)//未打完
+			{
+				isBattle=1;
+				user.waterBattleStep=1;
+			}
+			else if(arrSize(enemyHeroIDArr)==0)//ace
+			{
+				isBattle=0;
+				user.waterBattleStep=0;
+				
+				if(waterBattleType==2)
+				{
+					if(enemyWaterBattleScore>=battleCount*2) //对方积分充足
+					{
+						enemyWaterBattleScore-=battleCount*2;
+					}
+					else
+					{
+						enemyWaterBattleScore=0;
+					}	
+
+				}
+				else
+				{
+					if(enemyWaterBattleScore>=battleCount) //对方积分充足
+					{
+						enemyWaterBattleScore-=battleCount;
+					}
+					else
+					{
+						enemyWaterBattleScore=0;
+					}	
+				}
+				
+			}
+		}
+		else//败
+		{
+			waterBattle.hp=0;
+			isBattle=0;
+			user.waterBattleScore=waterBattleScore;
+			//score=battleCount;
+			// if(battleCount-2<0)
+			// {
+				// score=abs(battleCount-2);
+				// enemyWaterBattleScore+=score;
+			// }
+			// else
+			// {
+				// enemyWaterBattleScore+=score-2;
+			// }
+			if(waterBattleType==2)
+			{
+				score=battleCount*2-2;
+				if(enemyWaterBattleScore<score)
+				{
+					enemyWaterBattleScore=0;
+				}
+				else
+				{
+					enemyWaterBattleScore-=score;
+				}	
+			}
+			else
+			{
+				score=battleCount-2;
+				if(enemyWaterBattleScore<score)
+				{
+					enemyWaterBattleScore=0;
+				}
+				else
+				{
+					enemyWaterBattleScore-=score;
+				}	
+			}
+			
+		}
+		enemysInfo=dict();//仇人数组
+		enemyInfo=dict();//被打数组
+		
+		if(waterBattleType==3)//方击
+		{
+			i=0;enemyArrLength=size(enemyArr);
+			while(i<enemyArrLength)
+			{
+				if(enemyArr[i].userID==enemyUserID)
+				{
+					remove(enemyArr,i);
+					--enemyArrLength;
+				}
+				else
+				{
+					i++;
+				}
+			}
+		}
+		if(isBattle==0 )//END
+		{
+			if(winCount>=5 ||arrSize(enemyHeroIDArr)==0)//列入仇人数组
+			{
+				enemysInfo=dict("userID",myuid,"time",nowTime);
+			}
+			
+			if(winCount>0)//列入被打数组
+			{
+				if(winCount==enemyHeroCount)//ace
+				{
+					temporaryScore+=winCount;
+					temporaryScore=temporaryScore*loseCent*-1;
+				}
+				else
+				{
+					temporaryScore+=winCount;
+					temporaryScore=temporaryScore*loseCent*-1;
+					temporaryScore+=2;
+				}
+				enemyInfo=dict("userID",myuid,"time",nowTime,"enemyHeroID",heroID,"winCount",winCount,"battleScore",temporaryScore);
+			}
+			if(winCount>=20 || arrSize(enemyHeroIDArr)==0)//红名玩家 
+			{
+				multiKill=0;//连杀
+				//连杀
+				sql="select count(*) from "+tableName+" where userID="+userID+" and enemyUserID="+enemyUserID+"";
+				rs=mysqlCreateRs(cnn,sql);
+				if(mysqlNextRow(rs))
+				{
+					multiKill=mysqlGetColVal(rs,0);
+				}
+				mysqlDestroyRs(rs);
+				multiKill+=1;
+				//生成日记表
+				sql="insert into "+tableName+" set genTime='"+curTime+"'";
+				sql+=",userID="+userID;
+				sql+=",userName='"+name+"'";
+				sql+=",heroID="+heroID;
+				sql+=",enemyUserID="+enemyUserID;
+				sql+=",enemyUserName='"+enemyName+"'";
+				sql+=",killCount="+winCount;
+				sql+=",enemyCount="+enemyHeroCount;
+				sql+=",winCount="+multiKill;
+				mysqlExec(cnn,sql);
+			}
+			user.waterBattleStep=0;
+			waterBattle.enemyUserID=0;
+			
+			if(waterBattleType==1)
+			{
+				user.waterBattleEndTime=nowTime;
+				if(waterBattleCount<count)
+				{
+					waterBattleCount+=1;
+					user.waterBattleCount=waterBattleCount;
+				}
+			}
+			
+			achievement=json.achievement;
+			achievementWaterCount=achievement.waterCount;
+			dailyTask=json.dailyTask;
+			dailyTaskWaterCount=dailyTask.waterCount;
+			achievementWaterCount+=1;
+			dailyTaskWaterCount+=1;
+			achievement.waterCount=achievementWaterCount;
+			dailyTask.waterCount=dailyTaskWaterCount;
+			
+			waterBattle.type=0;
+		}
+		
+		
+		json.hero[heroIndex].growsExp=growsExp;
+		heroGrowsExp=json.hero[heroIndex].growsExp;
+		waterBattle.buyBuff=0;//购买BUFF ID
+		waterBattle.battleCount=battleCount;
+		waterBattle.buffArr=buff;
+		user.jsonExt=json_encode(jsonExt);
+		user.json=json_encode(json);
+		updateEnemyUser(game,enemyUserID,enemyWaterBattleScore,enemysInfo,enemyInfo);
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,battleInfo,enemyHeroIDArr,battleCount,nowTime,outcome,enemyHero,winCount,waterBattleCount,buff,enemyName,waterBattle.enemyHeroPromotionArr,growsExp,waterBattle.hp,enemyUserJsonWifePlus,isWin,enemyHeroHP)
+  			                          //2战报   3敌方豪杰ID数组 4战斗次数   5时间  6胜负  7敌方豪杰    8击败数    9议政次数   10可购买BUFF数组  11.敌方名字  12.仇人数组 13豪杰资质 14我方血量 15敌方wifePlus 16胜负 17敌方剩余血量
+		);
+		return(1);//修改
+		
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

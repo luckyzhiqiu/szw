@@ -1,0 +1,50 @@
+//我的宴会信息
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+partyBt=number(user.partyBt);//宴会开始时间
+if(partyBt==0)//宴会没有开始
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();//修改
+}
+
+jsonExt=json_decode(user.jsonExt);
+
+//数据
+partyBt=user.partyBt;//宴会开始时间
+partyType=user.partyType;//宴会类型：0=家宴；1=官宴（必须公开）；
+partyNum=user.partyNum;//宴会人数（能加入的人数）
+partyOpen=user.partyOpen;//宴会公开标记：0=否；1=是；
+
+party=jsonExt.party;//宴会信息
+
+myInfo=dict();
+myInfo["score"]=party.score;
+myInfo["seatArr"]=party.seatArr;
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,partyBt,partyType,partyNum,partyOpen,myInfo,time())
+);
+

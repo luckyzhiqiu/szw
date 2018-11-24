@@ -1,0 +1,564 @@
+//支付发放
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+orderNum=netMsg[3];//orderNum
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+updateFuc=##<game,orderNum,debugType>
+
+	if(debugType==1)//debug模式
+	{
+		sql="update `order` set status=1,`get`=1 where num='"+orderNum+"'";
+	}else
+	{
+		sql="update `order` set `get`=1 where num='"+orderNum+"'";
+	}
+	
+	mysqlExec(game.cnn,sql);
+	
+##.;
+
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,orderNum,userID,updateFuc;
+		json=json_decode(user.json);
+		nowTime=now();//今天时间
+		currentTime=strtotime(nowTime);
+		t=split(arr(),nowTime," ");
+		t_a=t[0];
+			
+		sql="select goodsID,type,rmb,userID,status,`get` from `order` where num='"+orderNum+"'";
+	
+		rs=mysqlCreateRs(game.cnn,sql);
+	
+		rmb2=0;
+		while(mysqlNextRow(rs))
+		{
+			payID=mysqlGetColVal(rs,0);
+			type=mysqlGetColVal(rs,1);
+			
+			rmb2=mysqlGetColVal(rs,2);
+			userID2=mysqlGetColVal(rs,3);
+			status2=mysqlGetColVal(rs,4);
+			get2=mysqlGetColVal(rs,5);
+			
+		}
+		mysqlDestroyRs(rs);
+		
+		
+		if(rmb2==0)
+		{	//没这条order
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);
+		}
+		
+		debugType=game.gameConfig.debug;
+	
+		//检查付钱
+		if(debugType==1)//debug模式
+		{
+		
+			// if(number(status2)!=0)
+			// {
+				// //order数据错误
+				// game.sendMsg
+				// (
+					// sessionID,
+					// arr(methodName+"Result",-5)
+				// );
+				// return(0);
+			// }
+			
+			
+		}else//正式
+		{
+			
+			if(number(status2)!=1)
+			{
+				//order数据错误
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-5)
+				);
+				return(0);
+			}
+			
+		}
+		
+		//检查发货
+		if(number(get2)!=0)
+		{
+			//order数据错误
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-5)
+			);
+			return(0);
+		}
+			
+		
+		
+		//发货
+		if(type==1)//礼包
+		{
+			buyMap=ref(json.buyMap);//购买记录
+			num=buyMap[payID];
+			
+			shopTable=game.table.shop;
+			row=shopTable.getRowFromColName("id",payID);
+			if(empty(row))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-99)//ID无效
+				);
+				return(0);//不修改
+			}
+			limited=row.getValFromColName("limited");
+			
+			if(number(num)>=number(limited))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-2)//已限购
+				);
+				return(0);//不修改
+			}
+			
+			payPrice=row.getValFromColName("payPrice");
+			
+			if(number(payPrice)!=number(rmb2) || number(userID)!=number(userID2))
+			{
+				//order数据错误
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-5)
+				);
+				return(0);
+			}
+			
+			type2=row.getValFromColName("type");
+			if(number(payPrice)<=0||number(type2)!=3)
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)//不是付费项
+				);
+				return(0);//不修改			
+			}
+			buyMap[payID]=number(num)+1;
+			
+			itemID=row.getValFromColName("itemID");
+			itemDict=json.item;
+			game.numMgr.addItem(number(itemID),1,itemDict);
+			
+			payPrice=row.getValFromColName("payPrice");		
+			rmb=ref(user.rmb);
+			
+			rmb=number(rmb)+number(payPrice);
+			myVip=ref(user.vip);
+			vip=game.numMgr.computeVip(rmb,number(myVip));
+			if(myVip!=vip)
+			{
+				nickname=user.nickname;
+				//公告群发
+				worldSendMsg(game,0,nickname,0,0,0,"恭喜 <font color=\"#33CC00\">"+nickname+"</font>将VIP等级提升至<font color=\"#33CC00\">"+vip+"</font>级，获得更多VIP特权！",0,2);
+			}
+			myVip=vip;
+			
+			
+			updateFuc(game,orderNum,debugType);
+			
+			dailyTask=ref(json.dailyTask);
+			rechargeOneDay=ref(dailyTask.rechargeOneDay);
+			rechargeOneDay=number(rechargeOneDay)+number(payPrice);
+			
+			limitTask=ref(json.limitTask);
+			recharge=ref(limitTask.recharge);
+			rechargeDate=ref(limitTask.rechargeDate);
+			rechargeDays=ref(limitTask.rechargeDays);
+			
+			recharge=number(recharge)+number(payPrice);
+			
+			
+			if(t_a !=rechargeDate)
+			{
+				rechargeDate=t_a;
+				rechargeDays=number(rechargeDays)+1;
+			}
+			buyCount=ref(dailyTask.buyCount);
+			buyCount=number(buyCount)+1;
+			
+			//保存
+			user.json=json_encode(json);
+			
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,type,rmb,json.item,myVip,buyMap,rechargeOneDay,recharge,rechargeDays,payID,buyCount)
+			);
+			
+			return(1);//修改
+			
+		}else if(type==2)
+		{
+			payMap=ref(json.payMap);//首充记录
+			payTable=game.table.pay;
+			row=payTable.getRowFromColName("id",payID);
+			if(empty(row))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-99)//ID无效
+				);
+				return(0);//不修改
+			}
+			
+			firstCharge=row.getValFromColName("firstCharge");
+			firstDouble=row.getValFromColName("firstDouble");
+			
+			price=row.getValFromColName("price");
+			if(number(price)!=number(rmb2) || number(userID)!=number(userID2))
+			{
+				//order数据错误
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-5)
+				);
+				return(0);
+			}
+			getGold=number(row.getValFromColName("getGold"));		
+			gold=ref(user.gold);
+			rmb=ref(user.rmb);
+			
+			doubleGold=1;
+			
+			
+			get4=ref(user.get4);
+			
+			if(number(firstCharge)==1 &&get4!=1){
+				
+				doubleGold=4;//四倍流水
+				newGold=number(gold)+number(getGold)*4;
+				if(newGold!=0)
+				{
+					gold=newGold;
+				}
+				rmb=number(rmb)+number(price);
+				
+				
+			
+			}else if(number(firstDouble)==1)
+			{
+				if(exist(payMap,payID))
+				{
+					newGold=number(gold)+number(getGold);
+					if(newGold!=0)
+					{
+						gold=newGold;
+					}
+					rmb=number(rmb)+number(price);
+				}else
+				{
+					doubleGold=2;//双倍流水
+					newGold=number(gold)+number(getGold)*2;
+					if(newGold!=0)
+					{
+						gold=newGold;
+					}
+					rmb=number(rmb)+number(price);
+					
+					payMap[payID]=1;
+				}
+				
+			}else
+			{
+				newGold=number(gold)+number(getGold);
+				if(newGold!=0)
+				{
+					gold=newGold;
+				}
+				
+				rmb=number(rmb)+number(price);
+				
+			}
+			get4=1;
+			myVip=ref(user.vip);
+			vip=game.numMgr.computeVip(rmb,number(myVip));
+			if(myVip!=vip)
+			{
+				nickname=user.nickname;
+				//公告群发
+				worldSendMsg(game,0,nickname,0,0,0,"恭喜 <font color=\"#33CC00\">"+nickname+"</font>将VIP等级提升至<font color=\"#33CC00\">"+vip+"</font>级，获得更多VIP特权！",0,2);
+			}
+			myVip=vip;
+			
+			updateFuc(game,orderNum,debugType);
+		
+			//流水记录
+			gold2=number(user.gold2);
+			allGold=number(gold)+gold2;//元宝余额
+			ifDoubleGoldGetGold=getGold*doubleGold;//是否触发双倍
+			game.saveResIO(userID,6,0,1,ifDoubleGoldGetGold,allGold);//充值(type,itemID,（0=消耗，1=获得）,count,allGold)
+			
+			dailyTask=ref(json.dailyTask);
+			rechargeOneDay=ref(dailyTask.rechargeOneDay);
+			rechargeOneDay=number(rechargeOneDay)+number(price);
+			
+			limitTask=ref(json.limitTask);
+			recharge=ref(limitTask.recharge);
+			rechargeDate=ref(limitTask.rechargeDate);
+			rechargeDays=ref(limitTask.rechargeDays);
+			
+			recharge=number(recharge)+number(price);
+			
+			
+			if(t_a !=rechargeDate)
+			{
+				rechargeDate=t_a;
+				rechargeDays=number(rechargeDays)+1;
+			}
+			//保存
+			user.json=json_encode(json);
+			
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,type,gold,rmb,myVip,payMap,rechargeOneDay,recharge,rechargeDays,get4)
+			);
+			
+			return(1);//修改
+			
+		
+		}else if(type==3)//购买月卡
+		{
+			tabelData=game.table;
+			monthSpareCount=number(user.monthSpareCount);
+	
+			rowCM=tabelData.cardMonth.getRow(0);
+			payPrice=number(rowCM.getValFromColName("RMB"));
+			gold2=number(rowCM.getValFromColName("get"));
+			num=number(rowCM.getValFromColName("num"));
+			if(number(payPrice)!=number(rmb2) || number(userID)!=number(userID2))
+			{
+				//order数据错误
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-5)
+				);
+				return(0);
+			}
+			rmb=ref(user.rmb);
+
+			rmb=number(rmb)+number(payPrice);
+			myVip=ref(user.vip);
+			vip=game.numMgr.computeVip(rmb,number(myVip));
+			if(myVip!=vip)
+			{
+				nickname=user.nickname;
+				//公告群发
+				worldSendMsg(game,0,nickname,0,0,0,"恭喜 <font color=\"#33CC00\">"+nickname+"</font>将VIP等级提升至<font color=\"#33CC00\">"+vip+"</font>级，获得更多VIP特权！",0,2);
+			}
+			myVip=vip;
+			newGold2=number(user.gold2)+number(gold2);
+			if(newGold2!=0)
+			{
+				user.gold2=newGold2;
+			}
+			
+			user.monthSpareCount=num;
+			user.monthUseCount=0;
+	
+			updateFuc(game,orderNum,debugType);
+			//流水
+			allGold=number(user.gold)+number(user.gold2);//元宝余额
+			game.saveResIO(userID,12,0,1,gold2,allGold);//月卡(type,itemID,（0=消耗，1=获得）,count,allGold)
+			
+			dailyTask=ref(json.dailyTask);
+			rechargeOneDay=ref(dailyTask.rechargeOneDay);
+			rechargeOneDay=number(rechargeOneDay)+number(payPrice);
+			
+			limitTask=ref(json.limitTask);
+			recharge=ref(limitTask.recharge);
+			rechargeDate=ref(limitTask.rechargeDate);
+			rechargeDays=ref(limitTask.rechargeDays);
+			
+			recharge=number(recharge)+number(payPrice);
+			
+			
+			if(t_a !=rechargeDate)
+			{
+				rechargeDate=t_a;
+				rechargeDays=number(rechargeDays)+1;
+			}
+				
+			//保存
+			user.json=json_encode(json);
+			
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,type,gold2,user.monthSpareCount,user.monthUseCount,rmb,rechargeOneDay,recharge,rechargeDays,myVip)
+			);
+			
+			return(1);//修改
+			
+		}
+		else if(type==4)//购买年卡
+		{
+			tabelData=game.table;
+			yearSpareCount=number(user.yearSpareCount);
+		
+			rowCY=tabelData.cardYear.getRow(0);
+			payPrice=number(rowCY.getValFromColName("RMB"));
+			gold2=number(rowCY.getValFromColName("get"));
+			num=number(rowCY.getValFromColName("num"));
+			getVIP=number(rowCY.getValFromColName("getVIP"));
+			if(number(payPrice)!=number(rmb2) || number(userID)!=number(userID2))
+			{
+				//order数据错误
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-5)
+				);
+				return(0);
+			}
+			myVip=ref(user.vip);
+			oldVip=clone(myVip);
+			if(number(myVip)<number(getVIP))
+			{
+				myVip=getVIP;
+			}
+			rmb=ref(user.rmb);
+			rmb=number(rmb)+number(payPrice);
+			
+			vip=game.numMgr.computeVip(rmb,number(myVip));
+			if(oldVip!=vip)
+			{
+				nickname=user.nickname;
+				//公告群发
+				worldSendMsg(game,0,nickname,0,0,0,"恭喜 <font color=\"#33CC00\">"+nickname+"</font>将VIP等级提升至<font color=\"#33CC00\">"+vip+"</font>级，获得更多VIP特权！",0,2);
+			}
+		
+			myVip=vip;
+			
+			
+			
+			user.gold2=number(user.gold2)+number(gold2);
+			user.yearSpareCount=num;
+			user.yearUseCount=0;
+			
+			updateFuc(game,orderNum,debugType);
+			
+			//流水
+			allGold=number(user.gold)+number(user.gold2);//元宝余额
+			game.saveResIO(userID,13,0,1,gold2,allGold);//年卡(type,itemID,（0=消耗，1=获得）,count,allGold)
+			
+			dailyTask=ref(json.dailyTask);
+			rechargeOneDay=ref(dailyTask.rechargeOneDay);
+			rechargeOneDay=number(rechargeOneDay)+number(payPrice);
+			
+			limitTask=ref(json.limitTask);
+			recharge=ref(limitTask.recharge);
+			rechargeDate=ref(limitTask.rechargeDate);
+			rechargeDays=ref(limitTask.rechargeDays);
+			
+			recharge=number(recharge)+number(payPrice);
+			
+			
+			if(t_a !=rechargeDate)
+			{
+				rechargeDate=t_a;
+				rechargeDays=number(rechargeDays)+1;
+			}
+			
+			
+			
+			//保存
+			user.json=json_encode(json);
+			
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,type,gold2,user.yearSpareCount,user.yearUseCount,myVip,rmb,rechargeOneDay,recharge,rechargeDays)
+			);
+			
+			return(1);//修改
+			
+		}else{
+			//order类型不存在
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-6)
+			);
+			return(0);
+			
+		}
+				
+		
+		
+		
+		
+	
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

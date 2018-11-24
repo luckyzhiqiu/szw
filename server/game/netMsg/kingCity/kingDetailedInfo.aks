@@ -1,0 +1,67 @@
+//皇宫-王爺信息®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+kingId=netMsg[3];//王爺ＩＤ
+
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+if(kingId<1&&kingId>5)//非法ID
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+//获取全局变量
+varName="kingCity";
+cnn=game.cnn;
+globaVar=game.rd.getRow(cnn,"global_var","name",varName,"*",1000);
+globalJson=json_decode(globaVar.json);
+unknownKing=globalJson["wang"+kingId];//王爷
+unknownKingID=number(unknownKing.userID);//王爷ID
+arrInfo=arr();
+if(unknownKingID!=0)
+{
+	unknownKingUser=game.rd.getRow(cnn,"user","id",unknownKingID,"*",1000);//王爷玩家
+	unknownKingName=unknownKingUser.nickname;//Name
+	unknownKingVip=unknownKingUser.vip;//VIP
+	unknownKingId=unknownKingUser.id;//编号
+	unknownKingPower=unknownKingUser.power;//勢力
+	unknownKingStrength=unknownKingUser.strength;//势力武力
+	unknownKingWisdom=unknownKingUser.wisdom;//势力智力
+	unknownKingCharm=unknownKingUser.charm;//势力魅力
+	unknownKingPolitics=unknownKingUser.politics;//势力政治
+	unknownKingLv=unknownKingUser.level;//Lv
+	unknownKingScore=unknownKingUser.score;//政绩
+	unknownKingIntimate=unknownKingUser.intimate;//亲密度总和
+	unknownKingChapterID=number(unknownKingUser.chapterID)+1;//章节ID
+	chapterTable=game.table.chapter;//关卡表
+	chapterIdRow=chapterTable.getRowFromColName("id",unknownKingChapterID);
+	chapterName=chapterIdRow.getValFromColName("name");//关卡名
+	unknownKingBarrierID=number(unknownKingUser.barrierID)+1;//关卡ID
+	unknownKingHead=unknownKingUser.head;//编号
+	push(arrInfo,unknownKingName,unknownKingVip,unknownKingId,unknownKingPower,unknownKingStrength,unknownKingWisdom,unknownKingCharm,unknownKingPolitics,unknownKingLv,unknownKingScore,unknownKingIntimate,chapterName,unknownKingBarrierID,unknownKingHead);
+}
+
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,arrInfo)
+);

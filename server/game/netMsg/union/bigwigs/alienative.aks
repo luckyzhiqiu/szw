@@ -1,0 +1,344 @@
+//离间
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+richmanID=int(netMsg[3]);//权贵ID
+type=int(netMsg[4]);//类型：1=银两离间;2=元宝离间
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+if(type!=1 && type!=2)//类型错误
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+userData=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+unionID=userData.unionID;
+if(unionID==0)//未加入联盟
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-3)
+	);
+	exit();
+}
+
+pass=0;//离间成败 0=败，1=是
+moneyAlienateIncrease=0;//银两离间增加好感
+goldAlienateIncrease=0;//元宝离间增加好感
+moneyAlienateDecrease=0;//银两离间降低好感
+goldAlienateDecrease=0;//元宝离间降低好感
+moneyAlienatEXP=0;//银两离间联盟经验
+goldAlienateEXP=0;//元宝离间联盟经验
+
+ifSuccess=0;
+updateUser=##<game,friendVal,userID>
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link sessionID,methodName,type,richmanID,friendVal,pass,moneyAlienateIncrease,goldAlienateIncrease,ifSuccess,moneyAlienateDecrease,goldAlienateDecrease,userID,moneyAlienatEXP,goldAlienateEXP;
+			money=number(user.money);
+			gold=number(user.gold);
+			gold2=number(user.gold2);
+			
+			//权贵表
+			allianceNobleTable=game.table.allianceNoble;
+			rowAN=allianceNobleTable.getRowFromColName("id",richmanID);
+			//银两离间
+			moneyAlienateCost=number(rowAN.getValFromColName("moneyAlienateCost"));//银两离间消耗
+			moneyAlienateItem=rowAN.getValFromColName("moneyAlienateItem");//银两离间道具（道具id,数量）
+			moneyAlienateIncrease=number(rowAN.getValFromColName("moneyAlienateIncrease"));//银两离间增加好感
+			moneyAlienateDecrease=number(rowAN.getValFromColName("moneyAlienateDecrease"));//银两离间降低好感
+			moneyAlienateDevote=number(rowAN.getValFromColName("moneyAlienateDevote"));//银两离间个人贡献
+			moneyAlienatEXP=number(rowAN.getValFromColName("moneyAlienatEXP"));//银两离间个人贡献
+			//元宝离间
+			goldAlienateCost=number(rowAN.getValFromColName("goldAlienateCost"));//元宝离间消耗
+			goldAlienateItem=rowAN.getValFromColName("goldAlienateItem");//元宝离间道具（道具id,数量）
+			goldAlienateIncrease=number(rowAN.getValFromColName("goldAlienateIncrease"));//元宝离间增加好感
+			goldAlienateDecrease=number(rowAN.getValFromColName("goldAlienateDecrease"));//元宝离间降低好感
+			goldAlienateDevote=number(rowAN.getValFromColName("goldAlienateDevote"));//元宝离间个人贡献
+			goldAlienateEXP=number(rowAN.getValFromColName("goldAlienateEXP"));//元宝离间个人贡献
+				
+			if(type==1)
+			{
+				if(money<moneyAlienateCost)//银两不足
+				{
+					ifSuccess=-4;
+					return(0);
+				}
+				//扣除银两
+				money-=moneyAlienateCost;
+			}
+			else if(type==2)
+			{
+				if(goldAlienateCost>(gold+gold2))//元宝不足
+				{
+					ifSuccess=-5;
+					return(0);
+				}
+			
+				//扣减元宝
+				if(goldAlienateCost>gold)
+				{
+					goldAlienateCost-=gold;
+					gold=0;
+					gold2-=goldAlienateCost;
+				}
+				else
+				{
+					gold-=goldAlienateCost;
+				}
+				
+				
+			}
+
+			uJson=json_decode(user.json);
+			itemDict=uJson.item;
+			numMgr=game.numMgr;
+			if(type==1)
+			{
+				friendItem=moneyAlienateItem;
+			}
+			else if(type==2)
+			{
+				friendItem=goldAlienateItem;
+			}
+			subItemArr=split(arr(),friendItem,",");
+			subIDCount=size(subItemArr);
+			if(subIDCount>=2)
+			{
+				i=0;j=0;addCount=subIDCount/2;
+				while(i<addCount)
+				{
+					itemID=number(subItemArr[j]);
+					itemCount=number(subItemArr[j+1]);
+					count=numMgr.subItem(itemID,itemCount,itemDict);//扣减道具
+					if(count==-1)//道具不足
+					{
+						ifSuccess=-6;
+						return(0);
+					}
+					j+=2;
+					++i;
+				}
+			}
+			
+			if(goldAlienateCost>0 && type==2)
+			{
+				//流水
+				allGold=gold+gold2;//元宝余额
+				game.saveResIO(userID,21,0,0,goldAlienateCost,allGold);//离间(type,itemID,（0=消耗，1=获得）,count,allGold)
+			}
+				
+			//离间成功率
+			allianceNobleRateTable=game.table.allianceNobleRate;
+			countANR=allianceNobleRateTable.size();
+			while(countANR!=0)
+			{
+				countANR-=1;
+				rowANR=allianceNobleRateTable.getRow(countANR);
+				favor=number(rowANR.getValFromColName("favor"));//好感度大于等于
+				if(friendVal>=favor)
+				{
+					alienateRate=0;
+					if(type==1)
+					{
+						alienateRate=number(rowANR.getValFromColName("moneyAlienateRate"));//银两离间成功率
+					}
+					else if(type==2)
+					{
+						alienateRate=number(rowANR.getValFromColName("goldAlienateRate"));//元宝离间成功率
+					}
+					
+					num=rand()%10000+1;
+					if(num<=alienateRate)//成功离间
+					{
+						pass=1;
+						if(type==1)//银两
+						{
+							user.devote=moneyAlienateDevote+number(user.devote);//增加贡献
+							user.devoteTotal=moneyAlienateDevote+number(user.devoteTotal);//增加累计贡献
+						}
+						else if(type==2)//元宝
+						{
+							user.devote=goldAlienateDevote+number(user.devote);//增加贡献
+							user.devoteTotal=goldAlienateDevote+number(user.devoteTotal);//增加累计贡献
+						}
+					}
+					break;
+				}
+			}
+			
+			//保存
+			ifSuccess=1;
+			user.money=money;
+			user.gold=gold;
+			user.gold2=gold2;
+			user.json=json_encode(uJson);
+
+			return(1);//修改
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	return(user);
+##.;
+
+addnionExp=0;
+updateUnion=##<game,unionID>
+	unionData=game.rd.updateRow
+	(
+		game.cnn,"union","id",unionID,"*",
+		//修改回调
+		##<unionData,game>
+			@link type,moneyAlienatEXP,goldAlienateEXP,addnionExp;
+			if(type==1)
+			{
+				addnionExp=moneyAlienatEXP;
+			}
+			else if(type==2)
+			{
+				addnionExp=goldAlienateEXP;
+			}
+			
+			//增加联盟经验
+			game.numMgr.addUnionExp(unionData,addnionExp);
+		
+			return(1);
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+##.;
+
+richman=game.rd.updateRow
+(
+	game.cnn,"union_richman","id",richmanID,"*",
+	//修改回调
+	##<richman,game>
+		@link sessionID,methodName,type,userID,unionID,pass,moneyAlienateIncrease,goldAlienateIncrease,updateUser,ifSuccess,moneyAlienateDecrease,goldAlienateDecrease,addnionExp,updateUnion;
+		richmanJson=json_decode(richman.json);
+		unionIDR=richman.unionID;
+		if(unionIDR==unionID)//不能离间自己联盟
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-7)
+			);
+			return(0);//
+		}
+		unionFriendMap=richmanJson.unionFriendMap;
+		friendVal=0;
+		if(exist(unionFriendMap,unionID))//联盟是否已存在
+		{
+			friendVal=unionFriendMap[unionID];
+		}
+		else
+		{
+			unionFriendMap[unionID]=friendVal;
+		}
+
+		user=updateUser(game,friendVal,userID);
+		if(ifSuccess==1)
+		{
+			if(pass)//离间成功
+			{
+				updateUnion(game,unionID);
+				if(type==1)
+				{
+					unionFriendMap[unionID]+=moneyAlienateIncrease;//增加好感度
+					unionFriendMap[unionIDR]-=moneyAlienateDecrease;//银两离间降低好感
+				}
+				else if(type==2)
+				{
+					unionFriendMap[unionID]+=goldAlienateIncrease;//增加好感度
+					unionFriendMap[unionIDR]-=goldAlienateDecrease;//元宝离间降低好感
+				}
+			}
+			
+			//保存
+			richman.json=json_encode(richmanJson);
+			
+			//返回
+			userJson=json_decode(user.json);
+			itemDict=userJson.item;
+			money=number(user.money);
+			gold=number(user.gold);
+			gold2=number(user.gold2);
+			devote=number(user.devote);
+			devoteTotal=number(user.devoteTotal);
+
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,itemDict,money,gold,gold2,pass,devote,devoteTotal,unionFriendMap[unionID],unionFriendMap[unionIDR],addnionExp)
+			);
+			return(1);//修改
+		}
+		else//条件不满足
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",ifSuccess)
+			);
+			return(0);//
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(richman))//联盟不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

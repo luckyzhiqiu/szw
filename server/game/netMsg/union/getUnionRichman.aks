@@ -1,0 +1,54 @@
+//获取联盟权贵信息
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+unionID=number(user.unionID);
+if(unionID==0)//未加入联盟
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+//联盟ID
+unionData=game.rd.getRow(game.cnn,"union","id",unionID,"*",1000);
+if(empty(unionData))//联盟不存在
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}
+
+infoDict=dict();
+uJson=json_decode(unionData.json);
+
+infoDict["richmanIDMap"]=uJson.richmanIDMap;//拉拢成功的权贵字典
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,infoDict)
+);
+	
+	

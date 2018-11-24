@@ -1,0 +1,93 @@
+//皇宫-登錄信息
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//获取全局变量
+varName="kingCity";
+cnn=game.cnn;
+var=game.rd.getRow(cnn,"global_var","name",varName,"*",1000);
+varJson=json_decode(var.json);
+wang1=varJson.wang1;//势力王爷
+wang1Id=wang1.userID;//势力王爷id
+chat1=wang1.chat;
+wang1Arr=arr();
+
+
+
+if(wang1Id!=0)
+{
+	wang1User=game.rd.getRow(cnn,"user","id",wang1Id,"*",1000);//势力王爷玩家
+	wang1Name=wang1User.nickname;
+	wang1head=wang1User.head;
+	wang1vip=wang1User.vip;
+	
+	push(wang1Arr,wang1Name,wang1head,wang1vip,wang1Id,chat1);
+}
+wang2=varJson.wang2;//论战王爷
+wang2Id=wang2.userID;//论战王爷id
+chat2=wang2.chat;
+wang2Arr=arr();
+if(wang2Id!=0)
+{
+	wang2User=game.rd.getRow(cnn,"user","id",wang2Id,"*",1000);//论战王爷玩家
+	wang2Name=wang2User.nickname;
+	wang2head=wang2User.head;
+	wang2vip=wang2User.vip;
+	push(wang2Arr,wang2Name,wang2head,wang2vip,wang2Id,chat2);
+}
+wang3=varJson.wang3;//亲密王爷
+wang3Id=wang3.userID;//亲密王爷id
+chat3=wang3.chat;
+wang3Arr=arr();
+if(wang3Id!=0)
+{
+	wang3User=game.rd.getRow(cnn,"user","id",wang3Id,"*",1000);//亲密王爷玩家
+	wang3Name=wang3User.nickname;
+	wang3head=wang3User.head;
+	wang3vip=wang3User.vip;
+	push(wang3Arr,wang3Name,wang3head,wang3vip,wang3Id,chat3);
+}
+wang4=varJson.wang4;//xx王爷
+wang4Id=wang4.userID;//xx王爷id
+chat4=wang4.chat;
+wang4Arr=arr();
+if(wang4Id!=0)
+{
+	wang4User=game.rd.getRow(cnn,"user","id",wang4Id,"*",1000);//帮会王爷玩家
+	wang4Name=wang4User.nickname;
+	wang4head=wang4User.head;
+	wang4vip=wang4User.vip;
+	push(wang4Arr,wang4Name,wang4head,wang4vip,wang4Id,chat4);
+}
+wang5=varJson.wang5;//xxx王爷
+wang5Id=wang5.userID;//xxx王爷id
+chat5=wang5.chat;
+wang5Arr=arr();
+if(wang1Id5=0)
+{
+	wang5User=game.rd.getRow(cnn,"user","id",wang5Id,"*",1000);//xxx王爷玩家
+	wang5Name=wang5User.nickname;
+	wang5head=wang5User.head;
+	wang5vip=wang5User.vip;
+	push(wang5Arr,wang5Name,wang5head,wang5vip,wang5Id,chat5);
+}
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,wang1Arr,wang2Arr,wang3Arr,wang4Arr,wang5Arr)
+);

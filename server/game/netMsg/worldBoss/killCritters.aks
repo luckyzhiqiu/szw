@@ -1,0 +1,225 @@
+//击杀阶段
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+heroIndex=netMsg[3];//豪杰位置
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//获取阶段小怪数量
+getWorldBossDetectStageCount=##<game,stage>
+	worldBossDetectTable=game.table.worldBossDetect;
+	wBDCount=worldBossDetectTable.size();
+	i=0;
+	stageCount=0;
+	while(i<wBDCount)
+	{
+		rowWBD=worldBossDetectTable.getRow(i);
+		stageWBD=number(rowWBD.getValFromColName("stage"));//阶段
+		if(stageWBD==stage)
+		{
+			stageCount+=1;
+		}
+		++i;
+	}
+	return(stageCount);
+##.;
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,heroIndex,getWorldBossDetectStageCount;
+		jsonExt=json_decode(user.jsonExt);
+		worldBoss=jsonExt.worldBoss;
+		
+		tableData=game.table;
+		worldBossTable=tableData.worldBoss;
+		rowWB=worldBossTable.getRow(0);
+		dayBt=strtotime(split(arr(),now()," ")[0]);//今天的开始时间（秒）
+		btDay=rowWB.getValFromColName("bt");
+		dtDay=rowWB.getValFromColName("dt");
+		bt=dateStrToSeconds(btDay);//开放时间
+		dt=dateStrToSeconds(dtDay);//结束时间
+		ct=time();
+		if(ct<(dayBt+bt) || ct>(dayBt+dt))//不在侦查探案时间
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		
+		status=ref(worldBoss.status);//0=初始阶段；1=选择发现阶段；2=发现小怪阶段；3=犒赏完成阶段（犒赏之后日场结束）
+		if(status!=2)//阶段错误
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		monHeroMap=worldBoss.monHeroMap;//日场豪杰上阵字典，heroIndex存在时代表上阵过//monHeroMap[heroIndex]=1;
+		if(exist(monHeroMap,heroIndex))//已出战
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+		monHeroMap[heroIndex]=1;
+		
+		findArr=worldBoss.findArr;//发现状态数组（元素数量3，定义：0=未发现；1=已发现）
+		findTypeArr=worldBoss.findTypeArr;////发现类型数组（元素数量3，定义：1=发现线索；2=发现小怪）
+		monHP=ref(worldBoss.monHP);//小怪血量
+
+		numMgr=game.numMgr;
+		json=json_decode(user.json);
+		heroArr=json.hero;
+		hero=heroArr[heroIndex];
+		//攻击BOSS伤害数值=豪杰战斗力=武力资质×5000×等级＋武力属性
+		atk=numMgr.getHeroAttack(hero,json);
+		//atk=hero.strengthGrows*5000*hero.level+hero.strengthTotal;
+		
+		worldBossScoreTotal=number(user.worldBossScoreTotal);
+		worldBossScore=number(user.worldBossScore);
+		stage=ref(worldBoss.stage);//打怪阶段
+		monCount=ref(worldBoss.monCount);//当前阶段打怪数量
+		monCountMax=ref(worldBoss.monCountMax);
+		worldBossDetect=tableData.worldBossDetect;
+		wBDCount=worldBossDetect.size();
+		i=0;
+		while(i<wBDCount)
+		{
+			rowWBD=worldBossDetect.getRow(i);
+			stageWBD=number(rowWBD.getValFromColName("stage"));//阶段
+			barrierWBD=number(rowWBD.getValFromColName("barrier"));//关卡
+			if(stage==stageWBD && monCount==barrierWBD)
+			{
+				lifeWBD=number(rowWBD.getValFromColName("life"));//血量
+				pointWBD=number(rowWBD.getValFromColName("point"));//积分
+				itemWBD=rowWBD.getValFromColName("item");//道具
+				atk=limit(atk,0,lifeWBD);
+				addPointWBD=floor(atk/lifeWBD*pointWBD);
+				
+				//增加积分
+				worldBossScoreTotal+=addPointWBD;
+				worldBossScore+=addPointWBD;
+				
+				itemDict=json.item;
+		
+				addItemArrAll=arr();
+				//减少血量
+				monHP-=atk;
+				if(monHP<=0)
+				{
+					monHP=0;
+					//变更阶段
+					status=1;
+					//初始化
+					clean(findArr);
+					push(findArr,0,0,0);
+					clean(findTypeArr);
+					push(findTypeArr,1,1,1);
+					findTypeArr[rand()%3]=2;
+							
+					//奖励道具
+					addItemArr=split(arr(),itemWBD,",");
+					addIDCount=size(addItemArr);
+					if(addIDCount>=2)
+					{
+						k=0;j=0;addCount=addIDCount/2;
+						while(k<addCount)
+						{
+							itemID=number(addItemArr[j]);
+							itemCount=number(addItemArr[j+1]);
+							numMgr.addItem(itemID,itemCount,itemDict);//奖励道具
+							push(addItemArrAll,itemID,itemCount);
+							j+=2;
+							++k;
+						}
+					}
+					
+					//更新关卡
+					stageCount=getWorldBossDetectStageCount(game,stage);
+					stageCount-=1;
+					if(monCount==stageCount)
+					{
+						stage+=1;
+						monCount=0;
+						
+						a=0;monCountMax=0;
+						while(a<wBDCount)
+						{
+							wBDRow=worldBossDetect.getRow(a);
+							stageWBD=number(wBDRow.getValFromColName("stage"));//阶段
+							barrierWBD=number(wBDRow.getValFromColName("barrier"));//关卡
+							if(stageWBD==stage)
+							{
+								++monCountMax;
+							}
+							++a;
+						}
+						worldBoss.monCountMax=monCountMax;
+					}
+					else
+					{
+						monCount+=1;
+					}
+				}
+				
+				//保存
+				user.worldBossScoreTotal=worldBossScoreTotal;
+				user.worldBossScore=worldBossScore;
+				user.json=json_encode(json);
+				user.jsonExt=json_encode(jsonExt);
+				
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,worldBossScoreTotal,worldBossScore,itemDict,addItemArrAll,addPointWBD,findArr,status,monHP,stage,monCount,monCountMax,monHeroMap)
+				);
+				return(1);//修改
+			}
+			++i;
+		}
+
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

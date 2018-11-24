@@ -1,0 +1,120 @@
+//下阵
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+type=int(netMsg[3]);//下阵类型:0=商业;1=农业;2=征兵;3=军营;
+pos=int(netMsg[4]);//座位
+
+if(pos<0||pos>=5)//座位值无效
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)//座位值无效
+	);
+	exit();
+}
+
+if(type<0||type>=4)//上阵类型无效
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)//上阵类型无效
+	);
+	exit();
+}
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,type,pos;
+	
+		json=json_decode(user.json);
+		heroArr=json.hero;//豪杰数组
+		
+		if(type==0)
+		{
+			useHero=json.makeMoney;//经营:商业
+		}
+		else if(type==1)
+		{
+			useHero=json.makeFood;//经营:农业
+		}
+		 else if(type==2)
+		{
+			useHero=json.makeSoldier;//经营:征兵
+		}
+		else if(type==3)
+		{
+			useHero=json.battle;//经营:军营
+			hero=useHero.hero;
+			heroIndex=hero[pos];
+			hero[pos]=-1;
+			heroArr[heroIndex].useSign=0;//下阵
+		}
+		
+		if(type==0||type==1||type==2)
+		{
+			hero=useHero.hero;//上阵豪杰列表
+			heroIndex=ref(hero[pos].heroIndex);//上阵豪杰位置
+			beginTime=ref(hero[pos].beginTime);
+			
+			if(heroIndex!=-1)
+			{
+				heroArr[heroIndex].useSign=0;//下阵
+				
+				heroIndex=-1;
+				beginTime=0;//时间重置
+			}
+		}
+		
+		//编码
+		user.json=json_encode(json);
+			
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,useHero)
+		);
+
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

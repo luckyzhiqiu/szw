@@ -1,0 +1,132 @@
+//领取月卡奖励
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID;
+		json=json_decode(user.json);
+		monthDate=user.monthDate;//月卡日期字符串
+		newTime=split(arr(),now()," ");
+		ymd=newTime[0];
+		if(monthDate==ymd)//已领取
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);
+		}
+		
+		monthSpareCount=number(user.monthSpareCount);//月卡剩余领奖次数
+		monthUseCount=number(user.monthUseCount);//月卡消耗领奖次数
+		
+		if(monthSpareCount==0)//没有奖励剩余次数
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);
+		}
+		
+		tabelData=game.table;
+		rowCM=tabelData.cardMonth.getRow(0);
+		getEveryday=number(rowCM.getValFromColName("getEveryday"));
+		
+		num=monthUseCount%7;
+		itemDict=json.item;
+		if(num==0)
+		{
+			numMgr=game.numMgr;
+			getEverySeven=rowCM.getValFromColName("getEverySeven");
+			addItemArr=split(arr(),getEverySeven,",");
+			addIDCount=size(addItemArr);
+			if(addIDCount>=2)
+			{
+				i=0;j=0;addCount=addIDCount/2;
+				while(i<addCount)
+				{
+					itemID=number(addItemArr[j]);
+					itemCount=number(addItemArr[j+1]);
+					numMgr.addItem(itemID,itemCount,itemDict);//奖励道具
+					j+=2;
+					++i;
+				}
+			}
+		}
+
+		monthSpareCount--;
+		monthUseCount++;
+		
+		//日常任务//领取月卡
+		dailyTask=json.dailyTask;
+		dailyTask.monthCard+=1;
+		
+		gold2=number(user.gold2);
+		gold2+=getEveryday;
+		//流水记录
+		allGold=number(user.gold)+gold2;//元宝余额
+		game.saveResIO(userID,12,0,1,getEveryday,allGold);//充值(type,itemID,（0=消耗，1=获得）,count,allGold)
+		
+		//保存
+		if(gold2!=0)
+		{
+			user.gold2=gold2;
+		}
+		
+		user.monthSpareCount=monthSpareCount;
+		user.monthUseCount=monthUseCount;
+		user.monthDate=ymd;
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,monthSpareCount,monthUseCount,user.monthDate,gold2,itemDict,dailyTask.monthCard)
+		);
+		
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

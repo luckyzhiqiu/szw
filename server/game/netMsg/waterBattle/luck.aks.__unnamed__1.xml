@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t163">100</v>
+<v t="n" n="__sys__t162">100</v>
+<v t="n" n="__sys__t144">89</v>
+<v t="n" n="__sys__t143">89</v>
+<v t="n" n="__sys__t134">81</v>
+<v t="n" n="__sys__t133">81</v>
+<v t="n" n="__sys__t131">80</v>
+<v t="n" n="__sys__t130">80</v>
+<v t="n" n="__sys__t128">79</v>
+<v t="n" n="__sys__t126">78</v>
+<v t="n" n="__sys__t123">76</v>
+<v t="n" n="__sys__t122">76</v>
+<v t="n" n="__sys__t98">59</v>
+<v t="n" n="__sys__t87">51</v>
+<v t="n" n="__sys__t73">40</v>
+<v t="n" n="__sys__t69">37</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="s" n="__sys__t3">.methodName.</v>
+<v t="s" n="__sys__t4">.sessionID.</v>
+<v t="s" n="__sys__t5">.waterBattleScore.</v>
+<v t="s" n="__sys__t6">.enemysInfo.</v>
+<v t="s" n="__sys__t7">.enemyInfo.</v>
+<v t="n" n="__sys__t8">0</v>
+<v t="n" n="__sys__t9">0</v>
+<v t="n" n="__sys__t10">0</v>
+<v t="n" n="__sys__t11">0</v>
+<v t="n" n="__sys__t12">0</v>
+<v t="n" n="__sys__t13">0</v>
+<v t="n" n="__sys__t14">0</v>
+<v t="n" n="__sys__t15">0</v>
+<v t="n" n="__sys__t16">0</v>
+<v t="n" n="__sys__t17">0</v>
+<v t="n" n="__sys__t18">0</v>
+<v t="n" n="__sys__t19">0</v>
+<v t="n" n="__sys__t20">0</v>
+<v t="n" n="__sys__t21">0</v>
+<v t="n" n="__sys__t22">1</v>
+<v t="n" n="__sys__t23">1</v>
+<o n="input"><o>__sys__t24</o><i>__sys__t1</i></o>
+<o n="="><o>user</o><i>__sys__t24</i></o>
+<o n="input"><o>__sys__t26</o><i>__sys__t2</i></o>
+<o n="="><o>game</o><i>__sys__t26</i></o>
+<o n="link" r="61"><o>__sys__t28</o><i>__sys__t3</i></o>
+<o n="=" r="61"><o>methodName</o><i>__sys__t28</i></o>
+<o n="link" r="61"><o>__sys__t30</o><i>__sys__t4</i></o>
+<o n="=" r="61"><o>sessionID</o><i>__sys__t30</i></o>
+<o n="link" r="61"><o>__sys__t32</o><i>__sys__t5</i></o>
+<o n="=" r="61"><o>waterBattleScore</o><i>__sys__t32</i></o>
+<o n="link" r="61"><o>__sys__t34</o><i>__sys__t6</i></o>
+<o n="=" r="61"><o>enemysInfo</o><i>__sys__t34</i></o>
+<o n="link" r="61"><o>__sys__t36</o><i>__sys__t7</i></o>
+<o n="=" r="61"><o>enemyInfo</o><i>__sys__t36</i></o>
+<v t="s" n="__sys__t39">.jsonExt.</v>
+<o n="." r="62"><o>__sys__t38</o><i>user</i><i>__sys__t39</i></o>
+<o n="json_decode" r="62"><o>__sys__t41</o><i>__sys__t38</i></o>
+<o n="=" r="62"><o>jsonExtEnemy</o><i>__sys__t41</i></o>
+<v t="s" n="__sys__t44">.waterBattleExt.</v>
+<o n="." r="63"><o>__sys__t43</o><i>jsonExtEnemy</i><i>__sys__t44</i></o>
+<o n="=" r="63"><o>waterBattleExtEnemy</o><i>__sys__t43</i></o>
+<v t="s" n="__sys__t48">.hitArr.</v>
+<o n="." r="64"><o>__sys__t47</o><i>waterBattleExtEnemy</i><i>__sys__t48</i></o>
+<o n="=" r="64"><o>hitArrExt</o><i>__sys__t47</i></o>
+<v t="s" n="__sys__t52">.enemyArr.</v>
+<o n="." r="65"><o>__sys__t51</o><i>waterBattleExtEnemy</i><i>__sys__t52</i></o>
+<o n="=" r="65"><o>enemyArrExt</o><i>__sys__t51</i></o>
+<o n="size" r="66"><o>__sys__t55</o><i>enemysInfo</i></o>
+<o n="=" r="66"><o>enemysInfoCount</o><i>__sys__t55</i></o>
+<o n="!=" r="67"><o>__sys__t57</o><i>enemysInfoCount</i><i>__sys__t8</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t57</i></o>
+<o n="=="><o>__sys__t59</o><i>__sys__rt</i><i>__sys__t9</i></o>
+<o n="if_goto"><o>__sys__t60</o><i>__sys__t59</i><i>__sys__t133</i></o>
+<o n="size" r="69"><o>__sys__t61</o><i>enemyArrExt</i></o>
+<o n="=" r="69"><o>enemyCount</o><i>__sys__t61</i></o>
+<o n="==" r="70"><o>__sys__t63</o><i>enemyCount</i><i>__sys__t10</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t63</i></o>
+<o n="=="><o>__sys__t65</o><i>__sys__rt</i><i>__sys__t11</i></o>
+<o n="if_goto"><o>__sys__t66</o><i>__sys__t65</i><i>__sys__t69</i></o>
+<o n="push" r="72"><o>__sys__t67</o><i>enemyArrExt</i><i>enemysInfo</i></o>
+<o n="goto"><o>__sys__t68</o><i>__sys__t131</i></o>
+<o n="arr" r="76"><o>__sys__t70</o></o>
+<o n="=" r="76"><o>enemyArrID</o><i>__sys__t70</i></o>
+<o n="=" r="77"><o>i</o><i>__sys__t12</i></o>
+<o n="&lt;" r="78"><o>__sys__t74</o><i>i</i><i>enemyCount</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t74</i></o>
+<o n="=="><o>__sys__t76</o><i>__sys__rt</i><i>__sys__t13</i></o>
+<o n="if_goto"><o>__sys__t77</o><i>__sys__t76</i><i>__sys__t87</i></o>
+<o n="[]" r="80"><o>__sys__t78</o><i>enemyArrExt</i><i>i</i></o>
+<v t="s" n="__sys__t80">.userID.</v>
+<o n="." r="80"><o>__sys__t79</o><i>__sys__t78</i><i>__sys__t80</i></o>
+<o n="number" r="80"><o>__sys__t82</o><i>__sys__t79</i></o>
+<o n="=" r="80"><o>userID</o><i>__sys__t82</i></o>
+<o n="push" r="81"><o>__sys__t84</o><i>enemyArrID</i><i>userID</i></o>
+<o n="++" r="82"><o>i</o><i>i</i></o>
+<o n="goto"><o>__sys__t86</o><i>__sys__t73</i></o>
+<v t="s" n="__sys__t89">.userID.</v>
+<o n="." r="84"><o>__sys__t88</o><i>enemysInfo</i><i>__sys__t89</i></o>
+<o n="number" r="84"><o>__sys__t91</o><i>__sys__t88</i></o>
+<o n="=" r="84"><o>enemyCID</o><i>__sys__t91</i></o>
+<o n="inArr" r="85"><o>__sys__t93</o><i>enemyArrID</i><i>enemyCID</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t93</i></o>
+<o n="=="><o>__sys__t95</o><i>__sys__rt</i><i>__sys__t14</i></o>
+<o n="if_goto"><o>__sys__t96</o><i>__sys__t95</i><i>__sys__t128</i></o>
+<o n="=" r="87"><o>j</o><i>__sys__t15</i></o>
+<o n="&lt;" r="88"><o>__sys__t99</o><i>j</i><i>enemyCount</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t99</i></o>
+<o n="=="><o>__sys__t101</o><i>__sys__rt</i><i>__sys__t16</i></o>
+<o n="if_goto"><o>__sys__t102</o><i>__sys__t101</i><i>__sys__t126</i></o>
+<o n="[]" r="90"><o>__sys__t103</o><i>enemyArrExt</i><i>j</i></o>
+<v t="s" n="__sys__t105">.userID.</v>
+<o n="." r="90"><o>__sys__t104</o><i>__sys__t103</i><i>__sys__t105</i></o>
+<o n="number" r="90"><o>__sys__t107</o><i>__sys__t104</i></o>
+<o n="=" r="90"><o>userCID</o><i>__sys__t107</i></o>
+<o n="==" r="91"><o>__sys__t109</o><i>userCID</i><i>enemyCID</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t109</i></o>
+<o n="=="><o>__sys__t111</o><i>__sys__rt</i><i>__sys__t17</i></o>
+<o n="if_goto"><o>__sys__t112</o><i>__sys__t111</i><i>__sys__t122</i></o>
+<o n="[]" r="93"><o>__sys__t113</o><i>enemyArrExt</i><i>j</i></o>
+<v t="s" n="__sys__t115">.time.</v>
+<o n="." r="93"><o>__sys__t114</o><i>__sys__t113</i><i>__sys__t115</i></o>
+<v t="s" n="__sys__t118">.time.</v>
+<o n="." r="93"><o>__sys__t117</o><i>enemysInfo</i><i>__sys__t118</i></o>
+<o n="=" r="93"><o>__sys__t114</o><i>__sys__t117</i></o>
+<o n="goto"><o>__sys__t121</o><i>__sys__t123</i></o>
+<o n="++" r="95"><o>j</o><i>j</i></o>
+<o n="goto"><o>__sys__t125</o><i>__sys__t98</i></o>
+<o n="goto"><o>__sys__t127</o><i>__sys__t130</i></o>
+<o n="push" r="100"><o>__sys__t129</o><i>enemyArrExt</i><i>enemysInfo</i></o>
+<o n="goto"><o>__sys__t132</o><i>__sys__t134</i></o>
+<o n="size" r="104"><o>__sys__t135</o><i>enemyInfo</i></o>
+<o n="=" r="104"><o>enemyInfoCount</o><i>__sys__t135</i></o>
+<o n="!=" r="105"><o>__sys__t137</o><i>enemyInfoCount</i><i>__sys__t18</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t137</i></o>
+<o n="=="><o>__sys__t139</o><i>__sys__rt</i><i>__sys__t19</i></o>
+<o n="if_goto"><o>__sys__t140</o><i>__sys__t139</i><i>__sys__t143</i></o>
+<o n="push" r="107"><o>__sys__t141</o><i>hitArrExt</i><i>enemyInfo</i></o>
+<o n="goto"><o>__sys__t142</o><i>__sys__t144</i></o>
+<v t="s" n="__sys__t146">.enemyArr.</v>
+<o n="." r="110"><o>__sys__t145</o><i>waterBattleExtEnemy</i><i>__sys__t146</i></o>
+<o n="=" r="110"><o>__sys__t145</o><i>enemyArrExt</i></o>
+<v t="s" n="__sys__t150">.hitArr.</v>
+<o n="." r="111"><o>__sys__t149</o><i>waterBattleExtEnemy</i><i>__sys__t150</i></o>
+<o n="=" r="111"><o>__sys__t149</o><i>hitArrExt</i></o>
+<o n="!=" r="112"><o>__sys__t153</o><i>enemyInfoCount</i><i>__sys__t20</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t153</i></o>
+<o n="=="><o>__sys__t155</o><i>__sys__rt</i><i>__sys__t21</i></o>
+<o n="if_goto"><o>__sys__t156</o><i>__sys__t155</i><i>__sys__t162</i></o>
+<v t="s" n="__sys__t158">.hitUnreadCount.</v>
+<o n="." r="114"><o>__sys__t157</o><i>waterBattleExtEnemy</i><i>__sys__t158</i></o>
+<o n="=" r="114"><o>__sys__t157</o><i>__sys__t22</i></o>
+<o n="goto"><o>__sys__t161</o><i>__sys__t163</i></o>
+<v t="s" n="__sys__t165">.waterBattleScore.</v>
+<o n="." r="116"><o>__sys__t164</o><i>user</i><i>__sys__t165</i></o>
+<o n="=" r="116"><o>__sys__t164</o><i>waterBattleScore</i></o>
+<v t="s" n="__sys__t169">.jsonExt.</v>
+<o n="." r="117"><o>__sys__t168</o><i>user</i><i>__sys__t169</i></o>
+<o n="json_encode" r="117"><o>__sys__t171</o><i>jsonExtEnemy</i></o>
+<o n="=" r="117"><o>__sys__t168</o><i>__sys__t171</i></o>
+<o n="return" r="118"><o>__sys__t173</o><i>__sys__t23</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t101" />
+<v n="__sys__t102" />
+<v n="__sys__t103" />
+<v n="__sys__t104" />
+<v n="__sys__t107" />
+<v n="__sys__t109" />
+<v n="__sys__t111" />
+<v n="__sys__t112" />
+<v n="__sys__t113" />
+<v n="__sys__t114" />
+<v n="__sys__t117" />
+<v n="__sys__t121" />
+<v n="__sys__t125" />
+<v n="__sys__t127" />
+<v n="__sys__t129" />
+<v n="__sys__t132" />
+<v n="__sys__t135" />
+<v n="__sys__t137" />
+<v n="__sys__t139" />
+<v n="__sys__t140" />
+<v n="__sys__t141" />
+<v n="__sys__t142" />
+<v n="__sys__t145" />
+<v n="__sys__t149" />
+<v n="__sys__t153" />
+<v n="__sys__t155" />
+<v n="__sys__t156" />
+<v n="__sys__t157" />
+<v n="__sys__t161" />
+<v n="__sys__t164" />
+<v n="__sys__t168" />
+<v n="__sys__t171" />
+<v n="__sys__t173" />
+<v n="__sys__t24" />
+<v n="__sys__t26" />
+<v n="__sys__t28" />
+<v n="__sys__t30" />
+<v n="__sys__t32" />
+<v n="__sys__t34" />
+<v n="__sys__t36" />
+<v n="__sys__t38" />
+<v n="__sys__t41" />
+<v n="__sys__t43" />
+<v n="__sys__t47" />
+<v n="__sys__t51" />
+<v n="__sys__t55" />
+<v n="__sys__t57" />
+<v n="__sys__t59" />
+<v n="__sys__t60" />
+<v n="__sys__t61" />
+<v n="__sys__t63" />
+<v n="__sys__t65" />
+<v n="__sys__t66" />
+<v n="__sys__t67" />
+<v n="__sys__t68" />
+<v n="__sys__t70" />
+<v n="__sys__t74" />
+<v n="__sys__t76" />
+<v n="__sys__t77" />
+<v n="__sys__t78" />
+<v n="__sys__t79" />
+<v n="__sys__t82" />
+<v n="__sys__t84" />
+<v n="__sys__t86" />
+<v n="__sys__t88" />
+<v n="__sys__t91" />
+<v n="__sys__t93" />
+<v n="__sys__t95" />
+<v n="__sys__t96" />
+<v n="__sys__t99" />
+<v n="enemyArrExt" />
+<v n="enemyArrID" />
+<v n="enemyCID" />
+<v n="enemyCount" />
+<v n="enemyInfo" />
+<v n="enemyInfoCount" />
+<v n="enemysInfo" />
+<v n="enemysInfoCount" />
+<v n="game" />
+<v n="hitArrExt" />
+<v n="i" />
+<v n="j" />
+<v n="jsonExtEnemy" />
+<v n="methodName" />
+<v n="sessionID" />
+<v n="user" />
+<v n="userCID" />
+<v n="userID" />
+<v n="waterBattleExtEnemy" />
+<v n="waterBattleScore" />
+</script>

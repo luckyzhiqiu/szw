@@ -1,0 +1,90 @@
+//恢复豪杰
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+heroIndex=netMsg[3];//豪杰位置
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,heroIndex;
+		json=json_decode(user.json);
+		jsonExt=json_decode(user.jsonExt);
+		worldBoss=jsonExt.worldBoss;
+		monHeroRecoveMap=worldBoss.monHeroRecoveMap;
+		if(exist(monHeroRecoveMap,heroIndex))//豪杰已存在不能恢复
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		numMgr=game.numMgr;
+		itemDict=json.item;
+		monHeroMap=worldBoss.monHeroMap;//日场豪杰上阵字典
+		if(exist(monHeroMap,heroIndex))
+		{
+			itemID=7;
+			num=numMgr.subItem(itemID,1,itemDict);
+			if(num==-1)//数量不足扣除失败
+			{
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)
+				);
+				return(0);//不修改
+			}
+			
+			remove(monHeroMap,heroIndex);
+			monHeroRecoveMap[heroIndex]=1;
+		}
+
+		//保存
+		user.json=json_encode(json);
+		user.jsonExt=json_encode(jsonExt);
+		
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,itemDict,monHeroMap,monHeroRecoveMap)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

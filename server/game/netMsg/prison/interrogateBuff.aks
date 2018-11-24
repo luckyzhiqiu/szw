@@ -1,0 +1,109 @@
+//审问Buff
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID;
+		json=json_decode(user.json);
+		prison=json.prison;
+		hitPercent=prison.hitPercent;
+		
+		tableData=game.table;
+		rowPC=tableData.prisonerConfigure.getRow(0);
+		goldHit=number(rowPC.getValFromColName("goldHit"));//元宝严刑拷打
+		goldHitRate=number(rowPC.getValFromColName("goldHitRate"));//严刑拷打增加万分比
+		goldHitMax=number(rowPC.getValFromColName("goldHitMax"));//严刑拷打上限
+		
+		if(hitPercent>=goldHitMax)//buff已达到上限
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+
+		gold=number(user.gold);//元宝（充值，优先使用）
+		gold2=number(user.gold2);//元宝（赠送）
+		if(goldHit>(gold+gold2))//元宝不足
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		//扣减元宝
+		if(goldHit>gold)
+		{
+			goldHit-=gold;
+			gold=0;
+			gold2-=goldHit;
+		}
+		else
+		{
+			gold-=goldHit;
+		}
+		
+		hitPercent+=goldHitRate;
+		hitPercent=limit(hitPercent,0,goldHitMax);//加成最大上限值
+		
+		//流水
+		allGold=gold+gold2;//元宝余额
+		game.saveResIO(userID,42,0,0,goldHit,allGold);//大狱严刑拷打(type,itemID,（0=消耗，1=获得）,count,allGold)
+		
+		//保存
+		prison.hitPercent=hitPercent;
+		user.gold=gold;
+		user.gold2=gold2;
+		user.json=json_encode(json);
+		
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,gold,gold2,prison)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

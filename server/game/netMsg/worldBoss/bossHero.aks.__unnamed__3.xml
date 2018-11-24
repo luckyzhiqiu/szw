@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">3</v>
+<v t="s" n="__sys__t4">.global_var.</v>
+<v t="s" n="__sys__t5">.name.</v>
+<v t="s" n="__sys__t6">.worldBoss.</v>
+<v t="s" n="__sys__t7">.*.</v>
+<v t="s" n="__sys__t8">.@__unnamed__0.</v>
+<v t="s" n="__sys__t9">.@__unnamed__1.</v>
+<v t="s" n="__sys__t10">.@__unnamed__2.</v>
+<v t="n" n="__sys__t11">1000</v>
+<o n="input"><o>__sys__t12</o><i>__sys__t1</i></o>
+<o n="="><o>game</o><i>__sys__t12</i></o>
+<o n="input"><o>__sys__t14</o><i>__sys__t2</i></o>
+<o n="="><o>current_T</o><i>__sys__t14</i></o>
+<o n="arr" r="21"><o>__sys__t16</o></o>
+<o n="=" r="21"><o>backArr</o><i>__sys__t16</i></o>
+<o n=" -" r="22"><o>__sys__t18</o><i>__sys__t3</i></o>
+<o n="push" r="22"><o>__sys__t19</o><i>backArr</i><i>__sys__t18</i></o>
+<v t="s" n="__sys__t21">.rd.</v>
+<o n="." r="25"><o>__sys__t20</o><i>game</i><i>__sys__t21</i></o>
+<v t="s" n="__sys__t24">.updateRow.</v>
+<o n="." r="25"><o>__sys__t23</o><i>__sys__t20</i><i>__sys__t24</i></o>
+<v t="s" n="__sys__t27">.cnn.</v>
+<o n="." r="27"><o>__sys__t26</o><i>game</i><i>__sys__t27</i></o>
+<o n="full"><o>__sys__t29</o><i>__sys__t8</i></o>
+<o n="full"><o>__sys__t30</o><i>__sys__t9</i></o>
+<o n="full"><o>__sys__t31</o><i>__sys__t10</i></o>
+<o n="__sys__t23" r="25"><o>__sys__t32</o><i>__sys__t20</i><i>__sys__t26</i><i>__sys__t4</i><i>__sys__t5</i><i>__sys__t6</i><i>__sys__t7</i><i>__sys__t29</i><i>__sys__t30</i><i>__sys__t31</i><i>game</i><i>__sys__t11</i></o>
+<o n="=" r="25"><o>global</o><i>__sys__t32</i></o>
+<o n="return" r="77"><o>__sys__t34</o><i>backArr</i></o>
+<v n="__sys__t12" />
+<v n="__sys__t14" />
+<v n="__sys__t16" />
+<v n="__sys__t18" />
+<v n="__sys__t19" />
+<v n="__sys__t20" />
+<v n="__sys__t23" />
+<v n="__sys__t26" />
+<v n="__sys__t29" />
+<v n="__sys__t30" />
+<v n="__sys__t31" />
+<v n="__sys__t32" />
+<v n="__sys__t34" />
+<v n="backArr" />
+<v n="current_T" />
+<v n="game" />
+<v n="global" />
+</script>

@@ -1,0 +1,89 @@
+//玩家信息-称号®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+titleID=netMsg[3];//称号ID
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+// if(type<1||type>3)//类型无效
+// {
+	// //回复
+	// game.sendMsg
+	// (
+		// sessionID,
+		// arr(methodName+"Result",-2)
+	// );
+	// exit();
+// }
+if(0>titleID ||titleID>4)//目前4个称号
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-3)//非法参数
+	);
+	exit();
+}
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,titleID;
+		json=json_decode(user.json);
+		titleMap=json.titleMap;
+		if(titleID!=0)
+		{
+			if(!exist(titleMap,titleID))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)//未拥有称号
+				);
+				exit();
+			}
+		}
+		user.titleID=titleID;
+		user.json=json_encode(json);
+		//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",1)
+	);
+	return(1);
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

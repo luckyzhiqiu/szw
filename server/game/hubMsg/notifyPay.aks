@@ -1,0 +1,27 @@
+//支付完成通知转发
+<game,netMsg>
+debug(netMsg);
+
+// log("pay.log",json_encode(netMsg)+"\r\n");
+// log("pay.log",json_encode(game.userSessionMap)+"\r\n");
+
+methodName=netMsg[0];
+params=netMsg[1];
+userID=int(params.userID);
+game_order=params.game_order;
+type=params.type;
+
+userSessionMap=game.userSessionMap;
+debug(userSessionMap);
+if(exist(userSessionMap,userID))//在线
+{
+	trace("online "+userID);
+	session=userSessionMap[userID];
+	sessionID=session.id;
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",game_order,type)
+	);
+}

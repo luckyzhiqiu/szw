@@ -1,0 +1,476 @@
+//豪杰资质升级®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+heroIndex=int(netMsg[3]);//豪杰位置
+growsType=int(netMsg[4]);//资质类型:0=武力资质;1=智力资质;2=魅力资质;3=政治资质;
+upType=int(netMsg[5]);//升级类型:0=经验升级;1=道具升级;
+
+if(growsType<0||growsType>3)//资质类型无效
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+if(upType<0||upType>1)//升级类型无效
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-3)
+	);
+	exit();
+}
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,heroIndex,growsType,upType;
+		json=json_decode(user.json);
+		heroArr=json.hero;//所有门客
+		if(!exist(heroArr,heroIndex))//豪杰不存在
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-5)
+			);
+			return(0);//不修改
+		}
+		
+		hero=heroArr[heroIndex];//对应豪杰位置
+		paperExp=hero.growsExp;//资质经验
+		pointTable=game.table.grows;//资质表格
+		itemId="";//物品id
+		itemCound=0;//物品数量
+		needconsume=0;//物品消耗个数
+		point=0;
+		if(growsType==0)
+		{
+			point=hero.strengthGrows;
+		}
+		else if(growsType==1)
+		{
+			point=hero.wisdomGrows;
+		}
+		else if(growsType==2)
+		{
+			point=hero.charmGrows;
+		}
+		else if(growsType==3)
+		{
+			point=hero.politicsGrows;
+		}
+		
+		nextLv=point+1;
+		levelRow=pointTable.getRowFromColName("point",nextLv);
+		if(empty(levelRow))//爆级
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+		upSucc=2;//升级是否成功 1升级成功 2升级失败
+		numMgr=game.numMgr;
+		itemDict=json.item;
+		if(upType==0)//经验升级
+		{
+			//经验消耗数量
+			needexpConsume=number(levelRow.getValFromColName("EXPCost"));
+			//经验提升成功率
+			needexpSuccessRate=number(levelRow.getValFromColName("EXPRate"));
+			num = rand()%10000;
+			if(paperExp>=needexpConsume)
+			{	
+				if(growsType==0)
+				{	
+					//武力资质
+					if(num<needexpSuccessRate)
+					{
+						point+=1;
+						paperExp-=needexpConsume;
+						upSucc=1;
+					}
+					else
+					{
+						paperExp-=needexpConsume;
+						upSucc=2;
+					}
+				}
+				else if(growsType==1)
+				{
+					//智力资质
+					if(num<needexpSuccessRate)
+					{
+						point+=1;
+						paperExp-=needexpConsume;
+						upSucc=1;
+					}
+					else
+					{
+						paperExp-=needexpConsume;
+						upSucc=2;
+					}
+				}
+				else if(growsType==2)
+				{
+					//魅力资质
+					if(num<needexpSuccessRate)
+					{
+						point+=1;
+						paperExp-=needexpConsume;
+						upSucc=1;
+					}
+					else
+					{
+						paperExp-=needexpConsume;
+						upSucc=2;
+					}
+				}
+				else if(growsType==3)
+				{
+					//政治资质
+					if(num<needexpSuccessRate)
+					{
+						point+=1;
+						paperExp-=needexpConsume;
+						upSucc=1;
+					}
+					else
+					{
+						paperExp-=needexpConsume;
+						upSucc=2;
+					}
+				}
+			}
+			else
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-8)
+				);
+				return(0);//不修改
+			}
+		 }
+		else//道具升级 //itemID:9-12 type:6
+		{
+			//书消耗数量
+			needconsume=number(levelRow.getValFromColName("ItemCost"));
+			//书提升成功率
+			needsuccessRate=number(levelRow.getValFromColName("ItemRate"));	
+			num = rand()%10000;
+			if(growsType==0)
+			{	
+				//武力资质
+				//武力书ID
+				itemId=levelRow.getValFromColName("strengthItemID");
+				if(exist(itemDict,itemId) )
+				{	
+					itemCound=itemDict[itemId];
+					if(itemCound>=needconsume)
+					{
+						if(num<needsuccessRate)
+						{	
+							point+=1;
+							upSucc=1;
+						}
+						else
+						{
+							upSucc=2;
+						}
+					}
+					else
+					{
+						//回复
+						game.sendMsg
+						(
+							sessionID,
+							arr(methodName+"Result",-7)//道具不足
+						);
+						return(0);//不修改
+					}
+				}
+				else
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-6)//道具不存在
+					);
+					return(0);//不修改
+				}
+			}
+			else if(growsType==1)
+			{
+				//智力资质
+				//智力书ID
+				itemId=levelRow.getValFromColName("wisdomItemID");
+				if(exist(itemDict,itemId) )	
+				{
+					itemCound=itemDict[itemId];
+					if(itemCound>=needconsume)
+					{
+						if(num<needsuccessRate)
+						{	
+							point+=1;
+							upSucc=1;
+						}
+						else
+						{
+							upSucc=2;
+						}
+					}
+					else
+					{
+						//回复
+						game.sendMsg
+						(
+							sessionID,
+							arr(methodName+"Result",-7)
+						);
+						return(0);//不修改
+					}
+				}
+				else
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-6)
+					);
+					return(0);//不修改
+				}
+			}
+			else if(growsType==2)
+			{
+				
+				//魅力资质
+				//魅力书ID
+				itemId=levelRow.getValFromColName("charmItemID");
+				
+				if(exist(itemDict,itemId) )
+				{	
+					itemCound=itemDict[itemId];
+					if(itemCound>=needconsume)
+					{
+						if(num<needsuccessRate)
+						{	
+							point+=1;
+							upSucc=1;
+						}
+						else
+						{
+							upSucc=2;
+						}
+					}
+					else
+					{
+						//回复
+						game.sendMsg
+						(
+							sessionID,
+							arr(methodName+"Result",-7)
+						);
+						return(0);//不修改
+					}
+				}
+				else
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-6)
+					);
+					return(0);//不修改
+				}
+				
+			}
+			else if(growsType==3)
+			{
+				//政治资质
+				//政治书ID
+				itemId=levelRow.getValFromColName("politicsItemID");
+				
+				if(exist(itemDict,itemId) )
+				{	
+					itemCound=itemDict[itemId];
+					if(itemCound>=needconsume)
+					{
+						if(num<needsuccessRate)
+						{	
+							point+=1;
+							upSucc=1;
+						}
+						else
+						{
+							upSucc=2;
+						}
+					}
+					else
+					{
+						//回复
+						game.sendMsg
+						(
+							sessionID,
+							arr(methodName+"Result",-7)
+						);
+						return(0);//不修改
+					}
+				}
+				else
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-6)
+					);
+					return(0);//不修改
+				}
+				
+			}
+		}
+		//保存
+		
+		hero.growsExp=paperExp;
+		
+		if(growsType==0)
+		{
+			hero.strengthGrows=point;
+			if(upType==1)
+			{
+				itemId=levelRow.getValFromColName("strengthItemID");
+				itemCound=numMgr.subItem(itemId,needconsume,itemDict);
+			}
+			
+		}
+		else if(growsType==1)
+		{
+			hero.wisdomGrows=point;
+			if(upType==1)
+			{
+				itemId=levelRow.getValFromColName("wisdomItemID");
+				itemCound=numMgr.subItem(itemId,needconsume,itemDict);
+			}
+		}
+		else if(growsType==2)
+		{
+			hero.charmGrows=point;
+			if(upType==1)
+			{
+				itemId=levelRow.getValFromColName("charmItemID");
+				itemCound=numMgr.subItem(itemId,needconsume,itemDict);
+			}
+			
+		}
+		else if(growsType==3)
+		{
+			hero.politicsGrows=point;
+			if(upType==1)
+			{
+				itemId=levelRow.getValFromColName("politicsItemID");
+				itemCound=numMgr.subItem(itemId,needconsume,itemDict);
+			}
+			
+		}
+		//使用资质果+成 0orX
+		dailyTask=json.dailyTask;
+		dailyTaskCount=dailyTask.useItem9_12;
+		dailyTaskCount+=needconsume;
+		json.dailyTask.useItem9_12=dailyTaskCount;//日常任务
+		limitTask=json.limitTask;
+		limitTaskCount=limitTask.useItem9_12;
+		limitTaskCount+=needconsume;
+		json.limitTask.useItem9_12=limitTaskCount;//限时任务
+		achievement=json.achievement;
+		useItemMap=achievement.useItemMap;
+		if(itemId!=0 && needconsume!=0)
+		{
+			if(exist(useItemMap,itemId))
+			{
+				useItemMap[itemId]+=needconsume;
+			}
+			else
+			{
+				useItemMap[itemId]=needconsume;
+			}
+		}
+		//重新计算加成
+		numMgr.computeHero(hero,json);
+		numMgr.computeUser(user,json);
+		user.json=json_encode(json);
+		
+		if(upType==0)//经验升级
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,upSucc,hero,0,0,
+					user.strength,user.wisdom,user.charm,user.politics,user.power,0)
+			);
+		}
+		else//道具升级
+		{ 
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,upSucc,hero,itemId,itemCound,
+					user.strength,user.wisdom,user.charm,user.politics,user.power,needconsume)
+			);
+		}
+		return(1);//修改
+		
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

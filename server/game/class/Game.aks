@@ -1,0 +1,1037 @@
+//游戏类
+@class Game
+	//初始化游戏服
+	@member initServer<server>
+		self.server=server;
+	@member.
+	
+	//初始化游戏
+	@member initGame
+		self.sessionMap=dict();//会话列表//sessionMap[sessionID]=session;
+		self.userSessionMap=dict();//会话列表//userSessionMap[userID]=session;
+		self.timer=tick();
+		self.cleanTmpDataTimer=tick();
+		self.tmp=buf();
+		self.tmpDataMap=dict();
+		self.showMsgArr=arr();
+		self.global_var=dict();//全局变量
+		//读取游戏配置
+		self.gameConfig=json(file_get_contents("config/game.json"));
+		//数值管理器
+		self.numMgr=NumMgr(self);
+		//活动管理器
+		self.activityMgr=ActivityMgr(self);
+		//子嗣管理器
+		self.childMgr=ChildMgr(self);
+		//机器人管理器
+		self.rebotMgr=RebotMgr(self);
+		//加载结构体定义
+		self.initStruct();
+	@member.
+	
+	//初始化剧情
+	@member initStory
+		//剧情管理器
+		self.storyMgr=StoryMgr(self);
+	@member.
+	
+	//获取临时数据
+	@member getTmpData<key>
+		tmpDataMap=self.tmpDataMap;
+		if(!exist(tmpDataMap,key))
+		{
+			data=dict();
+			tmpDataMap[key]=data;
+			return(data);
+		}
+		return(tmpDataMap[key]);
+	@member.
+	
+	//清理临时数据
+	@member cleanTmpData
+		clean(self.tmpDataMap);
+	@member.
+	
+	//加载结构体定义
+	@member initStruct
+		//user结构体
+		self.structMgr=structMgr_create();
+		structStr=file_get_contents("struct/struct.h");
+		structMgr_load(self.structMgr,structStr);
+		self.structVer=md5(structStr);//结构体版本号
+		//global_var结构体
+		self.global_var_structMgr=structMgr_create();
+		structMgr_load(self.global_var_structMgr,file_get_contents("struct/global_var.h"));
+	@member.
+	
+	//初始化数据库
+	@member initDB
+		db=readDBConfig("config/db.json","define/db_table.json");//读取数据库配置
+		cnnPool=AKMysqlCnnPool();//mysql连接池
+		dbMaker=AKDatabaseMaker(cnnPool);//数据库创建器
+		dbMaker.readDefine(db.cnn0,db.db0);//读取数据库表格定义
+		self.db=db;
+		self.cnnPool=cnnPool;
+		// self.dbMaker=dbMaker;
+		// self.dbName=db.cnn0.name;//数据库名
+		// self.cnn0=db.cnn0;
+		self.cnn=dbMaker.new_db_cnn_and_select_db(db.cnn0);//游戏数据库连接
+		self.cnn_global=dbMaker.new_db_cnn_and_select_db(db.cnn_global);//全局数据库连接
+		self.cnn_account=dbMaker.new_db_cnn_and_select_db(db.cnn_account);//帐号信息数据库连接
+	@member.
+	
+	//初始化redis
+	@member initRedis
+		//帐号信息redis
+		// redisConfig=json(file_get_contents("config/account_redis.json"));
+		// self.rd_account=AKRedis(redisConfig);
+		
+		//全局redis
+		redisConfig=json(file_get_contents("config/global_redis.json"));
+		self.rd_global=AKRedis(redisConfig);
+		
+		//游戏服redis
+		redisConfig=json(file_get_contents("config/redis.json"));
+		self.rd=AKRedis(redisConfig);
+		self.rd.userData.game=self;
+		//更新行数据回调//形参：type,tableName,colName,colVal,row//type=1为修改前回调，type=2为修改后回调
+		self.rd.updateRowCallback=##<self,type,tableName,colName,colVal,user>
+			//此处的self指rd本身
+			if(tableName=="user")
+			{
+				game=self.userData.game;
+				userData=game.getTmpData("userTmpData"+user.id);
+				if(type==1)//修改前回调
+				{
+					//////////////////////////////////////////////////////////////////////////////////////
+					//记录修改前状态
+					userData.power=number(user.power);//势力
+					userData.charm=number(user.charm);//魅力
+					userData.intimate=number(user.intimate);//红颜亲密度总和
+					userData.beauty=number(user.beauty);//红颜魅力总和
+					userData.chapterID=number(user.chapterID);//章节
+					userData.barrierID=number(user.barrierID);//章节
+					userData.sceneID=number(user.sceneID);//章节
+					userData.waterBattleScore=number(user.waterBattleScore);//论战总积分（论战积分榜）
+					userData.gold=number(user.gold);
+					userData.gold2=number(user.gold2);
+					userData.money=number(user.money);
+					userData.soldier=number(user.soldier);
+					userData.buildActivityScoreTotal=number(user.buildActivityScoreTotal);
+					userData.worldBossScoreTotal=number(user.worldBossScoreTotal);
+					userData.worldBossHurt=number(user.worldBossHurt);
+					userData.towerMaxID=number(user.towerMaxID);
+					userData.partyScore=number(user.partyScore);
+					//////////////////////////////////////////////////////////////////////////////////////
+				}
+				else if(type==2)//修改后回调
+				{
+					sendLimitTaskSign=0;//发送限时任务数据标记
+					ct=time();//当前时间（秒）
+					user.modifTime=now();//修改时间
+					//////////////////////////////////////////////////////////////////////////////////////
+					//修改后状态
+					power=number(user.power);//势力
+					charm=number(user.charm);//魅力
+					intimate=number(user.intimate);//红颜亲密度总和
+					beauty=number(user.beauty);//红颜魅力总和
+					chapterID=number(user.chapterID);//章节
+					barrierID=number(user.barrierID);//关卡
+					sceneID=number(user.sceneID);//场景
+					waterBattleScore=number(user.waterBattleScore);//论战总积分（论战积分榜）
+					gold=number(user.gold);
+					gold2=number(user.gold2);
+					money=number(user.money);
+					soldier=number(user.soldier);
+					buildActivityScoreTotal=number(user.buildActivityScoreTotal);
+					worldBossScoreTotal=number(user.worldBossScoreTotal);
+					worldBossHurt=number(user.worldBossHurt);
+					towerMaxID=number(user.towerMaxID);
+					partyScore=number(user.partyScore);
+					//////////////////////////////////////////////////////////////////////////////////////
+					// userData=self.userData;
+					activityMgr=game.activityMgr;
+					//以下对比修改前状态
+					if(partyScore!=userData.partyScore)//宴会分数变化
+					{
+						//刷新宴会榜
+						score=partyScore;
+						rankName=game.gameConfig.name+"_partyRank";//排行榜名称
+						rd=self.getRedisObj(rankName);//排行榜所在的redis对象
+						redis_zadd(rd,rankName,score,user.id);
+					}
+					if(gold!=userData.gold||gold2!=userData.gold2)//元宝变化
+					{
+						dGold=(gold2+gold)-(userData.gold2+userData.gold);
+						if(dGold<0)//元宝消耗
+						{
+							sendLimitTaskSign=1;
+							json=json_decode(user.json);
+							limitTask=json.limitTask;
+							activityMgr.updateLimitTask(limitTask);//更新限时任务数据
+							limitTask.useGold-=dGold;
+							user.json=json_encode(json);
+						}
+					}
+					if(soldier!=userData.soldier)//兵力变化
+					{
+						dSoldier=soldier-userData.soldier;
+						if(dSoldier<0)//兵力消耗
+						{
+							sendLimitTaskSign=1;
+							json=json_decode(user.json);
+							limitTask=json.limitTask;
+							activityMgr.updateLimitTask(limitTask);//更新限时任务数据
+							limitTask.useSoldier-=dSoldier;
+							user.json=json_encode(json);
+							
+							//刷新兵力冲榜
+							activityID=202;//兵力冲榜
+							if(activityMgr.getActivityStatus(activityID)==1)//活动进行中
+							{
+								global_var=game.global_var;
+								rushLoop=global_var.rushLoop;
+								rushLoopBt=rushLoop.bt;//阶段开始时间
+							
+								soldierSubBT=number(user.soldierSubBT);
+								soldierSub=number(user.soldierSub);
+								score=-dSoldier;
+								if(soldierSubBT!=rushLoopBt)//重置活动积分
+								{
+									user.soldierSubBT=rushLoopBt;
+									soldierSub=score;
+									user.soldierSubReward=0;
+								}
+								else//累计活动积分
+								{
+									soldierSub+=score;
+								}
+								user.soldierSub=soldierSub;
+								//刷新榜
+								score=soldierSub;
+								rankName=game.gameConfig.name+"_soldierSubRank";//排行榜名称
+								rd=self.getRedisObj(rankName);//排行榜所在的redis对象
+								userID=user.id;
+								redis_zadd(rd,rankName,score,userID);//更新榜单
+								//兵力消耗返回
+								userSessionMap=game.userSessionMap;
+								if(exist(userSessionMap,user.id))
+								{
+									session=userSessionMap[user.id];
+									msg=arr("soldierSubResult",soldierSub);
+									game.sendMsg(session.id,msg);
+								}
+							}
+						}
+					}
+					if(money!=userData.money)//银两变化
+					{
+						dMoeny=money-userData.money;
+						if(dMoeny<0)//银两消耗
+						{
+							sendLimitTaskSign=1;
+							json=json_decode(user.json);
+							limitTask=json.limitTask;
+							activityMgr.updateLimitTask(limitTask);//更新限时任务数据
+							limitTask.useMoney-=dMoeny;
+							user.json=json_encode(json);
+							
+							//刷新银两冲榜
+							activityID=201;//银两冲榜
+							if(activityMgr.getActivityStatus(activityID)==1)//活动进行中
+							{
+								global_var=game.global_var;
+								rushLoop=global_var.rushLoop;
+								rushLoopBt=rushLoop.bt;//阶段开始时间
+							
+								moneySubBT=number(user.moneySubBT);
+								moneySub=number(user.moneySub);
+								score=-dMoeny;
+								if(moneySubBT!=rushLoopBt)//重置活动积分
+								{
+									user.moneySubBT=rushLoopBt;
+									moneySub=score;
+									user.moneySubReward=0;
+								}
+								else//累计活动积分
+								{
+									moneySub+=score;
+								}
+								user.moneySub=moneySub;
+								//刷新榜
+								score=moneySub;
+								rankName=game.gameConfig.name+"_moneySubRank";//排行榜名称
+								rd=self.getRedisObj(rankName);//排行榜所在的redis对象
+								userID=user.id;
+								redis_zadd(rd,rankName,score,userID);//更新榜单
+								//银两消耗返回
+								userSessionMap=game.userSessionMap;
+								if(exist(userSessionMap,userID))
+								{
+									session=userSessionMap[userID];
+									msg=arr("moneySubResult",moneySub);
+									game.sendMsg(session.id,msg);
+								}
+							}
+						}
+					}
+					if(towerMaxID!=userData.towerMaxID)//塔战关卡变化
+					{
+						//刷新势力榜
+						score=towerMaxID;
+						rankName=game.gameConfig.name+"_towerBattleRank";//排行榜名称
+						rd=self.getRedisObj(rankName);//排行榜所在的redis对象
+						redis_zadd(rd,rankName,score,user.id);
+					}
+					if(power!=userData.power)//势力变化
+					{
+						//刷新势力榜
+						score=power;
+						rankName=game.gameConfig.name+"_powerRank";//排行榜名称
+						rd=self.getRedisObj(rankName);//排行榜所在的redis对象
+						redis_zadd(rd,rankName,score,user.id);
+						
+						dPower=floor(power-userData.power);
+						// if(dPower>0)//势力涨幅
+						// {
+							sendLimitTaskSign=1;
+							json=json_decode(user.json);
+							limitTask=json.limitTask;
+							activityMgr.updateLimitTask(limitTask);//更新限时任务数据
+							limitTask.powerAdd+=dPower;
+							user.json=json_encode(json);
+						// }
+						
+						//刷新势力冲榜
+						activityID=1;//势力冲榜
+						if(activityMgr.getActivityStatus(activityID)==1)//活动进行中
+						{
+							global_var=game.global_var;
+							rushLoop=global_var.rushLoop;
+							rushLoopBt=rushLoop.bt;//阶段开始时间
+						
+							powerAddBT=number(user.powerAddBT);
+							powerAdd=number(user.powerAdd);
+							score=power-userData.power;
+							if(powerAddBT!=rushLoopBt)//重置活动积分
+							{
+								user.powerAddBT=rushLoopBt;
+								powerAdd=score;
+								user.powerReward=0;
+							}
+							else//累计活动积分
+							{
+								powerAdd+=score;
+							}
+							user.powerAdd=powerAdd;
+							//刷新榜
+							score=powerAdd;
+							rankName=game.gameConfig.name+"_activityPowerRank";//排行榜名称
+							rd=self.getRedisObj(rankName);//排行榜所在的redis对象
+							userID=user.id;
+							oldRankID=redis_zrevrank(rd,rankName,userID);//原排名
+							redis_zadd(rd,rankName,score,userID);//更新榜单
+							newRankID=redis_zrevrank(rd,rankName,userID);//新排名
+							if(newRankID>=0&&newRankID<10&&newRankID<oldRankID)//排名提升，且为前10名
+							{
+								//公告群发
+								nickname=user.nickname;
+								worldSendMsg(game,0,nickname,0,0,0,"恭喜<font color=\"#33CC00\">"+nickname+"</font>在<font color=\"#33CC00\">势力冲榜</font>活动中晋升为第 <font color=\"#33CC00\">"+(newRankID+1)+"</font> 名，希望他能站到最后并拿走丰厚的奖励！",0,4);
+							}
+							//势力涨幅返回
+							userSessionMap=game.userSessionMap;
+							if(exist(userSessionMap,user.id))
+							{
+								session=userSessionMap[user.id];
+								msg=arr("powerAddResult",powerAdd);
+								game.sendMsg(session.id,msg);
+							}
+						}
+					}
+					if(charm!=userData.charm)//魅力变化
+					{
+						dCharm=charm-userData.charm;
+						if(dCharm>0)//魅力涨幅
+						{
+							sendLimitTaskSign=1;
+							json=json_decode(user.json);
+							limitTask=json.limitTask;
+							activityMgr.updateLimitTask(limitTask);//更新限时任务数据
+							limitTask.charmAdd+=dCharm;
+							user.json=json_encode(json);
+						}
+					}
+					if(intimate!=userData.intimate)//亲密度变化
+					{
+						//刷新亲密榜
+						score=intimate;
+						rankName=game.gameConfig.name+"_intimateRank";//排行榜名称
+						rd=self.getRedisObj(rankName);//排行榜所在的redis对象
+						redis_zadd(rd,rankName,score,user.id);
+						
+						dIntimate=intimate-userData.intimate;
+						if(dIntimate>0)//亲密度涨幅
+						{
+							sendLimitTaskSign=1;
+							json=json_decode(user.json);
+							limitTask=json.limitTask;
+							activityMgr.updateLimitTask(limitTask);//更新限时任务数据
+							limitTask.addIntimate+=dIntimate;
+							user.json=json_encode(json);
+						}
+						
+						//刷新活动亲密榜
+						activityID=2;//亲密冲榜
+						if(activityMgr.getActivityStatus(activityID)==1)//活动进行中
+						{
+							global_var=game.global_var;
+							rushLoop=global_var.rushLoop;
+							rushLoopBt=rushLoop.bt;//阶段开始时间
+						
+							intimateAddBT=number(user.intimateAddBT);
+							intimateAdd=number(user.intimateAdd);
+							score=intimate-userData.intimate;
+							if(intimateAddBT!=rushLoopBt)//重置活动积分
+							{
+								user.intimateAddBT=rushLoopBt;
+								intimateAdd=score;
+								user.intimateReward=0;
+							}
+							else//累计活动积分
+							{
+								intimateAdd+=score;
+							}
+							user.intimateAdd=intimateAdd;
+							//刷新榜
+							score=intimateAdd;
+							rankName=game.gameConfig.name+"_activityIntimateRank";//排行榜名称
+							rd=self.getRedisObj(rankName);//排行榜所在的redis对象
+							userID=user.id;
+							oldRankID=redis_zrevrank(rd,rankName,userID);//原排名
+							redis_zadd(rd,rankName,score,userID);//更新榜单
+							newRankID=redis_zrevrank(rd,rankName,userID);//新排名
+							if(newRankID>=0&&newRankID<10&&newRankID<oldRankID)//排名提升，且为前10名
+							{
+								//公告群发
+								nickname=user.nickname;
+								worldSendMsg(game,0,nickname,0,0,0,"恭喜<font color=\"#33CC00\">"+nickname+"</font>在<font color=\"#33CC00\">亲密冲榜</font>活动中晋升为第 <font color=\"#33CC00\">"+(newRankID+1)+"</font> 名，希望他能站到最后并拿走丰厚的奖励！",0,4);
+							}
+							//亲密涨幅返回
+							userSessionMap=game.userSessionMap;
+							if(exist(userSessionMap,user.id))
+							{
+								session=userSessionMap[user.id];
+								msg=arr("intimateAddResult",intimateAdd);
+								game.sendMsg(session.id,msg);
+							}
+						}
+					}
+					if(beauty!=userData.beauty)//魅力变化
+					{
+						dBeauty=beauty-userData.beauty;
+						if(dBeauty>0)//魅力涨幅
+						{
+							sendLimitTaskSign=1;
+							json=json_decode(user.json);
+							limitTask=json.limitTask;
+							activityMgr.updateLimitTask(limitTask);//更新限时任务数据
+							limitTask.beautyAdd+=dBeauty;
+							user.json=json_encode(json);
+						}
+					}
+					if(chapterID!=userData.chapterID||barrierID!=userData.barrierID||sceneID!=userData.sceneID)//关卡进度变化
+					{
+						//刷新关卡榜
+						score=(chapterID*7+barrierID)*8+sceneID;
+						rankName=game.gameConfig.name+"_barrierRank";//排行榜名称
+						rd=self.getRedisObj(rankName);//排行榜所在的redis对象
+						redis_zadd(rd,rankName,score,user.id);
+					}
+					if(waterBattleScore!=userData.waterBattleScore)//论战总积分变化
+					{
+						//刷新论战榜
+						score=waterBattleScore;
+						rankName=game.gameConfig.name+"_waterBattleRank";//排行榜名称
+						rd=self.getRedisObj(rankName);//排行榜所在的redis对象
+						redis_zadd(rd,rankName,score,user.id);
+						
+						dWaterBattleScore=waterBattleScore-userData.waterBattleScore;
+						if(dWaterBattleScore>0)//议政厅权威涨幅
+						{
+							sendLimitTaskSign=1;
+							json=json_decode(user.json);
+							limitTask=json.limitTask;
+							activityMgr.updateLimitTask(limitTask);//更新限时任务数据
+							limitTask.waterScoreAdd+=dWaterBattleScore;
+							user.json=json_encode(json);
+						}
+						
+						//议政日涨幅榜
+						curDate=date();
+						waterBattleScoreDayAdd=number(user.waterBattleScoreDayAdd);
+						if(user.waterBattleScoreDayDate!=curDate)//跨天
+						{
+							user.waterBattleScoreDayDate=curDate;
+							waterBattleScoreDayAdd=dWaterBattleScore;
+						}
+						else//当天
+						{
+							waterBattleScoreDayAdd+=dWaterBattleScore;
+						}
+						user.waterBattleScoreDayAdd=waterBattleScoreDayAdd;
+						score=waterBattleScoreDayAdd;
+						rankName=game.gameConfig.name+"_waterBattleDayRank";//排行榜名称
+						rd=self.getRedisObj(rankName);//排行榜所在的redis对象
+						redis_zadd(rd,rankName,score,user.id);
+						
+						//刷新活动论战榜
+						activityID=3;//论战冲榜
+						if(activityMgr.getActivityStatus(activityID)==1)//活动进行中
+						{
+							global_var=game.global_var;
+							rushLoop=global_var.rushLoop;
+							rushLoopBt=rushLoop.bt;//阶段开始时间
+						
+							score=waterBattleScore-userData.waterBattleScore;
+							// if(score>0)//只记录值为正的涨幅
+							// {
+								waterBattleScoreAddBT=number(user.waterBattleScoreAddBT);
+								waterBattleScoreAdd=number(user.waterBattleScoreAdd);
+								if(waterBattleScoreAddBT!=rushLoopBt)//重置活动积分
+								{
+									user.waterBattleScoreAddBT=rushLoopBt;
+									waterBattleScoreAdd=score;
+									user.waterBattleScoreReward=0;
+								}
+								else//累计活动积分
+								{
+									waterBattleScoreAdd+=score;
+								}
+								user.waterBattleScoreAdd=waterBattleScoreAdd;
+								//刷新榜
+								score=waterBattleScoreAdd;
+								rankName=game.gameConfig.name+"_activityWaterRank";//排行榜名称
+								rd=self.getRedisObj(rankName);//排行榜所在的redis对象
+								userID=user.id;
+								oldRankID=redis_zrevrank(rd,rankName,userID);//原排名
+								redis_zadd(rd,rankName,score,userID);//更新榜单
+								newRankID=redis_zrevrank(rd,rankName,userID);//新排名
+								if(newRankID>=0&&newRankID<10&&newRankID<oldRankID)//排名提升，且为前10名
+								{
+									//公告群发
+									nickname=user.nickname;
+									worldSendMsg(game,0,nickname,0,0,0,"恭喜<font color=\"#33CC00\">"+nickname+"</font>在<font color=\"#33CC00\">议政冲榜</font>活动中晋升为第 <font color=\"#33CC00\">"+(newRankID+1)+"</font> 名，希望他能站到最后并拿走丰厚的奖励！",0,4);
+								}
+								//论战积分涨幅返回
+								userSessionMap=game.userSessionMap;
+								if(exist(userSessionMap,user.id))
+								{
+									session=userSessionMap[user.id];
+									msg=arr("waterBattleScoreAddResult",waterBattleScoreAdd);
+									game.sendMsg(session.id,msg);
+								}
+							// }
+						}
+					}
+					if(buildActivityScoreTotal!=userData.buildActivityScoreTotal)//百废待兴积分变化
+					{
+						//百废待兴积分榜
+						score=buildActivityScoreTotal;
+						rankName=game.gameConfig.name+"_buildActivityRank";//排行榜名称
+						rd=self.getRedisObj(rankName);//排行榜所在的redis对象
+						redis_zadd(rd,rankName,score,user.id);
+					}
+					if(worldBossScoreTotal!=userData.worldBossScoreTotal)//日夜辑凶积分变化
+					{
+						//刷新日夜辑凶积分榜
+						score=worldBossScoreTotal;
+						rankName=game.gameConfig.name+"_WorldBossRank";//排行榜名称
+						rd=self.getRedisObj(rankName);//排行榜所在的redis对象
+						redis_zadd(rd,rankName,score,user.id);
+					}
+					if(worldBossHurt!=userData.worldBossHurt)//日夜辑凶伤害变化
+					{
+						//刷新日夜辑凶积分榜
+						score=worldBossHurt;
+						if(score>0)
+						{
+							rankName=game.gameConfig.name+"_WorldBossHurtRank";//排行榜名称
+							rd=self.getRedisObj(rankName);//排行榜所在的redis对象
+							redis_zadd(rd,rankName,score,user.id);
+						}
+					}
+					//发送限时任务数据
+					if(sendLimitTaskSign)
+					{
+						userSessionMap=game.userSessionMap;
+						if(exist(userSessionMap,user.id))
+						{
+							session=userSessionMap[user.id];
+							//limitTask
+							game.sendMsg
+							(
+								session.id,
+								arr("limitTask",limitTask)
+							);
+						}
+					}
+				}
+			}
+		##.;
+	@member.
+	
+	//初始化json表格
+	@member initJsonTable
+		self.table=dict();//json表格
+		self.txtTable=dict();//json表格文本格式
+		map=fileList(dict(),"www/json_table");
+		foreach
+		(
+			map,
+			##<url,isFile>
+				if(isFile)
+				{
+					@link self;
+					arr=split(arr(),url,"/");
+					fileNameInfo=split(arr(),arr[size(arr)-1],".");
+					fileName=fileNameInfo[0];
+					fileExtName=fileNameInfo[1];
+					if(fileExtName=="json")
+					{
+						txt=file_get_contents(url);
+						self.txtTable[fileName]=txt;
+						trace("load "+fileName+"."+fileExtName);
+						self.table[fileName]=AKJsonTable(txt);
+					}
+				}
+			##.
+		);
+	@member.
+	
+	//加入各种排行榜
+	@member addToRank<userID>
+		user=self.rd.getRow(self.cnn,"user","id",userID,"*",1000);
+		//加入势力榜
+		rankName=self.gameConfig.name+"_powerRank";//排行榜名称
+		rd=self.rd.getRedisObj(rankName);//排行榜所在的redis对象
+		score=number(user.power);
+		redis_zadd(rd,rankName,score,userID);
+		//加入亲密榜
+		rankName=self.gameConfig.name+"_intimateRank";//排行榜名称
+		rd=self.rd.getRedisObj(rankName);//排行榜所在的redis对象
+		score=number(user.intimate);
+		redis_zadd(rd,rankName,score,userID);
+		//加入关卡榜
+		rankName=self.gameConfig.name+"_chapterRank";//排行榜名称
+		rd=self.rd.getRedisObj(rankName);//排行榜所在的redis对象
+		chapterID=number(user.chapterID);
+		barrierID=number(user.barrierID);
+		sceneID=number(user.sceneID);
+		score=(chapterID*7+barrierID)*8+sceneID;
+		score=number(user.intimate);
+		redis_zadd(rd,rankName,score,userID);
+		
+		//加入论战榜
+		systemOpenTab=self.table.systemOpen;
+		sysID=1;//议政厅
+		row=systemOpenTab.getRowFromColName("id",sysID);
+		level=int(row.getValFromColName("level"));
+		userLevel=int(user.level);
+		if(userLevel>=level)
+		{
+			rankName=self.gameConfig.name+"_waterBattleRank";//排行榜名称
+			rd=self.rd.getRedisObj(rankName);//排行榜所在的redis对象
+			score=number(user.waterBattleScore);
+			redis_zadd(rd,rankName,score,userID);
+		}
+	@member.
+	
+	//分配用户ID
+	@member allocUserID
+		newUserID=0;
+		//修改数据
+		var=self.rd_global.updateRow
+		(
+			self.cnn_global,"global_var","name","userInfo","*",
+			//修改回调
+			##<var,game>
+				@link newUserID;
+				varJson=json_decode(var.json);
+				newUserID=varJson.allocUserID;
+				++varJson.allocUserID;
+				
+				var.json=json_encode(varJson);
+				return(1);//修改
+			##.,
+			//修改完成回调
+			##<row,userData>
+				//...
+			##.,
+			//解锁后回调
+			##<row,userData>
+				//...
+			##.,
+			self,//自定义数据userData
+			1000//加锁时间（毫秒），例如：1000
+		);
+		return(newUserID);
+	@member.
+	
+	//分配联盟ID
+	@member allocUnionID
+		newID=0;
+		//修改数据
+		var=self.rd_global.updateRow
+		(
+			self.cnn_global,"global_var","name","unionInfo","*",
+			//修改回调
+			##<var,game>
+				@link newID;
+				varJson=json_decode(var.json);
+				newID=varJson.allocUnionID;
+				++varJson.allocUnionID;
+				
+				var.json=json_encode(varJson);
+				return(1);//修改
+			##.,
+			//修改完成回调
+			##<row,userData>
+				//...
+			##.,
+			//解锁后回调
+			##<row,userData>
+				//...
+			##.,
+			self,//自定义数据userData
+			1000//加锁时间（毫秒），例如：1000
+		);
+		return(newID);
+	@member.
+	
+	//创建机器人
+	@member createRebot
+		userCount=0;
+		sql="select count(*) from user";
+		rs=mysqlCreateRs(self.cnn,sql);
+		if(mysqlNextRow(rs))
+		{
+			userCount=int(mysqlGetColVal(rs,0));
+		}
+		mysqlDestroyRs(rs);
+		if(userCount<3)
+		{
+			rebotMgr=self.rebotMgr;
+			rebotMgr.createRebot(1);
+			rebotMgr.createRebot(2);
+			rebotMgr.createRebot(3);
+		}
+	@member.
+	
+	//加载环境变量
+	@member loadVar
+		if(!exist(self,"var"))self.var=dict();
+		var=self.var;
+		sql="select name,val from var";
+		rs=mysqlCreateRs(self.cnn,sql);
+		while(mysqlNextRow(rs))
+		{
+			name=mysqlGetColVal(rs,0);
+			val=mysqlGetColVal(rs,1);
+			var[name]=val;
+		}
+		mysqlDestroyRs(rs);
+		// debug(var);
+	@member.
+	
+	//加载指定全局变量
+	@member loadGlobalVar<varName>
+		rd=self.rd;
+		cnn=self.cnn;
+		global_var=self.global_var;
+		var=rd.getRow(cnn,"global_var","name",varName,"*",1000);
+		global_var[varName]=json_decode(var.json);
+	@member.
+	
+	//加载若干全局变量
+	@member loadManyGlobalVar
+		self.loadGlobalVar("rushLoop");
+		self.loadGlobalVar("gameServer");
+		//debug(self.global_var.rushLoop);
+	@member.
+	
+	//获取通行证
+	@member getTick<userID>
+		return(md5(userID+self.gameConfig.privateKey));
+	@member.
+	
+	//校验通行证，返回:0=失败;1=成功;
+	@member checkTick<userID,tick>
+		if(self.getTick(userID)==tick)return(1);
+		return(0);
+	@member.
+	
+	//发送数据
+	@member sendMsg<sessionID,msg>
+		s2Send(self.server,sessionID,webSocketEncode(serialize(msg),self.tmp));
+		if(self.gameConfig.debug)
+		{
+			push(self.showMsgArr,msg);
+			// debug(msg);
+		}
+	@member.
+	
+	//群发数据（指定userID除外）
+	@member sendMsgToAllExceptUserID<msg,exceptUserID>
+		tmp=webSocketEncode(serialize(msg),self.tmp);
+		sessionMap=self.sessionMap;
+		server=self.server;
+		it=dictIt();
+		dictItBegin(sessionMap,it);
+		while(!dictItEmpty(it))
+		{
+			sessionID=dictItKey(it);
+			session=dictItVal(it);
+			userID=session.userID;
+			if(userID!=0&&userID!=exceptUserID)
+			{
+				s2Send(server,sessionID,tmp);
+			}
+			dictItNext(it);
+		}
+	@member.
+	
+	//群发数据给userIDMap指定的用户
+	@member sendMsgToAnyUser<msg,userIDMap,exceptUserID>
+		tmp=webSocketEncode(serialize(msg),self.tmp);
+		sessionMap=self.sessionMap;
+		server=self.server;
+		it=dictIt();
+		dictItBegin(sessionMap,it);
+		while(!dictItEmpty(it))
+		{
+			sessionID=dictItKey(it);
+			session=dictItVal(it);
+			userID=session.userID;
+			if(userID!=0&&userID!=exceptUserID)
+			{
+				if(exist(userIDMap,userID))
+				{
+					s2Send(server,sessionID,tmp);
+				}
+			}
+			dictItNext(it);
+		}
+	@member.
+	
+	//发邮件
+	@member sendMail
+	<
+		userIDArr,//用户ID数组
+		title,//标题
+		body,//正文
+		soldier,//兵力
+		money,//银两
+		food,//粮草
+		gold,//元宝（充值）
+		gold2,//元宝（赠送）
+		itemArrStr//物品奖励字符串，格式（字符串）:itemID1,num1,itemID2,num2,...
+	>
+		cnn=self.cnn;
+		i=0;c=size(userIDArr);
+		while(i<c)
+		{
+			userID=userIDArr[i];
+			tableName=createIDTable(cnn,"mail",userID);
+			curTime=now();//生成时间
+			sql="create table if not exists `"+tableName+"` like mail";
+			mysqlExec(cnn,sql);
+			sql="insert into "+tableName+" set genTime='"+curTime+"'";
+			sql+=",title='"+title+"'";
+			sql+=",body='"+body+"'";
+			sql+=",money="+money;
+			sql+=",food="+food;
+			sql+=",soldier="+soldier;
+			sql+=",gold="+gold;
+			sql+=",gold2="+gold2;
+			sql+=",item='"+itemArrStr+"'";
+			sql+=",`read`='"+0+"'";
+			sql+=",modifTime='"+0+"'";
+			// debug(sql);
+			mysqlExec(cnn,sql);
+			++i;
+		}
+	@member.
+	
+	//记录游戏资源流水
+	@member saveResIO
+	<
+		userID,
+		type,//资源类型，对应：json_table/resource.json
+		itemID,//道具ID，对应type描述
+		io,//进出：0=消耗；1=获得；
+		count,//进出数量
+		val//余额
+	>
+		//生成日记表
+		cnn=self.cnn;
+		tableName=createDayTable(cnn,"res_flow");
+		curTime=now();//生成时间
+		sql="insert into "+tableName+" set genTime='"+curTime+"'";
+		sql+=",userID="+userID;
+		sql+=",type="+type;
+		sql+=",itemID="+itemID;
+		sql+=",io='"+io+"'";
+		sql+=",count="+count;
+		sql+=",val="+val;
+		mysqlExec(cnn,sql);
+	@member.
+	
+	//记录登录日志
+	@member saveLogin<session>
+		userID=session.userID;
+		if(userID==0)exit();
+		loginID=session.loginID;
+		platformID=session.platformID;
+		curDate=now();
+		cnn=self.cnn;
+		if(loginID==0)//登入
+		{
+			ip=s2SessionIP(self.server,session.id);
+			tableName=createDayTable(cnn,"login");
+			sql="insert into "+tableName+" set ";
+			sql+="beginTime='"+curDate+"'";
+			sql+=",endTime='"+curDate+"'";
+			sql+=",platformID="+platformID;
+			sql+=",userID="+userID;
+			sql+=",ip='"+ip+"'";
+			mysqlExec(cnn,sql);
+			session.loginID=mysqlInsertID(cnn);
+			// trace(sql);
+		}
+		else//登出
+		{
+			//修改用户数据
+			self.rd.updateRow
+			(
+				self.cnn,"user","id",userID,"*",
+				//修改回调
+				##<user,game>
+					//最后登出时间
+					user.logoutTime=now();
+					user.online=0;//下线
+					return(1);//修改
+				##.,
+				//修改完成回调
+				##<row,userData>
+					//...
+				##.,
+				//解锁后回调
+				##<row,userData>
+					//...
+				##.,
+				self,//自定义数据userData
+				1000//加锁时间（毫秒），例如：1000
+			);
+			tableName=createDayTable(cnn,"login");
+			sql="update "+tableName+" set endTime='"+curDate+"' where id="+loginID+" limit 1";
+			mysqlExec(cnn,sql);
+			// trace(sql);
+		}
+	@member.
+	
+	//hub客户端初始化
+	@member initHubClient
+		hubClientConfig=json(file_get_contents("config/hubClient.json"));//读取数据库配置	
+		// debug(hubClientConfig);
+		self.hubClientDomain=hubClientConfig.domain;
+		self.hubClientPort=hubClientConfig.port;
+		self.hubClientPassword=hubClientConfig.password;
+		self.hubClient=c2Create();
+		c2Connect(self.hubClient,self.hubClientDomain,self.hubClientPort);
+		self.hubClientTimer=0;
+		self.hubClientReady=0;//连接准备：0=未准备；1=准备；
+		self.hubClientRecvBuf=buf();//接收缓存
+	@member.
+	
+	//hub客户端更新
+	@member updateHubClient
+		client=self.hubClient;
+		tmp=self.tmp;
+		if(c2HasConnect(client))
+		{
+			// trace("connect hub succ");
+			c2Send(client,packStr(tmp,self.hubClientPassword));
+			self.hubClientReady=1;
+			clean(self.hubClientRecvBuf);
+		}
+		if(c2HasData(client))
+		{
+			@try
+				hubClientRecvBuf=self.hubClientRecvBuf;
+				c2GetData(client,hubClientRecvBuf);
+				// trace("recv "+size(hubClientRecvBuf)+" bytes");
+				
+				spareBytes=size(hubClientRecvBuf);
+				pos=0;
+				while(spareBytes>0)
+				{
+					bufSetPos(hubClientRecvBuf,pos);
+					needBytes=4;
+					if(spareBytes<needBytes)break;
+					msgSize=bufReadUint32(hubClientRecvBuf);
+					// trace(now()+" msgSize="+msgSize+" bytes");
+					needBytes=4+msgSize;
+					if(spareBytes<needBytes)break;
+					clean(tmp);
+					bufAppend(tmp,hubClientRecvBuf,pos+4,msgSize);
+					pos+=needBytes;
+					spareBytes-=needBytes;
+					hubMsg=unserialize(tmp);
+					//处理hubMsg
+					msgName=hubMsg[0];
+					("?../hubMsg/"+msgName+".aks")(self,hubMsg);
+					//...
+				}
+				//弹出处理完的数据
+				if(pos>0)
+				{
+					newBuf=buf();
+					bufAppend(newBuf,hubClientRecvBuf,pos);
+					self.hubClientRecvBuf=newBuf;
+				}
+			@catch
+				c2Close(client);
+			@catch.
+		}
+		if(c2HasNetError(client))
+		{
+			// trace("connect hub fail");
+			c2Connect(self.hubClient,self.hubClientDomain,self.hubClientPort);
+			self.hubClientReady=0;
+			clean(self.hubClientRecvBuf);
+		}
+		if(isTimeout(self.hubClientTimer,5000)&&self.hubClientReady)
+		{
+			//心跳
+			clean(tmp);
+			bufWriteUint32(tmp,0);
+			c2Send(client,tmp);
+		}
+	@member.
+	
+	//请求hub转发
+	@member sendMsgToHub<msg>
+		if(!self.hubClientReady)exit();
+		msgBuf=serialize(msg);
+		tmp=self.tmp;
+		client=self.hubClient;
+		clean(tmp);
+		msgBytes=size(msgBuf);
+		bufWriteUint32(tmp,msgBytes+4);
+		bufWriteUint32(tmp,msgBytes);
+		bufAppend(tmp,msgBuf);
+		// trace("-----------------------"+msgBytes);
+		// trace("-----------------------"+size(tmp));
+		c2Send(client,tmp);
+	@member.
+@class.

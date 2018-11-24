@@ -1,0 +1,185 @@
+//充值
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+buffID=netMsg[3];//buffID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,buffID,userID;
+		
+		
+		json=json_decode(user.json);
+		
+		// debug(json.waterBattle.hp);	
+		// debug(json.waterBattle.me);
+		// debug(user.gold);
+		// debug(user.gold2);		
+		
+		waterBattle=ref(json.waterBattle);
+		buffArr=waterBattle.buffArr;
+		battleCount=waterBattle.battleCount;
+		buyBuff=ref(waterBattle.buyBuff);
+		
+		// buyBuff=0;
+		// waterBattle.me.hp=100;
+		// buffArr=arr(16);
+		// debug(arrFindNumberKey(buffArr,0));
+		// debug(arrFindNumberKey(buffArr,16));
+		
+		if(buyBuff==0)
+		{
+			waterBattleBuffTable=game.table.waterBattleBuff;
+			row=waterBattleBuffTable.getRowFromColName("id",buffID);
+			needGold=number(row.getValFromColName("gold"));
+			needCoin=row.getValFromColName("coin");
+			gold=ref(user.gold);
+			gold2=ref(user.gold2);
+			waterBattleToken=ref(user.waterBattleToken);
+			if(number(gold)+number(gold2)<needGold)
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-5)//gold不足
+				);
+				return(0);//不修改
+				
+			}	
+			if(number(waterBattleToken)<number(needCoin))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)//代币不足
+				);
+				return(0);//不修改
+				
+			}
+			if(arrFindNumberKey(buffArr,buffID)<0)
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)//不在可选buff
+				);
+				return(0);//不修改
+				
+			}
+			
+			if(number(gold)<needGold)
+			{
+				gold2=number(gold2)-(needGold-number(gold));
+				gold=0;
+			}else
+			{
+				gold=number(gold)-needGold;
+			}
+			
+			//流水
+			if(needGold!=0)
+			{
+				allGold=number(gold)+number(gold2);//元宝余额
+				game.saveResIO(userID,11,0,0,needGold,allGold);//议政厅购买状态(type,itemID,（0=消耗，1=获得）,count,allGold)
+			}
+
+			waterBattleToken=number(waterBattleToken)-number(needCoin);
+			
+			type=row.getValFromColName("type");
+			add=row.getValFromColName("add");
+			
+			if(number(type)==1)//回血
+			{
+				hp=ref(waterBattle.hp);
+				maxHp=waterBattle.me.hp;		
+				hp=number(hp)+number(maxHp)*number(add)/10000;
+				if(number(hp)>number(maxHp))
+				{
+					hp=maxHp;
+				}
+				
+			}else if(number(type)==2)//加攻击
+			{
+				attackC=ref(waterBattle.attackPlus);
+				attackC=number(attackC)+number(add);
+				
+			}else if(number(type)==3)//加暴击
+			{
+				skillPlus=ref(waterBattle.skillPlus);
+				skillPlus=number(skillPlus)+number(add);
+			}	
+			buyBuff=buffID;//标记已买
+			
+			
+			// debug(json.waterBattle.hp);	
+			// debug(json.waterBattle.me);		
+			// debug(user.gold);
+			// debug(user.gold2);	
+			
+		}else
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)//已买
+			);
+			return(0);//不修改
+		}			
+	
+		
+		
+			
+		//保存
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,user.gold,user.gold2,user.waterBattleToken,waterBattle.hp,waterBattle.attackPlus,waterBattle.skillPlus,buyBuff)
+		);
+		
+		return(1);//修改
+	
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

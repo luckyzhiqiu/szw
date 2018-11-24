@@ -1,0 +1,12 @@
+/*
+游戏配置
+debug:调试开关（注意：debug模式下开启模拟支付）
+privateKey:私钥
+jsonTableRoot:jsontable地址前缀
+*/
+{
+	debug:0,
+	name:"game_jipin",
+	privateKey:"game_jipin_xxoo",
+	jsonTableRoot:"/json_table/",
+}

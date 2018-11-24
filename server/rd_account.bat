@@ -1,0 +1,1 @@
+redis-server.exe rd_account.conf

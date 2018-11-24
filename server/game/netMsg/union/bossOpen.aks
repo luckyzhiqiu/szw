@@ -1,0 +1,411 @@
+//
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+type=netMsg[3];//type 1:消耗财富 2:消耗元宝
+bossId=netMsg[4];
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+bossMap_save=dict(); //
+
+//修改行数据
+updateFuc=##<game,userID,unionID,type,bossId>
+	backArr=arr();
+	push(backArr,-3);
+	
+	
+	unionRow=game.rd.updateRow
+	(
+		game.cnn,"union","id",unionID,"*",
+		//修改回调
+		##<unionRow,game>
+			@link methodName,sessionID,userID,backArr,type,bossId,bossMap_save;
+			
+			json=json_decode(unionRow.json);
+			bossMap=ref(json.bossMap);
+			viceLeaderUserIDMap=json.viceLeaderUserIDMap;
+			leaderUserID=unionRow.leaderUserID;
+			money=ref(unionRow.money);
+			structMgr=game.structMgr;
+			
+			rowAB=game.table.allianceBarrier.getRowFromColName("id",bossId);
+			
+					
+			if(empty(rowAB))
+			{
+				//不存在bossID
+				backArr[0]=-3; 
+				return(0);
+			}
+			needLevel=number(rowAB.getValFromColName("level"));
+			level=unionRow.level;
+				
+			if(number(level)<number(needLevel))
+			{
+				//等级不足
+				backArr[0]=5; 
+				return(0);
+				
+			}
+			
+			wealthCost=rowAB.getValFromColName("wealthCost");
+			
+			life=rowAB.getValFromColName("life");
+			devoteAll=rowAB.getValFromColName("devoteAll");
+			
+			if(userID!=leaderUserID && !exist(viceLeaderUserIDMap,userID))
+			{
+				backArr[0]=2; //身份不符
+				return(0);
+			}
+			
+			if(exist(bossMap,bossId))
+			{
+				backArr[0]=4; //已开启过
+				return(0);
+				
+			}
+			
+			if(type==1)
+			{
+				if(number(wealthCost)>number(money))
+				{
+					backArr[0]=3; //财富不足
+					return(0);
+					
+				}
+				money=number(money)-number(wealthCost);
+				unionBoss=structMgr_upgradeObj(structMgr,"UnionBoss",dict());
+				unionBoss.hp=number(life);
+				unionBoss.hpMax=number(life);
+				unionBoss.point=number(devoteAll);
+				bossMap[bossId]=unionBoss;
+				bossMap_save=bossMap;
+				backArr[0]=1;
+				push(backArr,money);		
+				unionRow.json=json_encode(json);
+				return(1);
+			}else
+			{
+			
+				unionBoss=structMgr_upgradeObj(structMgr,"UnionBoss",dict());
+				unionBoss.hp=number(life);
+				unionBoss.hpMax=number(life);
+				unionBoss.point=number(devoteAll);
+				bossMap[bossId]=unionBoss;
+				debug(bossMap);
+				bossMap_save=bossMap;
+				backArr[0]=1; 
+				
+				unionRow.json=json_encode(json);
+				return(1);
+				
+			}
+			
+	
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	
+	
+	
+	return(backArr);
+	
+	
+##.;
+
+
+	//修改行数据
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link methodName,sessionID,updateFuc,userID,type,bossId,bossMap_save;
+			
+			nowTime=now();//今天时间
+			currentTime=strtotime(nowTime);
+			t=split(arr(),nowTime," ");
+			t_a=t[0];
+			rowWB=game.table.allianceConfigure.getRow(0);
+
+			closeTime=strtotime(t_a+" "+rowWB.getValFromColName("closeTime"));
+			if(number(currentTime)>number(closeTime))
+			{
+				//不在开放时间
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-89)
+				);
+				return(0);//不修改
+				
+			}
+			
+			unionID=number(user.unionID);
+			if(unionID==0)//没有联盟
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)
+				);
+				return(0);//不修改
+			}
+			
+			//开启联盟聊天记录
+				
+			unionRow=game.rd.getRow(game.cnn,"union","id",unionID,"*",1000);
+			if(empty(unionRow))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-1)
+				);
+				exit();
+			}
+			
+			jsonStr=unionRow.json;
+			json=json_decode(jsonStr);
+			userIDMap=json.userIDMap;
+			
+			
+			rowAB=game.table.allianceBarrier.getRowFromColName("id",bossId);
+			if(type==2)
+			{
+				
+				if(empty(rowAB))
+				{
+					//不存在bossID
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-78)
+					);
+					return(0);//不修改
+				}
+				needGold=number(rowAB.getValFromColName("goldCost"));
+				
+			
+				gold=ref(user.gold);
+				gold2=ref(user.gold2);
+				if(number(gold)+number(gold2)<needGold)
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-5)//gold不足
+					);
+					return(0);//不修改
+					
+				}
+				
+				if(number(gold)<needGold)
+				{
+					gold2=number(gold2)-(needGold-number(gold));
+					gold=0;
+				}else
+				{
+					gold=number(gold)-needGold;
+				}
+				
+				if(needGold>0)
+				{
+					//流水
+					allGold=number(gold)+number(gold2);//元宝余额
+					game.saveResIO(userID,22,0,0,needGold,allGold);//开启BOSS(type,itemID,（0=消耗，1=获得）,count,allGold)
+				}
+				
+				backArr=updateFuc(game,userID,unionID,type,bossId);
+				if(backArr[0]==2)
+				{
+					//身份不符
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",2)
+					);
+					return(0);//不修改
+				}else if(backArr[0]==3)
+				{
+					//财富不足
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",3)
+					);
+					return(0);//不修改
+				}else if(backArr[0]==-3)
+				{
+					//联盟不存在或不存在bossID
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-11)
+					);
+					return(0);//不修改
+				}else if(backArr[0]==4)
+				{
+					//已开启过
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",4)
+					);
+					return(0);//不修改
+				}else if(backArr[0]==5)
+				{
+					//等级不足
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",5)
+					);
+					return(0);//不修改
+				}
+				
+
+				// textTable=game.table.text;
+				// rowT=textTable.getRowFromColName("id",402);
+				// str=rowT.getValFromColName("text");//
+				// outStr=sprintf(str,user.nickname,rowAB.getValFromColName("name"));
+				outStr="<font color=\"#33CC00\">"+user.nickname+"</font>使用<font color=\"#33CC00\">元宝</font>开启了<font color=\"#33CC00\">"+rowAB.getValFromColName("name")+"</font>秘境";
+			
+				//nickname:用户昵称;outStr:输出文本
+				userType=0;//user:0;
+				unionSendMsg(game,userType,user.nickname,outStr,userIDMap,unionRow.id,0);
+				
+				
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,bossMap_save,gold,gold2)
+				);
+				
+				return(1);//修改
+				
+			}else if(type==1)
+			{
+				backArr=updateFuc(game,userID,unionID,type,bossId);
+			
+				if(backArr[0]==2)
+				{
+					//身份不符
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",2)
+					);
+					return(0);//不修改
+				}else if(backArr[0]==3)
+				{
+					//财富不足
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",3)
+					);
+					return(0);//不修改
+				}else if(backArr[0]==-3)
+				{
+					//联盟不存在
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-11)
+					);
+					return(0);//不修改
+				}else if(backArr[0]==4)
+				{
+					//已开启过
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",4)
+					);
+					return(0);//不修改
+				}
+				
+
+
+				// textTable=game.table.text;
+				// rowT=textTable.getRowFromColName("id",402);
+				// str=rowT.getValFromColName("text");//
+				// outStr=sprintf(str,user.nickname,rowAB.getValFromColName("name"));
+				outStr="<font color=\"#33CC00\">"+user.nickname+"</font>使用<font color=\"#33CC00\">联盟财富</font>开启了<font color=\"#33CC00\">"+rowAB.getValFromColName("name")+"</font>秘境";
+				//nickname:用户昵称;outStr:输出文本
+				userType=0;//user:0;
+				unionSendMsg(game,userType,user.nickname,outStr,userIDMap,unionRow.id,0);
+				
+				
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,type,bossMap_save,backArr[1])
+				);
+				return(0);
+				
+			}else
+			{
+				//类型不存在
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-99)
+				);
+				return(0);//不修改
+				
+			}
+				
+			
+		
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	
+
+
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}

@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t158">91</v>
+<v t="n" n="__sys__t149">85</v>
+<v t="n" n="__sys__t98">55</v>
+<v t="n" n="__sys__t97">55</v>
+<v t="n" n="__sys__t86">47</v>
+<v t="n" n="__sys__t85">47</v>
+<v t="n" n="__sys__t58">27</v>
+<v t="n" n="__sys__t57">27</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="s" n="__sys__t3">.sessionID.</v>
+<v t="s" n="__sys__t4">.methodName.</v>
+<v t="s" n="__sys__t5">.userID.</v>
+<v t="s" n="__sys__t6">.updateUser.</v>
+<v t="s" n="__sys__t7">.unionID.</v>
+<v t="n" n="__sys__t8">0</v>
+<v t="s" n="__sys__t9">.Result.</v>
+<v t="n" n="__sys__t10">4</v>
+<v t="n" n="__sys__t11">0</v>
+<v t="n" n="__sys__t12">0</v>
+<v t="n" n="__sys__t13">0</v>
+<v t="n" n="__sys__t14">1</v>
+<v t="s" n="__sys__t15">.id.</v>
+<v t="n" n="__sys__t16">401</v>
+<v t="s" n="__sys__t17">.text.</v>
+<v t="n" n="__sys__t18">0</v>
+<v t="n" n="__sys__t19">0</v>
+<v t="s" n="__sys__t20">.Result.</v>
+<v t="n" n="__sys__t21">1</v>
+<v t="n" n="__sys__t22">1</v>
+<v t="s" n="__sys__t23">.Result.</v>
+<v t="n" n="__sys__t24">3</v>
+<v t="n" n="__sys__t25">0</v>
+<o n="input"><o>__sys__t26</o><i>__sys__t1</i></o>
+<o n="="><o>unionData</o><i>__sys__t26</i></o>
+<o n="input"><o>__sys__t28</o><i>__sys__t2</i></o>
+<o n="="><o>game</o><i>__sys__t28</i></o>
+<o n="link" r="62"><o>__sys__t30</o><i>__sys__t3</i></o>
+<o n="=" r="62"><o>sessionID</o><i>__sys__t30</i></o>
+<o n="link" r="62"><o>__sys__t32</o><i>__sys__t4</i></o>
+<o n="=" r="62"><o>methodName</o><i>__sys__t32</i></o>
+<o n="link" r="62"><o>__sys__t34</o><i>__sys__t5</i></o>
+<o n="=" r="62"><o>userID</o><i>__sys__t34</i></o>
+<o n="link" r="62"><o>__sys__t36</o><i>__sys__t6</i></o>
+<o n="=" r="62"><o>updateUser</o><i>__sys__t36</i></o>
+<o n="link" r="62"><o>__sys__t38</o><i>__sys__t7</i></o>
+<o n="=" r="62"><o>unionID</o><i>__sys__t38</i></o>
+<v t="s" n="__sys__t41">.leaderUserID.</v>
+<o n="." r="63"><o>__sys__t40</o><i>unionData</i><i>__sys__t41</i></o>
+<o n="number" r="63"><o>__sys__t43</o><i>__sys__t40</i></o>
+<o n="=" r="63"><o>leaderUserID</o><i>__sys__t43</i></o>
+<o n="==" r="64"><o>__sys__t45</o><i>leaderUserID</i><i>userID</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t45</i></o>
+<o n="=="><o>__sys__t47</o><i>__sys__rt</i><i>__sys__t8</i></o>
+<o n="if_goto"><o>__sys__t48</o><i>__sys__t47</i><i>__sys__t57</i></o>
+<v t="s" n="__sys__t50">.sendMsg.</v>
+<o n="." r="66"><o>__sys__t49</o><i>game</i><i>__sys__t50</i></o>
+<o n="+" r="69"><o>__sys__t52</o><i>methodName</i><i>__sys__t9</i></o>
+<o n=" -" r="69"><o>__sys__t53</o><i>__sys__t10</i></o>
+<o n="arr" r="69"><o>__sys__t54</o><i>__sys__t52</i><i>__sys__t53</i></o>
+<o n="__sys__t49" r="66"><o>__sys__t55</o><i>game</i><i>sessionID</i><i>__sys__t54</i></o>
+<o n="goto"><o>__sys__t56</o><i>__sys__t58</i></o>
+<v t="s" n="__sys__t60">.json.</v>
+<o n="." r="72"><o>__sys__t59</o><i>unionData</i><i>__sys__t60</i></o>
+<o n="json_decode" r="72"><o>__sys__t62</o><i>__sys__t59</i></o>
+<o n="=" r="72"><o>unionJson</o><i>__sys__t62</i></o>
+<v t="s" n="__sys__t65">.userIDMap.</v>
+<o n="." r="73"><o>__sys__t64</o><i>unionJson</i><i>__sys__t65</i></o>
+<o n="=" r="73"><o>userIDMap</o><i>__sys__t64</i></o>
+<o n="exist" r="74"><o>__sys__t68</o><i>userIDMap</i><i>userID</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t68</i></o>
+<o n="=="><o>__sys__t70</o><i>__sys__rt</i><i>__sys__t11</i></o>
+<o n="if_goto"><o>__sys__t71</o><i>__sys__t70</i><i>__sys__t149</i></o>
+<o n="updateUser" r="76"><o>__sys__t72</o><i>game</i><i>userID</i></o>
+<o n="=" r="76"><o>user</o><i>__sys__t72</i></o>
+<o n="remove" r="77"><o>__sys__t74</o><i>userIDMap</i><i>userID</i></o>
+<v t="s" n="__sys__t76">.viceLeaderUserIDMap.</v>
+<o n="." r="79"><o>__sys__t75</o><i>unionJson</i><i>__sys__t76</i></o>
+<o n="=" r="79"><o>viceLeaderUserIDMap</o><i>__sys__t75</i></o>
+<o n="exist" r="80"><o>__sys__t79</o><i>viceLeaderUserIDMap</i><i>userID</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t79</i></o>
+<o n="=="><o>__sys__t81</o><i>__sys__rt</i><i>__sys__t12</i></o>
+<o n="if_goto"><o>__sys__t82</o><i>__sys__t81</i><i>__sys__t85</i></o>
+<o n="remove" r="82"><o>__sys__t83</o><i>viceLeaderUserIDMap</i><i>userID</i></o>
+<o n="goto"><o>__sys__t84</o><i>__sys__t86</i></o>
+<v t="s" n="__sys__t88">.pickUserIDMap.</v>
+<o n="." r="85"><o>__sys__t87</o><i>unionJson</i><i>__sys__t88</i></o>
+<o n="=" r="85"><o>pickUserIDMap</o><i>__sys__t87</i></o>
+<o n="exist" r="86"><o>__sys__t91</o><i>pickUserIDMap</i><i>userID</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t91</i></o>
+<o n="=="><o>__sys__t93</o><i>__sys__rt</i><i>__sys__t13</i></o>
+<o n="if_goto"><o>__sys__t94</o><i>__sys__t93</i><i>__sys__t97</i></o>
+<o n="remove" r="88"><o>__sys__t95</o><i>pickUserIDMap</i><i>userID</i></o>
+<o n="goto"><o>__sys__t96</o><i>__sys__t98</i></o>
+<v t="s" n="__sys__t100">.json.</v>
+<o n="." r="91"><o>__sys__t99</o><i>unionData</i><i>__sys__t100</i></o>
+<o n="json_encode" r="91"><o>__sys__t102</o><i>unionJson</i></o>
+<o n="=" r="91"><o>__sys__t99</o><i>__sys__t102</i></o>
+<v t="s" n="__sys__t105">.peopleNum.</v>
+<o n="." r="92"><o>__sys__t104</o><i>unionData</i><i>__sys__t105</i></o>
+<o n="-=" r="92"><o>__sys__t104</o><i>__sys__t14</i></o>
+<v t="s" n="__sys__t109">.nickname.</v>
+<o n="." r="95"><o>__sys__t108</o><i>user</i><i>__sys__t109</i></o>
+<o n="=" r="95"><o>nickname</o><i>__sys__t108</i></o>
+<v t="s" n="__sys__t113">.table.</v>
+<o n="." r="96"><o>__sys__t112</o><i>game</i><i>__sys__t113</i></o>
+<v t="s" n="__sys__t116">.text.</v>
+<o n="." r="96"><o>__sys__t115</o><i>__sys__t112</i><i>__sys__t116</i></o>
+<o n="=" r="96"><o>textTable</o><i>__sys__t115</i></o>
+<v t="s" n="__sys__t120">.getRowFromColName.</v>
+<o n="." r="97"><o>__sys__t119</o><i>textTable</i><i>__sys__t120</i></o>
+<o n="__sys__t119" r="97"><o>__sys__t122</o><i>textTable</i><i>__sys__t15</i><i>__sys__t16</i></o>
+<o n="=" r="97"><o>rowT</o><i>__sys__t122</i></o>
+<v t="s" n="__sys__t125">.getValFromColName.</v>
+<o n="." r="98"><o>__sys__t124</o><i>rowT</i><i>__sys__t125</i></o>
+<o n="__sys__t124" r="98"><o>__sys__t127</o><i>rowT</i><i>__sys__t17</i></o>
+<o n="=" r="98"><o>str</o><i>__sys__t127</i></o>
+<o n="sprintf" r="99"><o>__sys__t129</o><i>str</i><i>nickname</i></o>
+<o n="=" r="99"><o>outStr</o><i>__sys__t129</i></o>
+<o n="=" r="102"><o>userType</o><i>__sys__t18</i></o>
+<o n="unionSendMsg" r="103"><o>__sys__t132</o><i>game</i><i>userType</i><i>nickname</i><i>outStr</i><i>userIDMap</i><i>unionID</i><i>__sys__t19</i></o>
+<v t="s" n="__sys__t134">.devote.</v>
+<o n="." r="105"><o>__sys__t133</o><i>user</i><i>__sys__t134</i></o>
+<o n="number" r="105"><o>__sys__t136</o><i>__sys__t133</i></o>
+<o n="=" r="105"><o>devote</o><i>__sys__t136</i></o>
+<v t="s" n="__sys__t139">.sendMsg.</v>
+<o n="." r="107"><o>__sys__t138</o><i>game</i><i>__sys__t139</i></o>
+<o n="+" r="110"><o>__sys__t141</o><i>methodName</i><i>__sys__t20</i></o>
+<v t="s" n="__sys__t143">.peopleNum.</v>
+<o n="." r="110"><o>__sys__t142</o><i>unionData</i><i>__sys__t143</i></o>
+<o n="arr" r="110"><o>__sys__t145</o><i>__sys__t141</i><i>__sys__t21</i><i>__sys__t142</i><i>devote</i></o>
+<o n="__sys__t138" r="107"><o>__sys__t146</o><i>game</i><i>sessionID</i><i>__sys__t145</i></o>
+<o n="return" r="112"><o>__sys__t147</o><i>__sys__t22</i></o>
+<o n="goto"><o>__sys__t148</o><i>__sys__t158</i></o>
+<v t="s" n="__sys__t151">.sendMsg.</v>
+<o n="." r="116"><o>__sys__t150</o><i>game</i><i>__sys__t151</i></o>
+<o n="+" r="119"><o>__sys__t153</o><i>methodName</i><i>__sys__t23</i></o>
+<o n=" -" r="119"><o>__sys__t154</o><i>__sys__t24</i></o>
+<o n="arr" r="119"><o>__sys__t155</o><i>__sys__t153</i><i>__sys__t154</i></o>
+<o n="__sys__t150" r="116"><o>__sys__t156</o><i>game</i><i>sessionID</i><i>__sys__t155</i></o>
+<o n="return" r="121"><o>__sys__t157</o><i>__sys__t25</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t102" />
+<v n="__sys__t104" />
+<v n="__sys__t108" />
+<v n="__sys__t112" />
+<v n="__sys__t115" />
+<v n="__sys__t119" />
+<v n="__sys__t122" />
+<v n="__sys__t124" />
+<v n="__sys__t127" />
+<v n="__sys__t129" />
+<v n="__sys__t132" />
+<v n="__sys__t133" />
+<v n="__sys__t136" />
+<v n="__sys__t138" />
+<v n="__sys__t141" />
+<v n="__sys__t142" />
+<v n="__sys__t145" />
+<v n="__sys__t146" />
+<v n="__sys__t147" />
+<v n="__sys__t148" />
+<v n="__sys__t150" />
+<v n="__sys__t153" />
+<v n="__sys__t154" />
+<v n="__sys__t155" />
+<v n="__sys__t156" />
+<v n="__sys__t157" />
+<v n="__sys__t26" />
+<v n="__sys__t28" />
+<v n="__sys__t30" />
+<v n="__sys__t32" />
+<v n="__sys__t34" />
+<v n="__sys__t36" />
+<v n="__sys__t38" />
+<v n="__sys__t40" />
+<v n="__sys__t43" />
+<v n="__sys__t45" />
+<v n="__sys__t47" />
+<v n="__sys__t48" />
+<v n="__sys__t49" />
+<v n="__sys__t52" />
+<v n="__sys__t53" />
+<v n="__sys__t54" />
+<v n="__sys__t55" />
+<v n="__sys__t56" />
+<v n="__sys__t59" />
+<v n="__sys__t62" />
+<v n="__sys__t64" />
+<v n="__sys__t68" />
+<v n="__sys__t70" />
+<v n="__sys__t71" />
+<v n="__sys__t72" />
+<v n="__sys__t74" />
+<v n="__sys__t75" />
+<v n="__sys__t79" />
+<v n="__sys__t81" />
+<v n="__sys__t82" />
+<v n="__sys__t83" />
+<v n="__sys__t84" />
+<v n="__sys__t87" />
+<v n="__sys__t91" />
+<v n="__sys__t93" />
+<v n="__sys__t94" />
+<v n="__sys__t95" />
+<v n="__sys__t96" />
+<v n="__sys__t99" />
+<v n="devote" />
+<v n="game" />
+<v n="leaderUserID" />
+<v n="methodName" />
+<v n="nickname" />
+<v n="outStr" />
+<v n="pickUserIDMap" />
+<v n="rowT" />
+<v n="sessionID" />
+<v n="str" />
+<v n="textTable" />
+<v n="unionData" />
+<v n="unionID" />
+<v n="unionJson" />
+<v n="updateUser" />
+<v n="user" />
+<v n="userID" />
+<v n="userIDMap" />
+<v n="userType" />
+<v n="viceLeaderUserIDMap" />
+</script>

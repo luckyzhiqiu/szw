@@ -1,0 +1,65 @@
+serverList=[];//游戏服信息列表
+uiMgr=new AKUIMgr("ui/");//UI管理器
+AKLoadFileQueue
+(
+	[
+		["../core/depend/amazeui/js/amazeui.min.js",false],
+		["../core/depend/amazeui/css/amazeui.min.css",false],
+		["../core/depend/jQuery.md5.js",false],
+		["../core/depend/xlsx.full.min.js",false],
+		["../core/webpage/AKTableEditor.js"],
+		["../core/ak/common/AKLocalStorage.js"],
+		["../core/common.js"],
+		["../config/mgr/config.js"],
+		["css/common.css"],
+		["js/common.js"],
+		["ui/loginUI.js"],
+		["ui/topUI.js"],
+		["ui/bottomUI.js"],
+		["ui/userUI.js"],
+		["ui/unionUI.js"],
+		["ui/varUI.js"],
+		["ui/serverUI.js"],
+		["ui/numUI.js"],
+		["ui/settingUI.js"],
+		["ui/accountUI.js"],
+		["ui/orderUI.js"],
+		["ui/resUI.js"],
+		["ui/publicMsgUI.js"],
+		["ui/cdkeyUI.js"],
+		///////////////////////////////////////////////////////
+		["ui/common.html"],
+	],
+	appVer,
+	function()
+	{
+		//业务逻辑的编写从这里开始
+		uiMgr.checkLoadComplete(function(){
+			//校验通行证
+			$.ajax({
+				type:"post",
+				url:'web_api/check.php',
+				data:{
+					userID:cache.get("userID"),
+					tick:cache.get("tick")
+				},
+				success:function(data){
+					var json=eval("("+data+")");
+					if(json.result==1)//成功
+					{
+						uiMgr.showUI("topUI");
+						uiMgr.showUI("bottomUI");
+						getServerList(function(){
+							$("#bottomUI_userUIBtn").click();
+						})
+					}
+					else//失败
+					{
+						uiMgr.showUI("loginUI");
+					}
+				}
+			});
+			//...
+		});
+	}
+);

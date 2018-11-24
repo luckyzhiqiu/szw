@@ -1,0 +1,4 @@
+//全局变量表
+mysqlCol("key","id");
+mysqlCol("varchar","name");//变型名
+mysqlCol("mediumblob","json");//json数据

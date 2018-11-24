@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t1">0</v>
+<v t="s" n="__sys__t2">.@__unnamed__0.</v>
+<v t="s" n="__sys__t3">.@__unnamed__2.</v>
+<v t="s" n="__sys__t4">.@__unnamed__3.</v>
+<v t="s" n="__sys__t5">.@__unnamed__4.</v>
+<v t="s" n="__sys__t6">.@__unnamed__5.</v>
+<v t="s" n="__sys__t7">.@__unnamed__6.</v>
+<v t="s" n="__sys__t8">.@__unnamed__7.</v>
+<v t="s" n="__sys__t9">.@__unnamed__8.</v>
+<v t="s" n="__sys__t10">.@__unnamed__9.</v>
+<v t="s" n="__sys__t11">.@__unnamed__10.</v>
+<v t="s" n="__sys__t12">.@__unnamed__11.</v>
+<v t="s" n="__sys__t13">.@__unnamed__13.</v>
+<v t="s" n="__sys__t14">.@__unnamed__14.</v>
+<v t="s" n="__sys__t15">.@__unnamed__15.</v>
+<v t="s" n="__sys__t16">.@__unnamed__16.</v>
+<v t="s" n="__sys__t17">.@__unnamed__17.</v>
+<v t="s" n="__sys__t18">.@__unnamed__18.</v>
+<v t="s" n="__sys__t19">.@__unnamed__19.</v>
+<v t="s" n="__sys__t20">.@__unnamed__20.</v>
+<v t="s" n="__sys__t21">.@__unnamed__21.</v>
+<v t="s" n="__sys__t22">.@__unnamed__22.</v>
+<v t="s" n="__sys__t23">.@__unnamed__23.</v>
+<v t="s" n="__sys__t24">.@__unnamed__24.</v>
+<v t="s" n="__sys__t25">.@__unnamed__25.</v>
+<v t="s" n="__sys__t26">.@__unnamed__26.</v>
+<v t="s" n="__sys__t27">.@__unnamed__27.</v>
+<v t="s" n="__sys__t28">.@__unnamed__28.</v>
+<v t="s" n="__sys__t29">.@__unnamed__29.</v>
+<v t="s" n="__sys__t30">.@__unnamed__30.</v>
+<v t="s" n="__sys__t31">.@__unnamed__31.</v>
+<v t="s" n="__sys__t32">.@__unnamed__32.</v>
+<v t="s" n="__sys__t33">.@__unnamed__33.</v>
+<v t="s" n="__sys__t34">.@__unnamed__34.</v>
+<v t="s" n="__sys__t35">.@__unnamed__35.</v>
+<v t="s" n="__sys__t36">.@__unnamed__36.</v>
+<v t="s" n="__sys__t37">.@__unnamed__37.</v>
+<v t="s" n="__sys__t38">.@__unnamed__38.</v>
+<v t="s" n="__sys__t39">.@__unnamed__39.</v>
+<v t="s" n="__sys__t40">.@__unnamed__40.</v>
+<v t="s" n="__sys__t41">.@__unnamed__41.</v>
+<v t="s" n="__sys__t42">.@__unnamed__43.</v>
+<v t="s" n="__sys__t43">.@__unnamed__44.</v>
+<v t="s" n="__sys__t44">.@__unnamed__45.</v>
+<v t="s" n="__sys__t45">.@__unnamed__46.</v>
+<o n="input"><o>__sys__t46</o><i>__sys__t1</i></o>
+<o n="="><o>game</o><i>__sys__t46</i></o>
+<o n="dict" r="2"><o>__sys__t48</o></o>
+<o n="=" r="2"><o>self</o><i>__sys__t48</i></o>
+<v t="s" n="__sys__t51">.game.</v>
+<o n="." r="3"><o>__sys__t50</o><i>self</i><i>__sys__t51</i></o>
+<o n="=" r="3"><o>__sys__t50</o><i>game</i></o>
+<v t="s" n="__sys__t55">.addPrisoner.</v>
+<o n="." r="6"><o>__sys__t54</o><i>self</i><i>__sys__t55</i></o>
+<o n="full"><o>__sys__t57</o><i>__sys__t2</i></o>
+<o n="=" r="6"><o>__sys__t54</o><i>__sys__t57</i></o>
+<v t="s" n="__sys__t60">.getRichmanIDArr.</v>
+<o n="." r="36"><o>__sys__t59</o><i>self</i><i>__sys__t60</i></o>
+<o n="full"><o>__sys__t62</o><i>__sys__t3</i></o>
+<o n="=" r="36"><o>__sys__t59</o><i>__sys__t62</i></o>
+<v t="s" n="__sys__t65">.getRichmanAddPercent.</v>
+<o n="." r="51"><o>__sys__t64</o><i>self</i><i>__sys__t65</i></o>
+<o n="full"><o>__sys__t67</o><i>__sys__t4</i></o>
+<o n="=" r="51"><o>__sys__t64</o><i>__sys__t67</i></o>
+<v t="s" n="__sys__t70">.addUnionExp.</v>
+<o n="." r="89"><o>__sys__t69</o><i>self</i><i>__sys__t70</i></o>
+<o n="full"><o>__sys__t72</o><i>__sys__t5</i></o>
+<o n="=" r="89"><o>__sys__t69</o><i>__sys__t72</i></o>
+<v t="s" n="__sys__t75">.addItem.</v>
+<o n="." r="152"><o>__sys__t74</o><i>self</i><i>__sys__t75</i></o>
+<o n="full"><o>__sys__t77</o><i>__sys__t6</i></o>
+<o n="=" r="152"><o>__sys__t74</o><i>__sys__t77</i></o>
+<v t="s" n="__sys__t80">.subItem.</v>
+<o n="." r="170"><o>__sys__t79</o><i>self</i><i>__sys__t80</i></o>
+<o n="full"><o>__sys__t82</o><i>__sys__t7</i></o>
+<o n="=" r="170"><o>__sys__t79</o><i>__sys__t82</i></o>
+<v t="s" n="__sys__t85">.getItemCount.</v>
+<o n="." r="193"><o>__sys__t84</o><i>self</i><i>__sys__t85</i></o>
+<o n="full"><o>__sys__t87</o><i>__sys__t8</i></o>
+<o n="=" r="193"><o>__sys__t84</o><i>__sys__t87</i></o>
+<v t="s" n="__sys__t90">.createWife.</v>
+<o n="." r="205"><o>__sys__t89</o><i>self</i><i>__sys__t90</i></o>
+<o n="full"><o>__sys__t92</o><i>__sys__t9</i></o>
+<o n="=" r="205"><o>__sys__t89</o><i>__sys__t92</i></o>
+<v t="s" n="__sys__t95">.isHeroExistInHeroArr.</v>
+<o n="." r="234"><o>__sys__t94</o><i>self</i><i>__sys__t95</i></o>
+<o n="full"><o>__sys__t97</o><i>__sys__t10</i></o>
+<o n="=" r="234"><o>__sys__t94</o><i>__sys__t97</i></o>
+<v t="s" n="__sys__t100">.createHero.</v>
+<o n="." r="246"><o>__sys__t99</o><i>self</i><i>__sys__t100</i></o>
+<o n="full"><o>__sys__t102</o><i>__sys__t11</i></o>
+<o n="=" r="246"><o>__sys__t99</o><i>__sys__t102</i></o>
+<v t="s" n="__sys__t105">.computeHeroArr.</v>
+<o n="." r="299"><o>__sys__t104</o><i>self</i><i>__sys__t105</i></o>
+<o n="full"><o>__sys__t107</o><i>__sys__t12</i></o>
+<o n="=" r="299"><o>__sys__t104</o><i>__sys__t107</i></o>
+<v t="s" n="__sys__t110">.computeHero.</v>
+<o n="." r="311"><o>__sys__t109</o><i>self</i><i>__sys__t110</i></o>
+<o n="full"><o>__sys__t112</o><i>__sys__t13</i></o>
+<o n="=" r="311"><o>__sys__t109</o><i>__sys__t112</i></o>
+<v t="s" n="__sys__t115">.isWifeIDExistInWifeArr.</v>
+<o n="." r="593"><o>__sys__t114</o><i>self</i><i>__sys__t115</i></o>
+<o n="full"><o>__sys__t117</o><i>__sys__t14</i></o>
+<o n="=" r="593"><o>__sys__t114</o><i>__sys__t117</i></o>
+<v t="s" n="__sys__t120">.isHeroIDExistInHeroArr.</v>
+<o n="." r="613"><o>__sys__t119</o><i>self</i><i>__sys__t120</i></o>
+<o n="full"><o>__sys__t122</o><i>__sys__t15</i></o>
+<o n="=" r="613"><o>__sys__t119</o><i>__sys__t122</i></o>
+<v t="s" n="__sys__t125">.computeUser.</v>
+<o n="." r="634"><o>__sys__t124</o><i>self</i><i>__sys__t125</i></o>
+<o n="full"><o>__sys__t127</o><i>__sys__t16</i></o>
+<o n="=" r="634"><o>__sys__t124</o><i>__sys__t127</i></o>
+<v t="s" n="__sys__t130">.getHeroBusinessPercent.</v>
+<o n="." r="649"><o>__sys__t129</o><i>self</i><i>__sys__t130</i></o>
+<o n="full"><o>__sys__t132</o><i>__sys__t17</i></o>
+<o n="=" r="649"><o>__sys__t129</o><i>__sys__t132</i></o>
+<v t="s" n="__sys__t135">.getHeroFarmPercent.</v>
+<o n="." r="662"><o>__sys__t134</o><i>self</i><i>__sys__t135</i></o>
+<o n="full"><o>__sys__t137</o><i>__sys__t18</i></o>
+<o n="=" r="662"><o>__sys__t134</o><i>__sys__t137</i></o>
+<v t="s" n="__sys__t140">.getHeroRecruitPercent.</v>
+<o n="." r="675"><o>__sys__t139</o><i>self</i><i>__sys__t140</i></o>
+<o n="full"><o>__sys__t142</o><i>__sys__t19</i></o>
+<o n="=" r="675"><o>__sys__t139</o><i>__sys__t142</i></o>
+<v t="s" n="__sys__t145">.getHeroStrengthAllPercent.</v>
+<o n="." r="688"><o>__sys__t144</o><i>self</i><i>__sys__t145</i></o>
+<o n="full"><o>__sys__t147</o><i>__sys__t20</i></o>
+<o n="=" r="688"><o>__sys__t144</o><i>__sys__t147</i></o>
+<v t="s" n="__sys__t150">.getHeroWisdomAllPercent.</v>
+<o n="." r="701"><o>__sys__t149</o><i>self</i><i>__sys__t150</i></o>
+<o n="full"><o>__sys__t152</o><i>__sys__t21</i></o>
+<o n="=" r="701"><o>__sys__t149</o><i>__sys__t152</i></o>
+<v t="s" n="__sys__t155">.getHeroCharmAllPercent.</v>
+<o n="." r="714"><o>__sys__t154</o><i>self</i><i>__sys__t155</i></o>
+<o n="full"><o>__sys__t157</o><i>__sys__t22</i></o>
+<o n="=" r="714"><o>__sys__t154</o><i>__sys__t157</i></o>
+<v t="s" n="__sys__t160">.getHeroPoliticsAllPercent.</v>
+<o n="." r="727"><o>__sys__t159</o><i>self</i><i>__sys__t160</i></o>
+<o n="full"><o>__sys__t162</o><i>__sys__t23</i></o>
+<o n="=" r="727"><o>__sys__t159</o><i>__sys__t162</i></o>
+<v t="s" n="__sys__t165">.getTotalStrength.</v>
+<o n="." r="740"><o>__sys__t164</o><i>self</i><i>__sys__t165</i></o>
+<o n="full"><o>__sys__t167</o><i>__sys__t24</i></o>
+<o n="=" r="740"><o>__sys__t164</o><i>__sys__t167</i></o>
+<v t="s" n="__sys__t170">.getTotalWisdom.</v>
+<o n="." r="759"><o>__sys__t169</o><i>self</i><i>__sys__t170</i></o>
+<o n="full"><o>__sys__t172</o><i>__sys__t25</i></o>
+<o n="=" r="759"><o>__sys__t169</o><i>__sys__t172</i></o>
+<v t="s" n="__sys__t175">.getTotalCharm.</v>
+<o n="." r="778"><o>__sys__t174</o><i>self</i><i>__sys__t175</i></o>
+<o n="full"><o>__sys__t177</o><i>__sys__t26</i></o>
+<o n="=" r="778"><o>__sys__t174</o><i>__sys__t177</i></o>
+<v t="s" n="__sys__t180">.getTotalPolitics.</v>
+<o n="." r="797"><o>__sys__t179</o><i>self</i><i>__sys__t180</i></o>
+<o n="full"><o>__sys__t182</o><i>__sys__t27</i></o>
+<o n="=" r="797"><o>__sys__t179</o><i>__sys__t182</i></o>
+<v t="s" n="__sys__t185">.getTotalPower.</v>
+<o n="." r="816"><o>__sys__t184</o><i>self</i><i>__sys__t185</i></o>
+<o n="full"><o>__sys__t187</o><i>__sys__t28</i></o>
+<o n="=" r="816"><o>__sys__t184</o><i>__sys__t187</i></o>
+<v t="s" n="__sys__t190">.getHeroStrength.</v>
+<o n="." r="825"><o>__sys__t189</o><i>self</i><i>__sys__t190</i></o>
+<o n="full"><o>__sys__t192</o><i>__sys__t29</i></o>
+<o n="=" r="825"><o>__sys__t189</o><i>__sys__t192</i></o>
+<v t="s" n="__sys__t195">.getHeroWisdom.</v>
+<o n="." r="855"><o>__sys__t194</o><i>self</i><i>__sys__t195</i></o>
+<o n="full"><o>__sys__t197</o><i>__sys__t30</i></o>
+<o n="=" r="855"><o>__sys__t194</o><i>__sys__t197</i></o>
+<v t="s" n="__sys__t200">.getHeroCharm.</v>
+<o n="." r="885"><o>__sys__t199</o><i>self</i><i>__sys__t200</i></o>
+<o n="full"><o>__sys__t202</o><i>__sys__t31</i></o>
+<o n="=" r="885"><o>__sys__t199</o><i>__sys__t202</i></o>
+<v t="s" n="__sys__t205">.getHeroPolitics.</v>
+<o n="." r="915"><o>__sys__t204</o><i>self</i><i>__sys__t205</i></o>
+<o n="full"><o>__sys__t207</o><i>__sys__t32</i></o>
+<o n="=" r="915"><o>__sys__t204</o><i>__sys__t207</i></o>
+<v t="s" n="__sys__t210">.sortHeroByStrength.</v>
+<o n="." r="945"><o>__sys__t209</o><i>self</i><i>__sys__t210</i></o>
+<o n="full"><o>__sys__t212</o><i>__sys__t33</i></o>
+<o n="=" r="945"><o>__sys__t209</o><i>__sys__t212</i></o>
+<v t="s" n="__sys__t215">.sortHeroByWisdom.</v>
+<o n="." r="973"><o>__sys__t214</o><i>self</i><i>__sys__t215</i></o>
+<o n="full"><o>__sys__t217</o><i>__sys__t34</i></o>
+<o n="=" r="973"><o>__sys__t214</o><i>__sys__t217</i></o>
+<v t="s" n="__sys__t220">.sortHeroByCharm.</v>
+<o n="." r="1001"><o>__sys__t219</o><i>self</i><i>__sys__t220</i></o>
+<o n="full"><o>__sys__t222</o><i>__sys__t35</i></o>
+<o n="=" r="1001"><o>__sys__t219</o><i>__sys__t222</i></o>
+<v t="s" n="__sys__t225">.sortHeroByPolitics.</v>
+<o n="." r="1029"><o>__sys__t224</o><i>self</i><i>__sys__t225</i></o>
+<o n="full"><o>__sys__t227</o><i>__sys__t36</i></o>
+<o n="=" r="1029"><o>__sys__t224</o><i>__sys__t227</i></o>
+<v t="s" n="__sys__t230">.getFreeHero.</v>
+<o n="." r="1057"><o>__sys__t229</o><i>self</i><i>__sys__t230</i></o>
+<o n="full"><o>__sys__t232</o><i>__sys__t37</i></o>
+<o n="=" r="1057"><o>__sys__t229</o><i>__sys__t232</i></o>
+<v t="s" n="__sys__t235">.computeUserWifeProperty.</v>
+<o n="." r="1069"><o>__sys__t234</o><i>self</i><i>__sys__t235</i></o>
+<o n="full"><o>__sys__t237</o><i>__sys__t38</i></o>
+<o n="=" r="1069"><o>__sys__t234</o><i>__sys__t237</i></o>
+<v t="s" n="__sys__t240">.computeVip.</v>
+<o n="." r="1087"><o>__sys__t239</o><i>self</i><i>__sys__t240</i></o>
+<o n="full"><o>__sys__t242</o><i>__sys__t39</i></o>
+<o n="=" r="1087"><o>__sys__t239</o><i>__sys__t242</i></o>
+<v t="s" n="__sys__t245">.getWaterBattleBuffArr.</v>
+<o n="." r="1105"><o>__sys__t244</o><i>self</i><i>__sys__t245</i></o>
+<o n="full"><o>__sys__t247</o><i>__sys__t40</i></o>
+<o n="=" r="1105"><o>__sys__t244</o><i>__sys__t247</i></o>
+<v t="s" n="__sys__t250">.computeWaterBattleHero.</v>
+<o n="." r="1149"><o>__sys__t249</o><i>self</i><i>__sys__t250</i></o>
+<o n="full"><o>__sys__t252</o><i>__sys__t41</i></o>
+<o n="=" r="1149"><o>__sys__t249</o><i>__sys__t252</i></o>
+<v t="s" n="__sys__t255">.getStrongestHeroArr.</v>
+<o n="." r="1188"><o>__sys__t254</o><i>self</i><i>__sys__t255</i></o>
+<o n="full"><o>__sys__t257</o><i>__sys__t42</i></o>
+<o n="=" r="1188"><o>__sys__t254</o><i>__sys__t257</i></o>
+<v t="s" n="__sys__t260">.getThreeenemyHeroIDArr.</v>
+<o n="." r="1219"><o>__sys__t259</o><i>self</i><i>__sys__t260</i></o>
+<o n="full"><o>__sys__t262</o><i>__sys__t43</i></o>
+<o n="=" r="1219"><o>__sys__t259</o><i>__sys__t262</i></o>
+<v t="s" n="__sys__t265">.getHeroAttack.</v>
+<o n="." r="1296"><o>__sys__t264</o><i>self</i><i>__sys__t265</i></o>
+<o n="full"><o>__sys__t267</o><i>__sys__t44</i></o>
+<o n="=" r="1296"><o>__sys__t264</o><i>__sys__t267</i></o>
+<v t="s" n="__sys__t270">.upgradeHero.</v>
+<o n="." r="1315"><o>__sys__t269</o><i>self</i><i>__sys__t270</i></o>
+<o n="full"><o>__sys__t272</o><i>__sys__t45</i></o>
+<o n="=" r="1315"><o>__sys__t269</o><i>__sys__t272</i></o>
+<o n="return" r="1319"><o>__sys__t274</o><i>self</i></o>
+<v n="__sys__t102" />
+<v n="__sys__t104" />
+<v n="__sys__t107" />
+<v n="__sys__t109" />
+<v n="__sys__t112" />
+<v n="__sys__t114" />
+<v n="__sys__t117" />
+<v n="__sys__t119" />
+<v n="__sys__t122" />
+<v n="__sys__t124" />
+<v n="__sys__t127" />
+<v n="__sys__t129" />
+<v n="__sys__t132" />
+<v n="__sys__t134" />
+<v n="__sys__t137" />
+<v n="__sys__t139" />
+<v n="__sys__t142" />
+<v n="__sys__t144" />
+<v n="__sys__t147" />
+<v n="__sys__t149" />
+<v n="__sys__t152" />
+<v n="__sys__t154" />
+<v n="__sys__t157" />
+<v n="__sys__t159" />
+<v n="__sys__t162" />
+<v n="__sys__t164" />
+<v n="__sys__t167" />
+<v n="__sys__t169" />
+<v n="__sys__t172" />
+<v n="__sys__t174" />
+<v n="__sys__t177" />
+<v n="__sys__t179" />
+<v n="__sys__t182" />
+<v n="__sys__t184" />
+<v n="__sys__t187" />
+<v n="__sys__t189" />
+<v n="__sys__t192" />
+<v n="__sys__t194" />
+<v n="__sys__t197" />
+<v n="__sys__t199" />
+<v n="__sys__t202" />
+<v n="__sys__t204" />
+<v n="__sys__t207" />
+<v n="__sys__t209" />
+<v n="__sys__t212" />
+<v n="__sys__t214" />
+<v n="__sys__t217" />
+<v n="__sys__t219" />
+<v n="__sys__t222" />
+<v n="__sys__t224" />
+<v n="__sys__t227" />
+<v n="__sys__t229" />
+<v n="__sys__t232" />
+<v n="__sys__t234" />
+<v n="__sys__t237" />
+<v n="__sys__t239" />
+<v n="__sys__t242" />
+<v n="__sys__t244" />
+<v n="__sys__t247" />
+<v n="__sys__t249" />
+<v n="__sys__t252" />
+<v n="__sys__t254" />
+<v n="__sys__t257" />
+<v n="__sys__t259" />
+<v n="__sys__t262" />
+<v n="__sys__t264" />
+<v n="__sys__t267" />
+<v n="__sys__t269" />
+<v n="__sys__t272" />
+<v n="__sys__t274" />
+<v n="__sys__t46" />
+<v n="__sys__t48" />
+<v n="__sys__t50" />
+<v n="__sys__t54" />
+<v n="__sys__t57" />
+<v n="__sys__t59" />
+<v n="__sys__t62" />
+<v n="__sys__t64" />
+<v n="__sys__t67" />
+<v n="__sys__t69" />
+<v n="__sys__t72" />
+<v n="__sys__t74" />
+<v n="__sys__t77" />
+<v n="__sys__t79" />
+<v n="__sys__t82" />
+<v n="__sys__t84" />
+<v n="__sys__t87" />
+<v n="__sys__t89" />
+<v n="__sys__t92" />
+<v n="__sys__t94" />
+<v n="__sys__t97" />
+<v n="__sys__t99" />
+<v n="game" />
+<v n="self" />
+</script>

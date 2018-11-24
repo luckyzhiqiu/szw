@@ -1,0 +1,11 @@
+//招亲表（未婚孩子表）
+mysqlCol("key","id");
+mysqlCol("int","userID",0);//用户ID
+mysqlCol("bigint","genTime",0);//生成时间（秒）
+mysqlCol("varchar","nickname");//玩家昵称
+mysqlCol("varchar","name");//孩子姓名
+mysqlCol("int","grows",0);//资质
+mysqlCol("int","num",0);//属性
+mysqlCol("int","sex",0);//性别：0=女；1=男；
+mysqlCol("int","skin",0);//形象ID
+mysqlCol("int","childID",0);//孩子ID

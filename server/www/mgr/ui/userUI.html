@@ -1,0 +1,140 @@
+<style>
+#userUI_pannel{
+	position:fixed;
+	width:100%;
+	top:25px;
+}
+#userUI_userListView{
+	position:fixed;
+	width:100%;
+	top:50px;
+	bottom:25px;
+	overflow:auto;
+}
+#userUI_userListView table{
+	width:100%;
+}
+#userUI_userListView td{
+	height:50px;
+	border-bottom:1px solid;
+	text-align:center;
+	vertical-align:middle;
+}
+#userUI_userListView table tbody tr:first-child{
+	background:#cccccc;
+}
+#userUI_userListView table tbody tr{
+	background:#eeeeee;
+}
+#userUI table:first-child{
+	width:100%;
+}
+#userUI_createUserBtn{
+	width:100%;
+}
+</style>
+
+<div id="userUI">
+	<div id="userUI_pannel">
+    	<input id="userUI_nickname" size="10" placeholder="昵称" />
+        <input id="userUI_userID" size="10" placeholder="玩家ID" />
+        <select id="userUI_type">
+			<option value="2">全部</option>
+            <option value="1">上线</option>
+            <option value="0">下线</option>
+        </select>
+        <button id="userUI_queryBtn">查询</button>
+        <button id="userUI_sendMailToAllBtn">群发邮件</button>
+    </div>
+	<div id="userUI_userListView">无玩家数据</div>
+</div>
+
+
+<div id="editJsonUI" class="am-modal am-modal-loading am-modal-no-btn" tabindex="-1">
+  <div class="am-modal-dialog">
+    <div class="am-modal-hd">编辑json
+      <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+    </div>
+    <div class="am-modal-bd">
+    	<div id="editJsonUI_jsonEditor" style="height:500px;"></div>
+	<br />
+	<button id="editJsonUI_saveJsonBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="editJsonExtUI" class="am-modal am-modal-loading am-modal-no-btn" tabindex="-1">
+  <div class="am-modal-dialog">
+    <div class="am-modal-hd">编辑jsonExt
+      <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+    </div>
+    <div class="am-modal-bd">
+    	<div id="editJsonExtUI_jsonEditor" style="height:500px;"></div>
+	<br />
+	<button id="editJsonExtUI_saveJsonBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<div id="editUserUI" class="am-modal am-modal-loading am-modal-no-btn" tabindex="-1">
+  <div class="am-modal-dialog">
+    <div class="am-modal-hd">编辑user
+      <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+    </div>
+    <div class="am-modal-bd">
+    	<div id="editUserUI_jsonEditor" style="height:500px;"></div>
+	<br />
+	<button id="editUserUI_saveBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<div id="sendMailUI" class="am-modal am-modal-loading am-modal-no-btn" tabindex="-1">
+  <div class="am-modal-dialog">
+    <div class="am-modal-hd">发邮件
+      <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+    </div>
+    <div class="am-modal-bd">
+    标题：<input id="sendMailUI_title" /><br />
+    正文：<input id="sendMailUI_body" /><br />
+    兵力：<input id="sendMailUI_soldier" value="0" /><br />
+    银两：<input id="sendMailUI_money" value="0" /><br />
+    粮草：<input id="sendMailUI_food" value="0" /><br />
+    元宝（充值）：<input id="sendMailUI_gold" value="0" /><br />
+    元宝（赠送）：<input id="sendMailUI_gold2" value="0" /><br />
+    物品：<input id="sendMailUI_item" placeholder="itemID1,num1,itemID2,num2,..." /><br />
+	<button id="sendMailUI_sendBtn">发送</button>
+    </div>
+  </div>
+</div>
+
+<div id="limitChatUI" class="am-modal am-modal-loading am-modal-no-btn" tabindex="-1">
+  <div class="am-modal-dialog">
+    <div class="am-modal-hd">禁言
+      <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+    </div>
+    <div class="am-modal-bd">
+    禁言开关：
+    <select id="limitChatUI_switch">
+    	<option value="0">关</option>
+        <option value="1">开</option>
+    </select><br />
+    禁言时间：<input id="limitChatUI_time" value="0" />分钟<br />
+	<button id="limitChatUI_yesBtn">确定</button>
+    </div>
+  </div>
+</div>
+
+<div id="lookMailUI" class="am-popup" id="my-popup">
+  <div class="am-popup-inner">
+    <div class="am-popup-hd">
+      <h4 class="am-popup-title">邮件列表</h4>
+      <span data-am-modal-close
+            class="am-close">&times;</span>
+    </div>
+    <div class="am-popup-bd">
+    	<div id="lookMailUI_listView" style="width:100%;"></div>
+    </div>
+  </div>
+</div>

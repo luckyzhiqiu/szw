@@ -1,0 +1,5 @@
+//服内公告表
+mysqlCol("key","id");
+mysqlCol("datetime","genTime");//生成时间
+mysqlCol("varchar","title");//标题
+mysqlCol("text","body");//正文

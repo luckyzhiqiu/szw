@@ -1,0 +1,184 @@
+//活动排行榜-获取物品®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+rankId=netMsg[3];//榜ID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+if((rankId<1&&rankId>208)&&(rankId<200&&rankId>4))//非法参数
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+addName="";
+//获取冲榜
+if(rankId==1)//势力
+{
+	rankName=game.gameConfig.name+"_activityPowerRank";//排行榜名称
+	addName="powerAdd";
+}
+else if(rankId==2)//亲密
+{
+	rankName=game.gameConfig.name+"_activityIntimateRank";//排行榜名称
+	addName="intimateAdd";
+}
+else if(rankId==3)//议政
+{
+	rankName=game.gameConfig.name+"_activityWaterRank";//排行榜名称
+	addName="waterBattleScoreAdd";
+}
+else if(rankId==4)//联萌
+{
+	rankName=game.gameConfig.name+"_activityUnionRank";//排行榜名称
+	// addName="intimateAdd";
+}
+else if(rankId==201)//银两
+{
+	rankName=game.gameConfig.name+"_moneySubRank";//排行榜名称
+	addName="moneySub";
+}
+else if(rankId==202)//士兵
+{
+	rankName=game.gameConfig.name+"_soldierSubRank";//排行榜名称
+	addName="soldierSub";
+}
+else if(rankId==203)//关卡
+{
+	rankName=game.gameConfig.name+"_barrierAddRank";//排行榜名称
+	addName="barrierAdd";
+}
+else if(rankId==204)//国子监
+{
+	rankName=game.gameConfig.name+"_bookHouseAddRank";//排行榜名称
+	addName="bookHouseAdd";
+}
+else if(rankId==205)//子嗣
+{
+	rankName=game.gameConfig.name+"_childAddRank";//排行榜名称
+	addName="childAdd";
+}
+else if(rankId==206)//召唤
+{
+	rankName=game.gameConfig.name+"_fuckAddRank";//排行榜名称
+	addName="fuckAdd";
+}
+else if(rankId==207)//联姻
+{
+	rankName=game.gameConfig.name+"_marryAddRank";//排行榜名称
+	addName="marryAdd";
+}
+else if(rankId==208)//寻访
+{
+	rankName=game.gameConfig.name+"_searchAddRank";//排行榜名称
+	addName="searchAdd";
+}
+
+
+
+
+
+if(rankId!=4)//其他棒
+{
+	rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+	redis_zrevrange(rd,rankName,0,2,0,rankUserIDArr=arr());
+}
+else//联萌
+{
+	rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+	redis_zrevrange(rd,rankName,0,2,1,rankUserIDArr=arr());
+}
+
+c=size(rankUserIDArr);
+userInfoArr=arr();
+if(c==0)//排行榜空
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1,rankUserIDArr,userInfoArr)
+	);
+	exit();
+}
+//userID、名字、官阶、势力值
+leaderUserArr=arr();
+cnn=game.cnn;
+if(rankId!=4)
+{
+	tt=join(rankUserIDArr,",");
+	sql="select id,nickname,level,fashionID,head ,("+addName+") from user where id in("+tt+") limit 3";
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		push(userInfoArr,mysqlGetColVal(rs,0));
+		push(userInfoArr,mysqlGetColVal(rs,1));
+		push(userInfoArr,mysqlGetColVal(rs,2));
+		push(userInfoArr,mysqlGetColVal(rs,3));
+		push(userInfoArr,mysqlGetColVal(rs,4));
+		push(userInfoArr,mysqlGetColVal(rs,5));
+	}
+	mysqlDestroyRs(rs);
+}
+else
+{
+	unionRankIdArr=arr();
+	
+	i=0;while(i<c)
+	{
+		unknownUnion=game.rd.getRow(cnn,"union","id",rankUserIDArr[i],"*",1000);
+		leaderUserID=unknownUnion.leaderUserID;//萌主ID
+		expAdd=unknownUnion.expAdd;//联萌经验涨幅
+		name=unknownUnion.name;//工会Name
+		push(unionRankIdArr,leaderUserID);
+		push(leaderUserArr,leaderUserID,rankUserIDArr[i+1],name);
+		i+=2;
+	}
+	
+	tt=join(unionRankIdArr,",");
+	sql="select id,nickname,level,fashionID,head from user where id in("+tt+") limit 3";
+	rs=mysqlCreateRs(cnn,sql);
+	
+	while(mysqlNextRow(rs))
+	{
+		push(userInfoArr,mysqlGetColVal(rs,0));
+		push(userInfoArr,mysqlGetColVal(rs,1));
+		push(userInfoArr,mysqlGetColVal(rs,2));
+		push(userInfoArr,mysqlGetColVal(rs,3));
+		push(userInfoArr,mysqlGetColVal(rs,4));
+	}
+	mysqlDestroyRs(rs);
+}
+if(rankId!=4)
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",1,rankUserIDArr,userInfoArr)
+	);
+}
+else
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",1,leaderUserArr,userInfoArr)
+	);
+}

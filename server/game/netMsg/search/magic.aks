@@ -1,0 +1,184 @@
+//走访-卜卦®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID;
+		json=json_decode(user.json);
+		dailyTask=json.dailyTask;//日常任务
+		searchGodTellingFree=dailyTask.searchGodTellingFree;//免费次数
+		searchGodTelling=dailyTask.searchGodTelling;//元宝次数
+		gold=number(user.gold);
+		gold2=number(user.gold2);
+		table=game.table;
+		searchConfigTable=table.searchConfig;
+		searchConfigTableRow=searchConfigTable.getRow(0);
+		immuneCount=number(searchConfigTableRow.getValFromColName("FuFreeTime"));//免费次数
+		if(searchGodTellingFree>=immuneCount)//不是免费
+		{
+			price=number(searchConfigTableRow.getValFromColName("FuCost"));//价钱
+			needGold=number(price*pow(2,searchGodTelling));
+			if(needGold>(gold+gold2))//元宝不足
+			{
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-2)
+				);
+				return(0);//不修改
+			}
+			//扣减元宝
+			if(needGold>gold)
+			{
+				needGold-=gold;
+				gold=0;
+				gold2-=needGold;
+			}
+			else
+			{
+				gold-=needGold;
+			}
+
+			if(needGold>0)
+			{
+				allGold=gold+gold2;//元宝余额
+				game.saveResIO(userID,47,0,0,needGold,allGold);//寻访占卜(type,itemID,（0=消耗，1=获得）,count,allGold)
+			}
+			
+			searchGodTelling+=1;
+		}
+		else
+		{
+			searchGodTellingFree+=1;
+		}
+		eventXTable=table.searchBuilding;//Building
+		num=eventXTable.size(); // 表的行数
+		rateXid=0;
+		k=0;
+		rateArr=arr();
+		while(k<num)
+		{
+			initRow=eventXTable.getRow(k);
+			initRate=number(initRow.getValFromColName("rate"));//机率
+			push(rateArr,initRate);
+			k+=1;
+		}
+		rateXid=randSelect(rateArr);
+		if(rateXid==-1)
+		{
+			rateXid=num-1;
+		}
+		buildingRow=eventXTable.getRow(rateXid);
+		roleIDMap=dict
+		(
+			int(buildingRow.getValFromColName("character1")),int(buildingRow.getValFromColName("FuRate1")),
+			int(buildingRow.getValFromColName("character2")),int(buildingRow.getValFromColName("FuRate2")),
+			int(buildingRow.getValFromColName("character3")),int(buildingRow.getValFromColName("FuRate3")),
+			int(buildingRow.getValFromColName("character4")),int(buildingRow.getValFromColName("FuRate4")),
+			int(buildingRow.getValFromColName("character5")),int(buildingRow.getValFromColName("FuRate5")),
+			int(buildingRow.getValFromColName("character6")),int(buildingRow.getValFromColName("FuRate6")),
+		);
+		searchCharacterTab=table.searchCharacter;//Character
+		wifeDic=json.wife;//红颜
+		i=0;c=searchCharacterTab.size();
+		while(i<c)
+		{
+			roleRow=searchCharacterTab.getRow(i);
+			roleID=int(roleRow.getValFromColName("id"));
+			if(exist(roleIDMap,roleID))
+			{
+				roleType=int(roleRow.getValFromColName("type"));
+				if(roleType==4)//隐藏角色
+				{
+					// wifeMap=json.wife;
+					wifeID=int(roleRow.getValFromColName("wifeID"));
+					if(!exist(wifeDic,wifeID))//非解锁红颜不存在
+					{
+						roleIDMap[roleID]=0;//概率为0
+					}
+				}
+			}
+			i++;
+		}
+		
+		roleArr=arr();
+		foreach(roleIDMap,##<roleID,num>
+			@link roleArr;
+			push(roleArr,roleID,num);
+		##.);
+
+		//概率数组
+		numArr=arr();
+		i=0;c=size(roleArr);
+		while(i<c)
+		{
+			num=roleArr[i+1];
+			push(numArr,num);
+			i+=2;
+		}
+
+		
+		index=randSelect(numArr);
+		roleID=roleArr[index*2];//角色Id
+		search=json.search;//走访
+		count=number(searchConfigTableRow.getValFromColName("FuTime"));//次数
+		//keep
+		search.searchCharacterID=roleID;
+		user.gold=gold;
+		user.gold2=gold2;
+		dailyTask.searchGodTelling=searchGodTelling;
+		dailyTask.searchGodTellingFree=searchGodTellingFree;
+		rateXid+=1;
+		search.searchBuildingID=rateXid;
+		search.searchCount=count;
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,roleID,gold,gold2,searchGodTelling,searchGodTellingFree,rateXid,count)
+		);
+		return(1);//修改
+	
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+	
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

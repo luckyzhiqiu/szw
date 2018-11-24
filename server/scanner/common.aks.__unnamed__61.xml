@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t252">147</v>
+<v t="n" n="__sys__t251">147</v>
+<v t="n" n="__sys__t249">146</v>
+<v t="n" n="__sys__t246">143</v>
+<v t="n" n="__sys__t245">143</v>
+<v t="n" n="__sys__t242">140</v>
+<v t="n" n="__sys__t241">140</v>
+<v t="n" n="__sys__t230">130</v>
+<v t="n" n="__sys__t229">130</v>
+<v t="n" n="__sys__t163">81</v>
+<v t="n" n="__sys__t161">80</v>
+<v t="n" n="__sys__t152">72</v>
+<v t="n" n="__sys__t147">68</v>
+<v t="n" n="__sys__t114">42</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="n" n="__sys__t4">3</v>
+<v t="n" n="__sys__t5">4</v>
+<v t="n" n="__sys__t6">3</v>
+<v t="n" n="__sys__t7">0</v>
+<v t="s" n="__sys__t8">._buildActivityRank.</v>
+<v t="n" n="__sys__t9">4</v>
+<v t="s" n="__sys__t10">.title.</v>
+<v t="s" n="__sys__t11">.body.</v>
+<v t="n" n="__sys__t12">0</v>
+<v t="n" n="__sys__t13">0</v>
+<v t="n" n="__sys__t14">0</v>
+<v t="s" n="__sys__t15">.beginRank.</v>
+<v t="s" n="__sys__t16">.endRank.</v>
+<v t="n" n="__sys__t17">0</v>
+<v t="n" n="__sys__t18">1</v>
+<v t="n" n="__sys__t19">0</v>
+<v t="n" n="__sys__t20">1</v>
+<v t="n" n="__sys__t21">0</v>
+<v t="n" n="__sys__t22">1</v>
+<v t="n" n="__sys__t23">0</v>
+<v t="n" n="__sys__t24">0</v>
+<v t="n" n="__sys__t25">0</v>
+<v t="n" n="__sys__t26">0</v>
+<v t="n" n="__sys__t27">0</v>
+<v t="s" n="__sys__t28">.user.</v>
+<v t="s" n="__sys__t29">.id.</v>
+<v t="s" n="__sys__t30">.*.</v>
+<v t="n" n="__sys__t31">1000</v>
+<v t="n" n="__sys__t32">0</v>
+<v t="n" n="__sys__t33">0</v>
+<v t="s" n="__sys__t34">.user.</v>
+<v t="s" n="__sys__t35">.id.</v>
+<v t="s" n="__sys__t36">.*.</v>
+<v t="s" n="__sys__t37">.@__unnamed__58.</v>
+<v t="s" n="__sys__t38">.@__unnamed__59.</v>
+<v t="s" n="__sys__t39">.@__unnamed__60.</v>
+<v t="n" n="__sys__t40">1000</v>
+<v t="s" n="__sys__t41">.money.</v>
+<v t="s" n="__sys__t42">.food.</v>
+<v t="s" n="__sys__t43">.soldier.</v>
+<v t="s" n="__sys__t44">.gold.</v>
+<v t="s" n="__sys__t45">.item.</v>
+<v t="n" n="__sys__t46">0</v>
+<v t="n" n="__sys__t47">0</v>
+<v t="s" n="__sys__t48">..</v>
+<v t="n" n="__sys__t49">1</v>
+<v t="n" n="__sys__t50">1</v>
+<v t="n" n="__sys__t51">0</v>
+<o n="input"><o>__sys__t52</o><i>__sys__t1</i></o>
+<o n="="><o>cnn</o><i>__sys__t52</i></o>
+<o n="input"><o>__sys__t54</o><i>__sys__t2</i></o>
+<o n="="><o>rd</o><i>__sys__t54</i></o>
+<o n="input"><o>__sys__t56</o><i>__sys__t3</i></o>
+<o n="="><o>table</o><i>__sys__t56</i></o>
+<o n="input"><o>__sys__t58</o><i>__sys__t4</i></o>
+<o n="="><o>gameConfig</o><i>__sys__t58</i></o>
+<o n="input"><o>__sys__t60</o><i>__sys__t5</i></o>
+<o n="="><o>game</o><i>__sys__t60</i></o>
+<v t="s" n="__sys__t63">.activityMgr.</v>
+<o n="." r="1320"><o>__sys__t62</o><i>game</i><i>__sys__t63</i></o>
+<v t="s" n="__sys__t66">.getBuildActivityStatus.</v>
+<o n="." r="1320"><o>__sys__t65</o><i>__sys__t62</i><i>__sys__t66</i></o>
+<o n="__sys__t65" r="1320"><o>__sys__t68</o><i>__sys__t62</i></o>
+<o n="=" r="1320"><o>state</o><i>__sys__t68</i></o>
+<o n="==" r="1321"><o>__sys__t70</o><i>state</i><i>__sys__t6</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t70</i></o>
+<o n="=="><o>__sys__t72</o><i>__sys__rt</i><i>__sys__t7</i></o>
+<o n="if_goto"><o>__sys__t73</o><i>__sys__t72</i><i>__sys__t251</i></o>
+<v t="s" n="__sys__t75">.name.</v>
+<o n="." r="1324"><o>__sys__t74</o><i>gameConfig</i><i>__sys__t75</i></o>
+<o n="+" r="1324"><o>__sys__t77</o><i>__sys__t74</i><i>__sys__t8</i></o>
+<o n="=" r="1324"><o>rankName</o><i>__sys__t77</i></o>
+<v t="s" n="__sys__t80">.getRedisObj.</v>
+<o n="." r="1325"><o>__sys__t79</o><i>rd</i><i>__sys__t80</i></o>
+<o n="__sys__t79" r="1325"><o>__sys__t82</o><i>rd</i><i>rankName</i></o>
+<o n="=" r="1325"><o>rankRd</o><i>__sys__t82</i></o>
+<v t="s" n="__sys__t85">.buildEventRank.</v>
+<o n="." r="1326"><o>__sys__t84</o><i>table</i><i>__sys__t85</i></o>
+<o n="=" r="1326"><o>rankTable</o><i>__sys__t84</i></o>
+<v t="s" n="__sys__t89">.size.</v>
+<o n="." r="1327"><o>__sys__t88</o><i>rankTable</i><i>__sys__t89</i></o>
+<o n="__sys__t88" r="1327"><o>__sys__t91</o><i>rankTable</i></o>
+<o n="=" r="1327"><o>tableLength</o><i>__sys__t91</i></o>
+<v t="s" n="__sys__t94">.mail.</v>
+<o n="." r="1328"><o>__sys__t93</o><i>table</i><i>__sys__t94</i></o>
+<o n="=" r="1328"><o>mailTable</o><i>__sys__t93</i></o>
+<v t="s" n="__sys__t98">.getRow.</v>
+<o n="." r="1329"><o>__sys__t97</o><i>mailTable</i><i>__sys__t98</i></o>
+<o n="__sys__t97" r="1329"><o>__sys__t100</o><i>mailTable</i><i>__sys__t9</i></o>
+<o n="=" r="1329"><o>mailRow</o><i>__sys__t100</i></o>
+<v t="s" n="__sys__t103">.getValFromColName.</v>
+<o n="." r="1330"><o>__sys__t102</o><i>mailRow</i><i>__sys__t103</i></o>
+<o n="__sys__t102" r="1330"><o>__sys__t105</o><i>mailRow</i><i>__sys__t10</i></o>
+<o n="=" r="1330"><o>title</o><i>__sys__t105</i></o>
+<v t="s" n="__sys__t108">.getValFromColName.</v>
+<o n="." r="1331"><o>__sys__t107</o><i>mailRow</i><i>__sys__t108</i></o>
+<o n="__sys__t107" r="1331"><o>__sys__t110</o><i>mailRow</i><i>__sys__t11</i></o>
+<o n="=" r="1331"><o>body</o><i>__sys__t110</i></o>
+<o n="=" r="1332"><o>i</o><i>__sys__t12</i></o>
+<o n="=" r="1333"><o>userArrLength</o><i>__sys__t13</i></o>
+<o n="&lt;" r="1334"><o>__sys__t115</o><i>i</i><i>tableLength</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t115</i></o>
+<o n="=="><o>__sys__t117</o><i>__sys__rt</i><i>__sys__t14</i></o>
+<o n="if_goto"><o>__sys__t118</o><i>__sys__t117</i><i>__sys__t249</i></o>
+<v t="s" n="__sys__t120">.getRow.</v>
+<o n="." r="1336"><o>__sys__t119</o><i>rankTable</i><i>__sys__t120</i></o>
+<o n="__sys__t119" r="1336"><o>__sys__t122</o><i>rankTable</i><i>i</i></o>
+<o n="=" r="1336"><o>row</o><i>__sys__t122</i></o>
+<v t="s" n="__sys__t125">.getValFromColName.</v>
+<o n="." r="1337"><o>__sys__t124</o><i>row</i><i>__sys__t125</i></o>
+<o n="__sys__t124" r="1337"><o>__sys__t127</o><i>row</i><i>__sys__t15</i></o>
+<o n="number" r="1337"><o>__sys__t128</o><i>__sys__t127</i></o>
+<o n="=" r="1337"><o>beginRank</o><i>__sys__t128</i></o>
+<v t="s" n="__sys__t131">.getValFromColName.</v>
+<o n="." r="1338"><o>__sys__t130</o><i>row</i><i>__sys__t131</i></o>
+<o n="__sys__t130" r="1338"><o>__sys__t133</o><i>row</i><i>__sys__t16</i></o>
+<o n="number" r="1338"><o>__sys__t134</o><i>__sys__t133</i></o>
+<o n="=" r="1338"><o>endRank</o><i>__sys__t134</i></o>
+<o n="==" r="1339"><o>__sys__t136</o><i>beginRank</i><i>endRank</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t136</i></o>
+<o n="=="><o>__sys__t138</o><i>__sys__rt</i><i>__sys__t17</i></o>
+<o n="if_goto"><o>__sys__t139</o><i>__sys__t138</i><i>__sys__t147</i></o>
+<o n="-" r="1341"><o>__sys__t140</o><i>beginRank</i><i>__sys__t18</i></o>
+<o n="max" r="1341"><o>__sys__t141</o><i>__sys__t140</i><i>__sys__t19</i></o>
+<o n="-" r="1341"><o>__sys__t142</o><i>endRank</i><i>__sys__t20</i></o>
+<o n="arr" r="1341"><o>__sys__t143</o></o>
+<o n="=" r="1341"><o>rankUserIDArr</o><i>__sys__t143</i></o>
+<o n="redis_zrevrange" r="1341"><o>__sys__t145</o><i>rankRd</i><i>rankName</i><i>__sys__t141</i><i>__sys__t142</i><i>__sys__t21</i><i>rankUserIDArr</i></o>
+<o n="goto"><o>__sys__t146</o><i>__sys__t152</i></o>
+<o n="-" r="1345"><o>__sys__t148</o><i>endRank</i><i>__sys__t22</i></o>
+<o n="arr" r="1345"><o>__sys__t149</o></o>
+<o n="=" r="1345"><o>rankUserIDArr</o><i>__sys__t149</i></o>
+<o n="redis_zrevrange" r="1345"><o>__sys__t151</o><i>rankRd</i><i>rankName</i><i>beginRank</i><i>__sys__t148</i><i>__sys__t23</i><i>rankUserIDArr</i></o>
+<o n="size" r="1347"><o>__sys__t153</o><i>rankUserIDArr</i></o>
+<o n="=" r="1347"><o>userArrLength</o><i>__sys__t153</i></o>
+<o n="==" r="1348"><o>__sys__t155</o><i>userArrLength</i><i>__sys__t24</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t155</i></o>
+<o n="=="><o>__sys__t157</o><i>__sys__rt</i><i>__sys__t25</i></o>
+<o n="if_goto"><o>__sys__t158</o><i>__sys__t157</i><i>__sys__t161</i></o>
+<o n="exit" r="1350"><o>__sys__t159</o></o>
+<o n="goto"><o>__sys__t160</o><i>__sys__t246</i></o>
+<o n="=" r="1354"><o>k</o><i>__sys__t26</i></o>
+<o n="&lt;" r="1354"><o>__sys__t164</o><i>k</i><i>userArrLength</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t164</i></o>
+<o n="=="><o>__sys__t166</o><i>__sys__rt</i><i>__sys__t27</i></o>
+<o n="if_goto"><o>__sys__t167</o><i>__sys__t166</i><i>__sys__t245</i></o>
+<o n="dict" r="1356"><o>__sys__t168</o></o>
+<o n="=" r="1356"><o>userData</o><i>__sys__t168</i></o>
+<v t="s" n="__sys__t171">.getRow.</v>
+<o n="." r="1357"><o>__sys__t170</o><i>rd</i><i>__sys__t171</i></o>
+<o n="[]" r="1357"><o>__sys__t173</o><i>rankUserIDArr</i><i>k</i></o>
+<o n="__sys__t170" r="1357"><o>__sys__t174</o><i>rd</i><i>cnn</i><i>__sys__t28</i><i>__sys__t29</i><i>__sys__t173</i><i>__sys__t30</i><i>__sys__t31</i></o>
+<o n="=" r="1357"><o>unknownUser</o><i>__sys__t174</i></o>
+<v t="s" n="__sys__t177">.buildActivityRecvSign.</v>
+<o n="." r="1358"><o>__sys__t176</o><i>unknownUser</i><i>__sys__t177</i></o>
+<o n="number" r="1358"><o>__sys__t179</o><i>__sys__t176</i></o>
+<o n="=" r="1358"><o>buildActivityRecvSign</o><i>__sys__t179</i></o>
+<o n="==" r="1359"><o>__sys__t181</o><i>buildActivityRecvSign</i><i>__sys__t32</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t181</i></o>
+<o n="=="><o>__sys__t183</o><i>__sys__rt</i><i>__sys__t33</i></o>
+<o n="if_goto"><o>__sys__t184</o><i>__sys__t183</i><i>__sys__t241</i></o>
+<v t="s" n="__sys__t186">.updateRow.</v>
+<o n="." r="1361"><o>__sys__t185</o><i>rd</i><i>__sys__t186</i></o>
+<o n="[]" r="1363"><o>__sys__t188</o><i>rankUserIDArr</i><i>k</i></o>
+<o n="full"><o>__sys__t189</o><i>__sys__t37</i></o>
+<o n="full"><o>__sys__t190</o><i>__sys__t38</i></o>
+<o n="full"><o>__sys__t191</o><i>__sys__t39</i></o>
+<o n="__sys__t185" r="1361"><o>__sys__t192</o><i>rd</i><i>cnn</i><i>__sys__t34</i><i>__sys__t35</i><i>__sys__t188</i><i>__sys__t36</i><i>__sys__t189</i><i>__sys__t190</i><i>__sys__t191</i><i>userData</i><i>__sys__t40</i></o>
+<v t="s" n="__sys__t194">.getValFromColName.</v>
+<o n="." r="1381"><o>__sys__t193</o><i>row</i><i>__sys__t194</i></o>
+<o n="__sys__t193" r="1381"><o>__sys__t196</o><i>row</i><i>__sys__t41</i></o>
+<o n="number" r="1381"><o>__sys__t197</o><i>__sys__t196</i></o>
+<o n="=" r="1381"><o>money</o><i>__sys__t197</i></o>
+<v t="s" n="__sys__t200">.getValFromColName.</v>
+<o n="." r="1382"><o>__sys__t199</o><i>row</i><i>__sys__t200</i></o>
+<o n="__sys__t199" r="1382"><o>__sys__t202</o><i>row</i><i>__sys__t42</i></o>
+<o n="number" r="1382"><o>__sys__t203</o><i>__sys__t202</i></o>
+<o n="=" r="1382"><o>food</o><i>__sys__t203</i></o>
+<v t="s" n="__sys__t206">.getValFromColName.</v>
+<o n="." r="1383"><o>__sys__t205</o><i>row</i><i>__sys__t206</i></o>
+<o n="__sys__t205" r="1383"><o>__sys__t208</o><i>row</i><i>__sys__t43</i></o>
+<o n="number" r="1383"><o>__sys__t209</o><i>__sys__t208</i></o>
+<o n="=" r="1383"><o>soldier</o><i>__sys__t209</i></o>
+<v t="s" n="__sys__t212">.getValFromColName.</v>
+<o n="." r="1384"><o>__sys__t211</o><i>row</i><i>__sys__t212</i></o>
+<o n="__sys__t211" r="1384"><o>__sys__t214</o><i>row</i><i>__sys__t44</i></o>
+<o n="number" r="1384"><o>__sys__t215</o><i>__sys__t214</i></o>
+<o n="=" r="1384"><o>gold</o><i>__sys__t215</i></o>
+<v t="s" n="__sys__t218">.getValFromColName.</v>
+<o n="." r="1385"><o>__sys__t217</o><i>row</i><i>__sys__t218</i></o>
+<o n="__sys__t217" r="1385"><o>__sys__t220</o><i>row</i><i>__sys__t45</i></o>
+<o n="=" r="1385"><o>item</o><i>__sys__t220</i></o>
+<o n="number" r="1386"><o>__sys__t222</o><i>item</i></o>
+<o n="==" r="1386"><o>__sys__t223</o><i>__sys__t222</i><i>__sys__t46</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t223</i></o>
+<o n="=="><o>__sys__t225</o><i>__sys__rt</i><i>__sys__t47</i></o>
+<o n="if_goto"><o>__sys__t226</o><i>__sys__t225</i><i>__sys__t229</i></o>
+<o n="=" r="1388"><o>item</o><i>__sys__t48</i></o>
+<o n="goto"><o>__sys__t228</o><i>__sys__t230</i></o>
+<o n=" -" r="1390"><o>__sys__t231</o><i>__sys__t49</i></o>
+<o n="=" r="1390"><o>rankID</o><i>__sys__t231</i></o>
+<o n="[]" r="1391"><o>__sys__t233</o><i>rankUserIDArr</i><i>k</i></o>
+<o n="redis_zrevrank" r="1391"><o>__sys__t234</o><i>rankRd</i><i>rankName</i><i>__sys__t233</i></o>
+<o n="=" r="1391"><o>rankID</o><i>__sys__t234</i></o>
+<o n="[]" r="1393"><o>__sys__t236</o><i>rankUserIDArr</i><i>k</i></o>
+<o n="+" r="1393"><o>__sys__t237</o><i>rankID</i><i>__sys__t50</i></o>
+<o n="sprintf" r="1393"><o>__sys__t238</o><i>body</i><i>__sys__t237</i></o>
+<o n="sendMailToPrivate" r="1393"><o>__sys__t239</o><i>cnn</i><i>__sys__t236</i><i>title</i><i>__sys__t238</i><i>soldier</i><i>money</i><i>food</i><i>__sys__t51</i><i>gold</i><i>item</i></o>
+<o n="goto"><o>__sys__t240</o><i>__sys__t242</i></o>
+<o n="=" r="1395"><o>__sys__t243</o><i>k</i></o>
+<o n="++" r="1395"><o>k</o><i>k</i></o>
+<o n="goto"><o>__sys__t244</o><i>__sys__t163</i></o>
+<o n="=" r="1399"><o>__sys__t247</o><i>i</i></o>
+<o n="++" r="1399"><o>i</o><i>i</i></o>
+<o n="goto"><o>__sys__t248</o><i>__sys__t114</i></o>
+<o n="goto"><o>__sys__t250</o><i>__sys__t252</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t100" />
+<v n="__sys__t102" />
+<v n="__sys__t105" />
+<v n="__sys__t107" />
+<v n="__sys__t110" />
+<v n="__sys__t115" />
+<v n="__sys__t117" />
+<v n="__sys__t118" />
+<v n="__sys__t119" />
+<v n="__sys__t122" />
+<v n="__sys__t124" />
+<v n="__sys__t127" />
+<v n="__sys__t128" />
+<v n="__sys__t130" />
+<v n="__sys__t133" />
+<v n="__sys__t134" />
+<v n="__sys__t136" />
+<v n="__sys__t138" />
+<v n="__sys__t139" />
+<v n="__sys__t140" />
+<v n="__sys__t141" />
+<v n="__sys__t142" />
+<v n="__sys__t143" />
+<v n="__sys__t145" />
+<v n="__sys__t146" />
+<v n="__sys__t148" />
+<v n="__sys__t149" />
+<v n="__sys__t151" />
+<v n="__sys__t153" />
+<v n="__sys__t155" />
+<v n="__sys__t157" />
+<v n="__sys__t158" />
+<v n="__sys__t159" />
+<v n="__sys__t160" />
+<v n="__sys__t164" />
+<v n="__sys__t166" />
+<v n="__sys__t167" />
+<v n="__sys__t168" />
+<v n="__sys__t170" />
+<v n="__sys__t173" />
+<v n="__sys__t174" />
+<v n="__sys__t176" />
+<v n="__sys__t179" />
+<v n="__sys__t181" />
+<v n="__sys__t183" />
+<v n="__sys__t184" />
+<v n="__sys__t185" />
+<v n="__sys__t188" />
+<v n="__sys__t189" />
+<v n="__sys__t190" />
+<v n="__sys__t191" />
+<v n="__sys__t192" />
+<v n="__sys__t193" />
+<v n="__sys__t196" />
+<v n="__sys__t197" />
+<v n="__sys__t199" />
+<v n="__sys__t202" />
+<v n="__sys__t203" />
+<v n="__sys__t205" />
+<v n="__sys__t208" />
+<v n="__sys__t209" />
+<v n="__sys__t211" />
+<v n="__sys__t214" />
+<v n="__sys__t215" />
+<v n="__sys__t217" />
+<v n="__sys__t220" />
+<v n="__sys__t222" />
+<v n="__sys__t223" />
+<v n="__sys__t225" />
+<v n="__sys__t226" />
+<v n="__sys__t228" />
+<v n="__sys__t231" />
+<v n="__sys__t233" />
+<v n="__sys__t234" />
+<v n="__sys__t236" />
+<v n="__sys__t237" />
+<v n="__sys__t238" />
+<v n="__sys__t239" />
+<v n="__sys__t240" />
+<v n="__sys__t243" />
+<v n="__sys__t244" />
+<v n="__sys__t247" />
+<v n="__sys__t248" />
+<v n="__sys__t250" />
+<v n="__sys__t52" />
+<v n="__sys__t54" />
+<v n="__sys__t56" />
+<v n="__sys__t58" />
+<v n="__sys__t60" />
+<v n="__sys__t62" />
+<v n="__sys__t65" />
+<v n="__sys__t68" />
+<v n="__sys__t70" />
+<v n="__sys__t72" />
+<v n="__sys__t73" />
+<v n="__sys__t74" />
+<v n="__sys__t77" />
+<v n="__sys__t79" />
+<v n="__sys__t82" />
+<v n="__sys__t84" />
+<v n="__sys__t88" />
+<v n="__sys__t91" />
+<v n="__sys__t93" />
+<v n="__sys__t97" />
+<v n="beginRank" />
+<v n="body" />
+<v n="buildActivityRecvSign" />
+<v n="cnn" />
+<v n="endRank" />
+<v n="food" />
+<v n="game" />
+<v n="gameConfig" />
+<v n="gold" />
+<v n="i" />
+<v n="item" />
+<v n="k" />
+<v n="mailRow" />
+<v n="mailTable" />
+<v n="money" />
+<v n="rankID" />
+<v n="rankName" />
+<v n="rankRd" />
+<v n="rankTable" />
+<v n="rankUserIDArr" />
+<v n="rd" />
+<v n="row" />
+<v n="soldier" />
+<v n="state" />
+<v n="table" />
+<v n="tableLength" />
+<v n="title" />
+<v n="unknownUser" />
+<v n="userArrLength" />
+<v n="userData" />
+</script>

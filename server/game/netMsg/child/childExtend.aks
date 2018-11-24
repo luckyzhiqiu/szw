@@ -1,0 +1,114 @@
+//子嗣扩展席位
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID;
+		json=json_decode(user.json);
+		childSys=json.childSys;
+		childMaxCount=childSys.childMaxCount;
+		
+		//最大可扩建
+		table=game.table;
+		childConfigure=table.childConfigure;
+		rowC=childConfigure.getRow(0);
+		seatMax=number(rowC.getValFromColName("seatMax"));//最大可扩建至
+		seat=childMaxCount+seatMax;
+		if(childMaxCount<seat)
+		{
+			childMaxCount+=1;
+			seatCost=number(rowC.getValFromColName("seatCost"+childMaxCount));//扩建消耗
+			
+			gold=number(user.gold);//元宝（充值，优先使用）
+			gold2=number(user.gold2);//元宝（赠送）
+			if(seatCost>(gold+gold2))//元宝不足
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-2)
+				);
+				return(0);//不修改
+			}
+			
+			//扣减元宝
+			if(seatCost>gold)
+			{
+				seatCost-=gold;
+				gold=0;
+				gold2-=seatCost;
+			}
+			else
+			{
+				gold-=seatCost;
+			}
+			
+			//流水
+			allGold=gold+gold2;//元宝余额
+			game.saveResIO(userID,8,0,0,seatCost,allGold);//子嗣扩建(type,itemID,（0=消耗，1=获得）,count,allGold)
+			
+			//保存
+			user.gold=gold;
+			user.gold2=gold2;
+			childSys.childMaxCount=childMaxCount;
+			user.json=json_encode(json);
+			
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,gold,gold2,childMaxCount)
+			);
+			
+			return(1);//修改
+		}
+		else//已扩建至最大
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);
+		}
+		
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

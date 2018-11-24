@@ -1,0 +1,182 @@
+//解散联盟
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+passwordVerify=netMsg[3];//密码验证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+unionID=number(user.unionID);
+if(unionID==0)//未加入联盟
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+devote=0;
+//成员退出联盟
+deleteUnionID=##<game,selectUserID>
+	userR=game.rd.updateRow
+	(
+		game.cnn,"user","id",selectUserID,"*",
+		//修改回调
+		##<userR,game>
+			@link devote;
+			userR.unionID=0;
+			devote=floor(number(userR.devote)/2);
+			userR.devote=devote;
+			return(1);//修改
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+##.;
+
+//删除权贵联盟
+deleteBefriendUnionID=##<game,unionID>
+	sql="select id from union_richman";
+	rs=mysqlCreateRs(game.cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		rID=mysqlGetColVal(rs,0);
+		uRichman=game.rd.updateRow
+		(
+			game.cnn,"union_richman","id",rID,"*",
+			//修改回调
+			##<uRichman,game>
+			@link unionID,rID;
+				unionIDR=number(uRichman.unionID);
+				if(unionIDR==unionID)
+				{
+					allianceNobleTable=game.table.allianceNoble;
+					rowAN=allianceNobleTable.getRowFromColName("id",rID);
+					belong=number(rowAN.getValFromColName("belong"));//默认所属
+					uRichman.unionID=belong;
+				}
+				
+				urJson=json_decode(uRichman.json);
+				unionFriendMap=urJson.unionFriendMap;
+				
+				if(exist(unionFriendMap,unionID))
+				{
+					remove(unionFriendMap,unionID);
+				}
+				uRichman.json=json_encode(urJson);
+
+				return(1);//修改
+			##.,
+			//修改完成回调
+			##<row,userData>
+				//...
+			##.,
+			//解锁后回调
+			##<row,userData>
+				//...
+			##.,
+			game,//自定义数据userData
+			1000//加锁时间（毫秒），例如：1000
+		);
+	}
+	mysqlDestroyRs(rs);
+##.;
+
+pass=0;
+unionData=game.rd.updateRow
+(
+	game.cnn,"union","id",unionID,"*",
+	//修改回调
+	##<unionData,game>
+		@link sessionID,methodName,userID,deleteUnionID,passwordVerify,pass,deleteBefriendUnionID,unionID;
+		leaderUserID=number(unionData.leaderUserID);
+		if(leaderUserID!=userID)//不是盟主
+		{
+			pass=-3;
+			return(0);
+		}
+		
+		password=unionData.password;
+		if(password!=passwordVerify)//密码错误
+		{
+			pass=-4;
+			return(0);
+		}
+
+		pass=1;
+		unionJson=json_decode(unionData.json);
+		userIDMap=unionJson.userIDMap;
+		
+		it=dictIt();
+		dictItBegin(userIDMap,it);
+		while(!dictItEmpty(it))
+		{
+			selectUserID=dictItKey(it);
+			//所有用户退出联盟
+			deleteUnionID(game,selectUserID);
+			dictItNext(it);
+		}
+
+		deleteBefriendUnionID(game,unionID);
+		
+		rankName=game.gameConfig.name+"_unionBuildActivityRank";//排行榜名称
+		rdsrc=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+		redis_zrem(rdsrc,rankName,unionID);
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(pass==1)
+{
+	//删除行
+	game.rd.delRow(game.cnn,"union","id",unionID,1000);
+	
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",pass,devote)
+	);
+}
+else
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",pass)
+	);
+}
+
+
+
+
+

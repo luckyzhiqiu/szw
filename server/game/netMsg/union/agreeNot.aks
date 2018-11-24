@@ -1,0 +1,180 @@
+//不同意申请® -联萌工会
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+unionUserID=netMsg[3];//联萌萌友申请ID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+cnn=game.cnn;
+rd=game.rd;
+unionUser=rd.getRow(cnn,"user","id",userID,"*",1000);
+unionID=unionUser.unionID;//联萌id
+if(unionID==0)
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)//自己未+入联萌 bug操作
+	);
+	exit();
+}
+if(unionUserID==0)//一键拒绝
+{
+	//修改行数据
+	unionX=rd.updateRow
+	(
+		cnn,"union","id",unionID,"*",
+		//修改回调
+		##<unionX,game>
+			@link methodName,sessionID,userID;
+			leaderUserID=unionX.leaderUserID;//萌主ID
+			if(userID!=leaderUserID)
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)//非本人操作
+				);
+				return(0);//不修改	
+			}	
+			unionXJson=json_decode(unionX.json);
+			reqUserIDMap=unionXJson.reqUserIDMap;//申请+入
+			reqUserIDMap=clean(reqUserIDMap);
+			//keep
+			unionXJson.reqUserIDMap=reqUserIDMap;
+			unionX.json=json_encode(unionXJson);
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1)
+			);
+			return(1);//修改
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	if(empty(unionX))//联萌不存在
+	{
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",-1)
+		);
+	}
+}
+else//单个拒绝
+{
+	// tagerUser=rd.getRow(cnn,"user","id",unionUserID,"*",1000);
+	// tagerUserUnionID=tagerUser.unionID;//联萌id
+	// if(tagerUserUnionID!=0)
+	// {
+		// //回复
+		// game.sendMsg
+		// (
+			// sessionID,
+			// arr(methodName+"Result",-6)//以+入联萌
+		// );
+		// exit();
+	// }
+	//修改行数据
+	unionX=rd.updateRow
+	(
+		cnn,"union","id",unionID,"*",
+		//修改回调
+		##<unionX,game>
+			@link methodName,sessionID,userID,unionUserID;
+			leaderUserID=int(unionX.leaderUserID);//萌主ID
+			unionXJson=json_decode(unionX.json);
+			viceLeaderUserIDMap=unionXJson.viceLeaderUserIDMap;//副队长
+			if(userID!=leaderUserID )
+			{
+				if(!exist(viceLeaderUserIDMap,userID))
+				{
+					//回复
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-3)//非本人操作
+					);
+					return(0);//不修改	
+				}
+				
+			}	
+			
+			reqUserIDMap=unionXJson.reqUserIDMap;//申请+入
+			if(!exist(reqUserIDMap,unionUserID))//不存在
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)//非法操作
+				);
+				return(0);//不修改	
+			}
+			//userIDMap=unionXJson.userIDMap;//成员
+			// if(exist(userIDMap,unionUserID))
+			// {
+				// //回复
+				// game.sendMsg
+				// (
+					// sessionID,
+					// arr(methodName+"Result",-5)//无效操作
+				// );
+				// return(0);//不修改	
+			// }
+			
+			//keep
+			remove(reqUserIDMap,unionUserID);
+			unionX.json=json_encode(unionXJson);
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1)
+			);
+			return(1);//修改
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	if(empty(unionX))//联萌不存在
+	{
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",-1)
+		);
+	}
+}

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t111">72</v>
+<v t="n" n="__sys__t63">25</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="n" n="__sys__t4">3</v>
+<v t="n" n="__sys__t5">4</v>
+<v t="n" n="__sys__t6">5</v>
+<v t="n" n="__sys__t7">6</v>
+<v t="n" n="__sys__t8">7</v>
+<v t="n" n="__sys__t9">8</v>
+<v t="n" n="__sys__t10">9</v>
+<v t="n" n="__sys__t11">0</v>
+<v t="n" n="__sys__t12">0</v>
+<v t="s" n="__sys__t13">.mail.</v>
+<v t="s" n="__sys__t14">.create table if not exists `.</v>
+<v t="s" n="__sys__t15">.` like mail.</v>
+<v t="s" n="__sys__t16">.insert into .</v>
+<v t="s" n="__sys__t17">. set genTime='.</v>
+<v t="s" n="__sys__t18">.'.</v>
+<v t="s" n="__sys__t19">.,title='.</v>
+<v t="s" n="__sys__t20">.'.</v>
+<v t="s" n="__sys__t21">.,body='.</v>
+<v t="s" n="__sys__t22">.'.</v>
+<v t="s" n="__sys__t23">.,money=.</v>
+<v t="s" n="__sys__t24">.,food=.</v>
+<v t="s" n="__sys__t25">.,soldier=.</v>
+<v t="s" n="__sys__t26">.,gold=.</v>
+<v t="s" n="__sys__t27">.,gold2=.</v>
+<v t="s" n="__sys__t28">.,item='.</v>
+<v t="s" n="__sys__t29">.'.</v>
+<v t="s" n="__sys__t30">.,`read`='.</v>
+<v t="n" n="__sys__t31">0</v>
+<v t="s" n="__sys__t32">.'.</v>
+<v t="s" n="__sys__t33">.,modifTime='.</v>
+<v t="n" n="__sys__t34">0</v>
+<v t="s" n="__sys__t35">.'.</v>
+<o n="input"><o>__sys__t36</o><i>__sys__t1</i></o>
+<o n="="><o>self</o><i>__sys__t36</i></o>
+<o n="input"><o>__sys__t38</o><i>__sys__t2</i></o>
+<o n="="><o>userIDArr</o><i>__sys__t38</i></o>
+<o n="input"><o>__sys__t40</o><i>__sys__t3</i></o>
+<o n="="><o>title</o><i>__sys__t40</i></o>
+<o n="input"><o>__sys__t42</o><i>__sys__t4</i></o>
+<o n="="><o>body</o><i>__sys__t42</i></o>
+<o n="input"><o>__sys__t44</o><i>__sys__t5</i></o>
+<o n="="><o>soldier</o><i>__sys__t44</i></o>
+<o n="input"><o>__sys__t46</o><i>__sys__t6</i></o>
+<o n="="><o>money</o><i>__sys__t46</i></o>
+<o n="input"><o>__sys__t48</o><i>__sys__t7</i></o>
+<o n="="><o>food</o><i>__sys__t48</i></o>
+<o n="input"><o>__sys__t50</o><i>__sys__t8</i></o>
+<o n="="><o>gold</o><i>__sys__t50</i></o>
+<o n="input"><o>__sys__t52</o><i>__sys__t9</i></o>
+<o n="="><o>gold2</o><i>__sys__t52</i></o>
+<o n="input"><o>__sys__t54</o><i>__sys__t10</i></o>
+<o n="="><o>itemArrStr</o><i>__sys__t54</i></o>
+<v t="s" n="__sys__t57">.cnn.</v>
+<o n="." r="839"><o>__sys__t56</o><i>self</i><i>__sys__t57</i></o>
+<o n="=" r="839"><o>cnn</o><i>__sys__t56</i></o>
+<o n="=" r="840"><o>i</o><i>__sys__t11</i></o>
+<o n="size" r="840"><o>__sys__t61</o><i>userIDArr</i></o>
+<o n="=" r="840"><o>c</o><i>__sys__t61</i></o>
+<o n="&lt;" r="841"><o>__sys__t64</o><i>i</i><i>c</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t64</i></o>
+<o n="=="><o>__sys__t66</o><i>__sys__rt</i><i>__sys__t12</i></o>
+<o n="if_goto"><o>__sys__t67</o><i>__sys__t66</i><i>__sys__t111</i></o>
+<o n="[]" r="843"><o>__sys__t68</o><i>userIDArr</i><i>i</i></o>
+<o n="=" r="843"><o>userID</o><i>__sys__t68</i></o>
+<o n="createIDTable" r="844"><o>__sys__t70</o><i>cnn</i><i>__sys__t13</i><i>userID</i></o>
+<o n="=" r="844"><o>tableName</o><i>__sys__t70</i></o>
+<o n="now" r="845"><o>__sys__t72</o></o>
+<o n="=" r="845"><o>curTime</o><i>__sys__t72</i></o>
+<o n="+" r="846"><o>__sys__t74</o><i>__sys__t14</i><i>tableName</i></o>
+<o n="+" r="846"><o>__sys__t75</o><i>__sys__t74</i><i>__sys__t15</i></o>
+<o n="=" r="846"><o>sql</o><i>__sys__t75</i></o>
+<o n="mysqlExec" r="847"><o>__sys__t77</o><i>cnn</i><i>sql</i></o>
+<o n="+" r="848"><o>__sys__t78</o><i>__sys__t16</i><i>tableName</i></o>
+<o n="+" r="848"><o>__sys__t79</o><i>__sys__t78</i><i>__sys__t17</i></o>
+<o n="+" r="848"><o>__sys__t80</o><i>__sys__t79</i><i>curTime</i></o>
+<o n="+" r="848"><o>__sys__t81</o><i>__sys__t80</i><i>__sys__t18</i></o>
+<o n="=" r="848"><o>sql</o><i>__sys__t81</i></o>
+<o n="+" r="849"><o>__sys__t83</o><i>__sys__t19</i><i>title</i></o>
+<o n="+" r="849"><o>__sys__t84</o><i>__sys__t83</i><i>__sys__t20</i></o>
+<o n="+=" r="849"><o>sql</o><i>__sys__t84</i></o>
+<o n="+" r="850"><o>__sys__t86</o><i>__sys__t21</i><i>body</i></o>
+<o n="+" r="850"><o>__sys__t87</o><i>__sys__t86</i><i>__sys__t22</i></o>
+<o n="+=" r="850"><o>sql</o><i>__sys__t87</i></o>
+<o n="+" r="851"><o>__sys__t89</o><i>__sys__t23</i><i>money</i></o>
+<o n="+=" r="851"><o>sql</o><i>__sys__t89</i></o>
+<o n="+" r="852"><o>__sys__t91</o><i>__sys__t24</i><i>food</i></o>
+<o n="+=" r="852"><o>sql</o><i>__sys__t91</i></o>
+<o n="+" r="853"><o>__sys__t93</o><i>__sys__t25</i><i>soldier</i></o>
+<o n="+=" r="853"><o>sql</o><i>__sys__t93</i></o>
+<o n="+" r="854"><o>__sys__t95</o><i>__sys__t26</i><i>gold</i></o>
+<o n="+=" r="854"><o>sql</o><i>__sys__t95</i></o>
+<o n="+" r="855"><o>__sys__t97</o><i>__sys__t27</i><i>gold2</i></o>
+<o n="+=" r="855"><o>sql</o><i>__sys__t97</i></o>
+<o n="+" r="856"><o>__sys__t99</o><i>__sys__t28</i><i>itemArrStr</i></o>
+<o n="+" r="856"><o>__sys__t100</o><i>__sys__t99</i><i>__sys__t29</i></o>
+<o n="+=" r="856"><o>sql</o><i>__sys__t100</i></o>
+<o n="+" r="857"><o>__sys__t102</o><i>__sys__t30</i><i>__sys__t31</i></o>
+<o n="+" r="857"><o>__sys__t103</o><i>__sys__t102</i><i>__sys__t32</i></o>
+<o n="+=" r="857"><o>sql</o><i>__sys__t103</i></o>
+<o n="+" r="858"><o>__sys__t105</o><i>__sys__t33</i><i>__sys__t34</i></o>
+<o n="+" r="858"><o>__sys__t106</o><i>__sys__t105</i><i>__sys__t35</i></o>
+<o n="+=" r="858"><o>sql</o><i>__sys__t106</i></o>
+<o n="mysqlExec" r="860"><o>__sys__t108</o><i>cnn</i><i>sql</i></o>
+<o n="++" r="861"><o>i</o><i>i</i></o>
+<o n="goto"><o>__sys__t110</o><i>__sys__t63</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t100" />
+<v n="__sys__t102" />
+<v n="__sys__t103" />
+<v n="__sys__t105" />
+<v n="__sys__t106" />
+<v n="__sys__t108" />
+<v n="__sys__t110" />
+<v n="__sys__t36" />
+<v n="__sys__t38" />
+<v n="__sys__t40" />
+<v n="__sys__t42" />
+<v n="__sys__t44" />
+<v n="__sys__t46" />
+<v n="__sys__t48" />
+<v n="__sys__t50" />
+<v n="__sys__t52" />
+<v n="__sys__t54" />
+<v n="__sys__t56" />
+<v n="__sys__t61" />
+<v n="__sys__t64" />
+<v n="__sys__t66" />
+<v n="__sys__t67" />
+<v n="__sys__t68" />
+<v n="__sys__t70" />
+<v n="__sys__t72" />
+<v n="__sys__t74" />
+<v n="__sys__t75" />
+<v n="__sys__t77" />
+<v n="__sys__t78" />
+<v n="__sys__t79" />
+<v n="__sys__t80" />
+<v n="__sys__t81" />
+<v n="__sys__t83" />
+<v n="__sys__t84" />
+<v n="__sys__t86" />
+<v n="__sys__t87" />
+<v n="__sys__t89" />
+<v n="__sys__t91" />
+<v n="__sys__t93" />
+<v n="__sys__t95" />
+<v n="__sys__t97" />
+<v n="__sys__t99" />
+<v n="body" />
+<v n="c" />
+<v n="cnn" />
+<v n="curTime" />
+<v n="food" />
+<v n="gold" />
+<v n="gold2" />
+<v n="i" />
+<v n="itemArrStr" />
+<v n="money" />
+<v n="self" />
+<v n="soldier" />
+<v n="sql" />
+<v n="tableName" />
+<v n="title" />
+<v n="userID" />
+<v n="userIDArr" />
+</script>

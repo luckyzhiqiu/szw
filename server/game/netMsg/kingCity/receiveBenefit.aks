@@ -1,0 +1,99 @@
+//皇宫-领取
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID;
+		json=json_decode(user.json);
+		kingCity=json.kingCity;
+		sign=kingCity.sign;
+		achievement=json.achievement;
+		helloCount=0;
+		if(sign!=0)
+		{
+			//回复
+			game.sendMsg//不再摸拜状态
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		
+		gold2=number(user.gold2);
+		if(sign==0)
+		{
+			helloCount=achievement.helloCount;
+			sign=1;
+			level=number(user.level);
+			levelTable=game.table.level;
+			rowL=levelTable.getRowFromColName("level",level);
+			addGold=number(rowL.getValFromColName("gold"));
+			gold2+=addGold;
+			helloCount+=1;
+		}
+		
+		//流水记录
+		gold=number(user.gold);
+		allGold=gold+gold2;//元宝余额
+		game.saveResIO(userID,3,0,1,addGold,allGold);//皇宫(type,itemID,（0=消耗，1=获得）,count,allGold)
+		
+		//保存
+		if(gold2!=0)
+		{
+			user.gold2=gold2;
+		}
+		
+		kingCity.sign=sign;
+		achievement.helloCount=helloCount;
+		//皇宫请安次数
+		dailyTask=json.dailyTask;
+		dailyTask.helloCount+=1;
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

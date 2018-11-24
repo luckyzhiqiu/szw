@@ -1,0 +1,79 @@
+//皇宫-宣言
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+kingId=netMsg[3];//王爷Id
+chat=netMsg[4];//短信
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+if(kingId<1&&kingId>5)//非法ID
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+//修改行数据
+global=game.rd.updateRow
+(
+	game.cnn,"global_var","name","kingCity","*",
+	//修改回调
+	##<global,game>
+		@link methodName,sessionID,kingId,chat,userID;
+		
+		//获取全局变量
+		globalJson=json_decode(global.json);
+		unknownKing=globalJson["wang"+kingId];//王爷
+		
+		unknownKingID=unknownKing.userID;//王爷ID
+		if(unknownKingID==userID)
+		{
+			unknownKingChat=unknownKing.chat;//王爷话
+			unknownKingChat=chat;
+		}
+		else//未够资格 修改宣言
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//修改
+		}
+		//保存
+		globalJson["wang"+kingId].chat=chat;
+		globalJson_var=json_encode(globalJson);
+		global.json=globalJson_var;
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);

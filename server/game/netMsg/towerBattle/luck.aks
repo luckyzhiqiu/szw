@@ -1,0 +1,186 @@
+//论战抽奖®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+pos=int(netMsg[3]);//抽奖位置（0~5）
+
+if(pos<0&&pos>5)//非法参数
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2) 
+	);
+	exit();
+}
+
+//获取随机抽奖ID
+waterBattleRewardRand=##<game>
+	waterBattleRewardID=0;
+	num=rand()%10000;
+	rateTotal=0;
+	tab=game.table.waterBattleReward;//迟早要改表！
+	c=tab.size();
+	i=0;while(i<c) 
+	{
+		row=tab.getRow(i);
+		rate=number(row.getValFromColName("rate"));
+		rateTotal+=rate;
+		if(num<rateTotal)
+		{
+			waterBattleRewardID=number(row.getValFromColName("id"));
+			return(waterBattleRewardID);
+		}
+		++i;
+		
+	}
+	return(waterBattleRewardID);
+	
+##.;
+	
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+
+		@link methodName,sessionID,pos,waterBattleRewardRand,userID;
+		json=json_decode(user.json);
+		jsonExt=json_decode(user.jsonExt);
+		
+		isLuckyDraw=number( user.towerBattleStep);
+		towerBattle=json.towerBattle;
+		koCount=towerBattle.battleCount;
+		
+		if(isLuckyDraw!=2 || koCount==0 || koCount%3!=0)
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3) //没抽奖的资格
+			);
+			return(0);
+		}
+		
+		idArr=arr();
+		i=0;
+		while(i<6) //6个奖品
+		{
+			push(idArr,waterBattleRewardRand(game));
+			i++;
+		}
+		
+		itemTable=game.table.waterBattleReward;
+		idRow=itemTable.getRowFromColName("id",idArr[pos]);
+		type=number (idRow.getValFromColName("type"));//类型
+		luckyDraw=number( idRow.getValFromColName("num"));//对应奖品
+		itemDict=json.item;
+		rewardDic=dict();
+		if(type==1 || type==2)
+		{
+			hero=json.hero;
+			heroIndex=towerBattle.heroIndex;//我方豪杰位置
+			if(type==1)
+			{
+				//获得资质经验
+				hero[heroIndex].growsExp+=luckyDraw;
+				rewardDic["growsExp"]=luckyDraw;
+			}
+			else if(type==2)
+			{
+				//获得技能经验
+				hero[heroIndex].skillExp+=luckyDraw;
+				rewardDic["skillExp"]=luckyDraw;
+			}
+			
+		}
+		else if(type==3)
+		{
+			numMgr=game.numMgr;
+			numMgr.addItem(luckyDraw,1,itemDict);
+			rewardDic["item"]=luckyDraw;
+		}
+		
+		enemyHeroIDArr=towerBattle.enemyHeroIDArr;//敌方英雄数组
+		towerMaxID=number(user.towerMaxID);//历史通过的塔ID 
+		towerID=number(user.towerID);//当前通过的塔ID
+		// useHeroIndexMap=towerBattle.useHeroIndexMap;//豪杰使用字典
+		//保存
+		if(arrSize(enemyHeroIDArr)!=0)
+		{
+			user.towerBattleStep=1;
+		}
+		else//ace
+		{
+			if(towerID!=0 && towerID%10==0)
+			{
+				user.towerBattleStep=0;
+			}
+		}
+			// towerBattleExt=jsonExt.towerBattleExt;
+			// towerBattle.battleCount=0; //？？
+			
+			// towerID+=1;
+			// if(towerID>towerMaxID)//历史记录
+			// {
+				// towerMaxID=towerID;
+			// }
+			// towerBattle.enemyHeroIDArr=arr();//清空对方数组
+			// towerBattleExt.enemyHeroArr=arr();//??
+			// if(towerID!=0 && towerID%10==0)
+			// {
+				// useHeroIndexMap=dict();
+			// }
+		// }
+		// user.towerID=towerID;
+		// user.towerMaxID=towerMaxID;
+		// towerBattle.useHeroIndexMap=useHeroIndexMap;
+		user.jsonExt=json_encode(jsonExt);
+		user.json=json_encode(json);
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,idArr,rewardDic,user.towerBattleStep)
+			
+		);
+		return(1);//修改
+	
+		
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

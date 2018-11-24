@@ -1,0 +1,125 @@
+//书院扩展席位
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID;
+		json=json_decode(user.json);
+		bookHouse=json.bookHouse;
+		seatCount=bookHouse.seatCount;
+		heroArr=bookHouse.heroArr;
+		count=size(heroArr);
+		structMgr=game.structMgr;
+		if(count==0)
+		{
+			bookHouseHero=structMgr_upgradeObj(structMgr,"BookHouseHero",dict());
+			bookHouseHero["heroIndex"]=-1;
+			bookHouseHero["bt"]=0;
+			push(heroArr,bookHouseHero);
+		}
+		
+		//最大可扩建
+		table=game.table;
+		schoolTable=table.school;
+		rowS=schoolTable.getRow(0);
+		maxSeat=number(rowS.getValFromColName("maxSeat"));//最大席位数量
+		if(seatCount>=maxSeat)//已扩建至最大
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);
+		}
+		
+		seatCost=number(rowS.getValFromColName("SeatCost"+seatCount));//扩建消耗
+		gold=number(user.gold);//元宝（充值，优先使用）
+		gold2=number(user.gold2);//元宝（赠送）
+		if(seatCost>(gold+gold2))//元宝不足
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		//扣减元宝
+		if(seatCost>gold)
+		{
+			seatCost-=gold;
+			gold=0;
+			gold2-=seatCost;
+		}
+		else
+		{
+			gold-=seatCost;
+		}
+		
+		//流水
+		allGold=gold+gold2;//元宝余额
+		game.saveResIO(userID,38,0,0,seatCost,allGold);//书院开席位(type,itemID,（0=消耗，1=获得）,count,allGold)
+		
+		seatCount+=1;
+		
+		map=structMgr_upgradeObj(structMgr,"BookHouseHero",dict());
+		map["heroIndex"]=-1;
+		map["bt"]=0;
+		push(heroArr,map);
+		
+		//保存
+		user.gold=gold;
+		user.gold2=gold2;
+		bookHouse.seatCount=seatCount;
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,gold,gold2,bookHouse)
+		);
+		
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

@@ -1,0 +1,265 @@
+//获取提亲数组
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+childID=netMsg[3];//孩子id
+type=netMsg[4];//提亲类型 0:向全服提亲 1:向玩家提亲
+goldType=netMsg[5];//0:不用元宝 1:要用元宝
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+//修改行数据
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link methodName,sessionID,userID,type,childID,goldType;
+									
+			pairArr=arr();
+			jsonExt=json_decode(user.jsonExt);
+			pairSys=ref(jsonExt.pairSys);
+			childArr=ref(pairSys.children);
+			
+			
+
+						
+			if(type==1)
+			{	
+				pairArr=pairSys.pairReqArr;
+				
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",1,pairArr)
+				);
+				return(0);//修改
+				
+			}else if(type==0)
+			{
+				sex=0;
+				grows=0;
+				hadChild=0;
+			
+				currentTime=time();	
+				
+				c=size(childArr);
+				i=0;while(i<c){
+					if(childArr[i].id==childID)
+					{
+						hadChild=1;
+						grows=childArr[i].grows;
+						sex=childArr[i].sex;
+						globalReqArr=ref(childArr[i].globalReqArr);	
+						reqTime=ref(childArr[i].globalReqTime);
+						
+						if(goldType==1)
+						{
+							//要用元宝100
+							needGold=100;
+							gold=ref(user.gold);
+							gold2=ref(user.gold2);
+							
+							if(number(gold)+number(gold2)<needGold)
+							{
+								//回复
+								game.sendMsg
+								(
+									sessionID,
+									arr(methodName+"Result",-5)//gold不足
+								);
+								return(0);//不修改
+								
+							}
+							
+							if(number(gold)<number(needGold))
+							{
+								gold2=number(gold2)-(number(needGold)-number(gold));
+								gold=0;
+							}else
+							{
+								gold=number(gold)-number(needGold);
+							}
+							
+							//流水
+							allGold=number(user.gold)+number(user.gold2);//元宝余额
+							game.saveResIO(userID,14,0,0,needGold,allGold);//姻缘祠刷新(type,itemID,（0=消耗，1=获得）,count,allGold)
+							
+							//获取信息
+							time=currentTime-3*24*60*60;
+
+							sql="select userID,genTime,nickname,name,grows,num,sex,skin,childID from unmarry_child where "+time+"<gentime and grows="+grows+" and sex!="+sex+" and userID!="+userID+" ORDER BY RAND() limit 3";
+							rs=mysqlCreateRs(game.cnn,sql);
+
+							reqTime=currentTime;
+							globalReqArr=arr();
+												
+							while(mysqlNextRow(rs))
+							{
+								PairReqMsg=dict();
+								PairReqMsg["userID"]=mysqlGetColVal(rs,0);
+								PairReqMsg["genTime"]=mysqlGetColVal(rs,1);
+								PairReqMsg["nickname"]=mysqlGetColVal(rs,2);	
+								PairReqMsg["name"]=mysqlGetColVal(rs,3);	
+								PairReqMsg["grows"]=mysqlGetColVal(rs,4);	
+								PairReqMsg["num"]=mysqlGetColVal(rs,5);	
+								PairReqMsg["sex"]=mysqlGetColVal(rs,6);	
+								PairReqMsg["skin"]=mysqlGetColVal(rs,7);	
+								PairReqMsg["childID"]=mysqlGetColVal(rs,8);		
+								
+								push(pairArr,PairReqMsg);
+								push(globalReqArr,PairReqMsg);
+							}
+							mysqlDestroyRs(rs);
+							
+							//保存
+							user.jsonExt=json_encode(jsonExt);
+							//回复
+							game.sendMsg
+							(
+								sessionID,
+								arr(methodName+"Result",1,globalReqArr,reqTime,gold,gold2)
+							);
+					
+							
+							return(1);//修改
+							
+						}else{
+							
+							if(currentTime-number(reqTime)<(60*60))
+							{
+								//回复
+								game.sendMsg
+								(
+									sessionID,
+									arr(methodName+"Result",1,globalReqArr,reqTime,)
+								);	
+								
+								return(0);
+								
+							}else
+							{
+								//获取信息
+								time=currentTime-3*24*60*60;
+
+								sql="select userID,genTime,nickname,name,grows,num,sex,skin,childID from unmarry_child where "+time+"<gentime and grows="+grows+" and sex!="+sex+" and userID!="+userID+" ORDER BY RAND() limit 3";
+								rs=mysqlCreateRs(game.cnn,sql);
+
+								reqTime=currentTime;
+								
+								globalReqArr=arr();
+													
+								while(mysqlNextRow(rs))
+								{
+									PairReqMsg=dict();
+									PairReqMsg["userID"]=mysqlGetColVal(rs,0);
+									PairReqMsg["genTime"]=mysqlGetColVal(rs,1);
+									PairReqMsg["nickname"]=mysqlGetColVal(rs,2);	
+									PairReqMsg["name"]=mysqlGetColVal(rs,3);	
+									PairReqMsg["grows"]=mysqlGetColVal(rs,4);	
+									PairReqMsg["num"]=mysqlGetColVal(rs,5);	
+									PairReqMsg["sex"]=mysqlGetColVal(rs,6);	
+									PairReqMsg["skin"]=mysqlGetColVal(rs,7);	
+									PairReqMsg["childID"]=mysqlGetColVal(rs,8);		
+									
+									push(pairArr,PairReqMsg);
+									push(globalReqArr,PairReqMsg);
+								}
+								mysqlDestroyRs(rs);
+								
+								//保存
+								user.jsonExt=json_encode(jsonExt);
+								//回复
+								game.sendMsg
+								(
+									sessionID,
+									arr(methodName+"Result",1,globalReqArr,reqTime)
+								);
+						
+								
+								return(1);//修改
+								
+								
+							}
+							
+						}								
+							
+							
+						
+					
+						
+						
+						break;
+					}
+					i++;
+				}
+				if(hadChild==0)
+				{
+					//回复孩子不存在
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",4)
+					);
+					return(0);
+					
+				}
+	
+				
+				
+			
+			}else
+			{
+				//没有类型
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-10)
+				);
+				return(0);
+				
+			}	
+
+
+
+	
+			
+		
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	
+	if(empty(user))
+	{
+		//不存在
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",-2)
+		);
+		exit();
+		
+	}	
+
+
+
+	

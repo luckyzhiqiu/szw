@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t29">19</v>
+<v t="n" n="__sys__t15">8</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">0</v>
+<v t="n" n="__sys__t4">0</v>
+<v t="n" n="__sys__t5">0</v>
+<v t="n" n="__sys__t6">10000</v>
+<o n="input"><o>__sys__t7</o><i>__sys__t1</i></o>
+<o n="="><o>self</o><i>__sys__t7</i></o>
+<o n="input"><o>__sys__t9</o><i>__sys__t2</i></o>
+<o n="="><o>heroArr</o><i>__sys__t9</i></o>
+<o n="=" r="728"><o>percent</o><i>__sys__t3</i></o>
+<o n="size" r="729"><o>__sys__t12</o><i>heroArr</i></o>
+<o n="=" r="729"><o>heroArrCount</o><i>__sys__t12</i></o>
+<o n="=" r="730"><o>i</o><i>__sys__t4</i></o>
+<o n="&lt;" r="730"><o>__sys__t16</o><i>i</i><i>heroArrCount</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t16</i></o>
+<o n="=="><o>__sys__t18</o><i>__sys__rt</i><i>__sys__t5</i></o>
+<o n="if_goto"><o>__sys__t19</o><i>__sys__t18</i><i>__sys__t29</i></o>
+<o n="[]" r="732"><o>__sys__t20</o><i>heroArr</i><i>i</i></o>
+<o n="=" r="732"><o>hero</o><i>__sys__t20</i></o>
+<v t="s" n="__sys__t23">.strengthAllPercent.</v>
+<o n="." r="733"><o>__sys__t22</o><i>hero</i><i>__sys__t23</i></o>
+<o n="/" r="733"><o>__sys__t25</o><i>__sys__t22</i><i>__sys__t6</i></o>
+<o n="+=" r="733"><o>percent</o><i>__sys__t25</i></o>
+<o n="++" r="734"><o>i</o><i>i</i></o>
+<o n="goto"><o>__sys__t28</o><i>__sys__t15</i></o>
+<o n="return" r="736"><o>__sys__t30</o><i>percent</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t12" />
+<v n="__sys__t16" />
+<v n="__sys__t18" />
+<v n="__sys__t19" />
+<v n="__sys__t20" />
+<v n="__sys__t22" />
+<v n="__sys__t25" />
+<v n="__sys__t28" />
+<v n="__sys__t30" />
+<v n="__sys__t7" />
+<v n="__sys__t9" />
+<v n="hero" />
+<v n="heroArr" />
+<v n="heroArrCount" />
+<v n="i" />
+<v n="percent" />
+<v n="self" />
+</script>

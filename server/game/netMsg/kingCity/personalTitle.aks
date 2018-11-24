@@ -1,0 +1,39 @@
+//个人信息-王爷称号®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+targetID=netMsg[3];//targetID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+targetUser=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+json=json_decode(targetUser.json);
+
+titleMap=json.titleMap;
+targetUser.json=json_encode(json);
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,titleMap)
+);
+
+if(empty(targetUser))//不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

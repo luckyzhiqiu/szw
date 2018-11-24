@@ -1,0 +1,2919 @@
+//判断阶段是否存在
+@def isStageExist<rushLoopTable,stage>
+	i=0;c=rushLoopTable.size();
+	while(i<c)
+	{
+		row=rushLoopTable.getRow(i);
+		if(row.getValFromColName("stage")==stage)
+		{
+			return(1);
+		}
+		++i;
+	}
+	return(0);
+@def.
+
+//获取阶段活动数组
+@def getStageActivity<rushLoopTable,stage>
+	map=dict();
+	i=0;c=rushLoopTable.size();
+	while(i<c)
+	{
+		row=rushLoopTable.getRow(i);
+		if(row.getValFromColName("stage")==stage)
+		{
+			activityID=int(row.getValFromColName("eventID"));
+			map[activityID]=dict
+			(
+				"id",activityID,
+				"bt",dateStrToSeconds(row.getValFromColName("bt")),
+				"dt",dateStrToSeconds(row.getValFromColName("dt")),
+				"rt",dateStrToSeconds(row.getValFromColName("rewardTime")),
+			);
+		}
+		++i;
+	}
+	return(map);
+@def.
+
+//判断阶段是否结束
+@def isStageEnd<varJson>
+	stageDt=time()-varJson.bt;//阶段已过时间
+	activityMap=varJson.activityMap;
+	rt=1;
+	foreach(activityMap,##<activityID,activity>
+		@link stageDt,rt;
+		dt=activity.bt+activity.dt+activity.rt;//活动占用总时长
+		if(stageDt<dt)//当前活动未结束
+		{
+			rt=0;
+			return(0);
+		}
+	##.);
+	return(rt);
+@def.
+
+//计算阶段持续时间
+@def getStageDt<activityMap>
+	maxDt=0;
+	foreach(activityMap,##<activityID,activity>
+		@link maxDt;
+		dt=activity.bt+activity.dt+activity.rt;//活动占用总时长
+		if(dt>maxDt)maxDt=dt;
+	##.);
+	return(maxDt);
+@def.
+
+//重置所有冲榜
+@def resetActivityRank<rdObj,gameConfig>
+	//势力冲榜
+	rankName=gameConfig.name+"_activityPowerRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	redis_del(rd,rankName);//删除原榜单
+	//亲密冲榜
+	rankName=gameConfig.name+"_activityIntimateRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	redis_del(rd,rankName);//删除原榜单
+	//论战冲榜
+	rankName=gameConfig.name+"_activityWaterRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	redis_del(rd,rankName);//删除原榜单
+	//联盟冲榜
+	rankName=gameConfig.name+"_activityUnionRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	redis_del(rd,rankName);//删除原榜单
+	///////////////////////////////////////////////////////////////////////
+	//银两冲榜
+	rankName=gameConfig.name+"_moneySubRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	redis_del(rd,rankName);//删除原榜单
+	//兵力冲榜
+	rankName=gameConfig.name+"_soldierSubRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	redis_del(rd,rankName);//删除原榜单
+	//关卡冲榜
+	rankName=gameConfig.name+"_barrierAddRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	redis_del(rd,rankName);//删除原榜单
+	//国子监冲榜
+	rankName=gameConfig.name+"_bookHouseAddRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	redis_del(rd,rankName);//删除原榜单
+	//子嗣冲榜
+	rankName=gameConfig.name+"_childAddRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	redis_del(rd,rankName);//删除原榜单
+	//召唤冲榜
+	rankName=gameConfig.name+"_fuckAddRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	redis_del(rd,rankName);//删除原榜单
+	//联姻冲榜
+	rankName=gameConfig.name+"_marryAddRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	redis_del(rd,rankName);//删除原榜单
+	//寻访冲榜
+	rankName=gameConfig.name+"_searchAddRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	redis_del(rd,rankName);//删除原榜单
+@def.
+
+//初始化所有冲榜
+@def initActivityRank<cnn,rdObj,gameConfig>
+	//当前活动阶段信息
+	rushLoopVar=rdObj.getRow(cnn,"global_var","name","rushLoop","*",1000);
+	rushLoopJson=json_decode(rushLoopVar.json);
+	rushLoopBt=rushLoopJson.bt;
+	//重置所有冲榜
+	resetActivityRank(rdObj,gameConfig);
+	//势力冲榜
+	rankName=gameConfig.name+"_activityPowerRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,powerAdd from user where powerAddBT="+rushLoopBt;
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+	//亲密冲榜
+	rankName=gameConfig.name+"_activityIntimateRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,intimateAdd from user where intimateAddBT="+rushLoopBt;
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+	//议政冲榜
+	rankName=gameConfig.name+"_activityWaterRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,waterBattleScoreAdd from user where waterBattleScoreAddBT="+rushLoopBt;
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+	//联盟冲榜
+	rankName=gameConfig.name+"_activityUnionRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,expAdd from `union` where expAddBT="+rushLoopBt;
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+	///////////////////////////////////////////////////////////////////////
+	//银两冲榜
+	rankName=gameConfig.name+"_moneySubRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,moneySub from user where moneySubBT="+rushLoopBt;
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+	//兵力冲榜
+	rankName=gameConfig.name+"_soldierSubRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,soldierSub from user where soldierSubBT="+rushLoopBt;
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+	//关卡冲榜
+	rankName=gameConfig.name+"_barrierAddRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,barrierAdd from user where barrierAddBT="+rushLoopBt;
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+	//国子监冲榜
+	rankName=gameConfig.name+"_bookHouseAddRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,bookHouseAdd from user where bookHouseAddBT="+rushLoopBt;
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+	//子嗣冲榜
+	rankName=gameConfig.name+"_childAddRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,childAdd from user where childAddBT="+rushLoopBt;
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+	//召唤冲榜
+	rankName=gameConfig.name+"_fuckAddRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,fuckAdd from user where fuckAddBT="+rushLoopBt;
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+	//联姻冲榜
+	rankName=gameConfig.name+"_marryAddRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,marryAdd from user where marryAddBT="+rushLoopBt;
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+	//寻访冲榜
+	rankName=gameConfig.name+"_searchAddRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,searchAdd from user where searchAddBT="+rushLoopBt;
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+@def.
+
+//任命新一代王爷
+@def modifWangInfo<cnn,rd,wangID,userID>
+	//修改王位信息
+	userData=dict();
+	rd.updateRow
+	(
+		cnn,"global_var","name","kingCity","*",
+		//修改回调
+		##<var,userData>
+			@link wangID,userID;
+			kingCityJson=json_decode(var.json);
+			wang=kingCityJson["wang"+wangID];
+			wang.userID=userID;
+			wang.chat="";
+			//保存
+			var.json=json_encode(kingCityJson);
+			return(1);//修改
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		userData,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	tableName="wang"+wangID;
+	sql="select userID from "+tableName+"  order by id desc limit 1";
+	kingEdID=0;
+	
+	rs=mysqlCreateRs(cnn,sql);
+	if(mysqlNextRow(rs))
+	{
+		kingEdID=int(mysqlGetColVal(rs,0));
+	}
+	mysqlDestroyRs(rs);
+	if(kingEdID!=userID && kingEdID!=0) //删除旧王爷-称号
+	{
+		rd.updateRow
+		(
+			cnn,"user","id",kingEdID,"*",
+			//修改回调
+			##<userEd,userData>
+				@link wangID;
+				userEdJson=json_decode(userEd.json);
+				titleMap=userEdJson.titleMap;//称号Dic
+				//keep
+				titleID=int(userEd.titleID);
+				if(titleID==wangID)
+				{
+					userEd.titleID=0;//称号Id
+					if(wangID==1)
+					{
+						if(userEd.fashionID==81)userEd.fashionID=0;
+					}
+					else if(wangID==2)
+					{
+						if(userEd.fashionID==82)userEd.fashionID=0;
+					}
+					else if(wangID==3)
+					{
+						if(userEd.fashionID==83)userEd.fashionID=0;
+					}
+					else if(wangID==4)
+					{
+						if(userEd.fashionID==84)userEd.fashionID=0;
+					}
+				}					
+				remove(titleMap,wangID);
+				//保存
+				userEd.json=json_encode(userEdJson);
+				return(1);//修改
+			##.,
+			//修改完成回调
+			##<row,userData>
+				//...
+			##.,
+			//解锁后回调
+			##<row,userData>
+				//...
+			##.,
+			userData,//自定义数据userData
+			1000//加锁时间（毫秒），例如：1000
+		);
+	}
+	
+	
+	user=rd.getRow(cnn,"user","id",userID,"*",1000);
+	//插入历任王爷列表
+	sql="insert into wang"+wangID+" set ";
+	sql+="genTime='"+now()+"'";
+	sql+=",userID="+userID;
+	sql+=",nickname='"+user.nickname+"'";
+	mysqlExec(cnn,sql);
+@def.
+
+//判断当前活动是否结算
+@def isActivitySave<oldActivityMap,activityID,varJson>
+	enter=0;
+	if(!exist(oldActivityMap,activityID))//首次活动
+	{
+		enter=1;
+	}
+	else if(oldActivityMap[activityID]!=varJson.bt)//当前活动未归档
+	{
+		enter=1;
+	}
+	return(enter);
+@def.
+
+//更新冲榜活动信息
+@def updateActivityInfo<game,varJson,cnn,rdObj,gameConfig>
+	modif=0;
+	activityMap=varJson.activityMap;
+	oldActivityMap=varJson.oldActivityMap;
+	foreach(activityMap,##<activityID,activity>
+		@link cnn,rdObj,gameConfig,oldActivityMap,varJson,game,modif;
+		if(activityID==1)//势力冲榜
+		{
+			state=game.activityMgr.getActivityStatus(activityID);
+			if(state>=2)//领奖中或活动结束
+			{
+				if(isActivitySave(oldActivityMap,activityID,varJson))
+				{
+					//任命新一代王爷
+					rankName=gameConfig.name+"_activityPowerRank";//排行榜名称
+					rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+					redis_zrevrange(rd,rankName,0,0,0,rankUserIDArr=arr());
+					if(size(rankUserIDArr)>0)
+					{
+						wangID=1;
+						userID=rankUserIDArr[0];
+						modifWangInfo(cnn,rdObj,wangID,userID);
+						trace("任命新王爷 activityID="+activityID);
+						//记录活动结束信息
+						oldActivityMap[activityID]=varJson.bt;
+					}
+					
+					modif=1;
+				}
+			}
+		}
+		else if(activityID==2)//亲密冲榜
+		{
+			state=game.activityMgr.getActivityStatus(activityID);
+			if(state>=2)//领奖中或活动结束
+			{
+				if(isActivitySave(oldActivityMap,activityID,varJson))
+				{
+					//任命新一代王爷
+					rankName=gameConfig.name+"_activityIntimateRank";//排行榜名称
+					rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+					redis_zrevrange(rd,rankName,0,0,0,rankUserIDArr=arr());
+					if(size(rankUserIDArr)>0)
+					{
+						wangID=2;
+						userID=rankUserIDArr[0];
+						modifWangInfo(cnn,rdObj,wangID,userID);
+						trace("任命新王爷 activityID="+activityID);
+						//记录活动结束信息
+						oldActivityMap[activityID]=varJson.bt;
+					}
+					
+					modif=1;
+				}
+			}
+			
+		}
+		else if(activityID==3)//论战冲榜
+		{
+			state=game.activityMgr.getActivityStatus(activityID);
+			if(state>=2)//领奖中或活动结束
+			{
+				if(isActivitySave(oldActivityMap,activityID,varJson))
+				{
+					//任命新一代王爷
+					rankName=gameConfig.name+"_activityWaterRank";//排行榜名称
+					rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+					redis_zrevrange(rd,rankName,0,0,0,rankUserIDArr=arr());
+					if(size(rankUserIDArr)>0)
+					{
+						wangID=3;
+						userID=rankUserIDArr[0];
+						modifWangInfo(cnn,rdObj,wangID,userID);
+						trace("任命新王爷 activityID="+activityID);
+						//记录活动结束信息
+						oldActivityMap[activityID]=varJson.bt;
+					}
+					
+					modif=1;
+				}
+			}
+			
+		}
+		else if(activityID==4)//联盟冲榜
+		{
+			state=game.activityMgr.getActivityStatus(activityID);
+			if(state>=2)//领奖中或活动结束
+			{
+				if(isActivitySave(oldActivityMap,activityID,varJson))
+				{
+					//任命新一代王爷
+					rankName=gameConfig.name+"_activityUnionRank";//排行榜名称
+					rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+					redis_zrevrange(rd,rankName,0,0,0,rankUnionIDArr=arr());
+					if(size(rankUnionIDArr)>0)
+					{
+						wangID=4;
+						unionID=rankUnionIDArr[0];
+						unionX=game.rd.getRow(cnn,"union","id",unionID,"*",1000);
+						userID=unionX.leaderUserID;//萌主ID
+						modifWangInfo(cnn,rdObj,wangID,userID);
+						trace("任命新王爷 activityID="+activityID);
+						//记录活动结束信息
+						oldActivityMap[activityID]=varJson.bt;
+					}
+					
+					modif=1;
+				}
+			}
+			
+		}
+	##.);
+	return(modif);
+@def.
+
+//初始化联盟开服建设榜
+@def initUnionBuildActivityRank<cnn,rdObj,gameConfig>
+	rankName=gameConfig.name+"_unionBuildActivityRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	unionIDArr=arr();
+	sql="select id,buildValTotal from `union` where buildValTotal>0";
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		unionID=int(mysqlGetColVal(rs,0));
+		score=int(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,unionID);
+	}
+	mysqlDestroyRs(rs);
+@def.
+
+//初始化塔战榜（过关斩将）
+@def initTowerBattleRank<cnn,rdObj,gameConfig>
+	rankName=gameConfig.name+"_towerBattleRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,towerMaxID from user where towerMaxID>0";
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+@def.
+
+//初始化宴会榜
+@def initPartyRank<cnn,rdObj,gameConfig>
+	rankName=gameConfig.name+"_partyRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,partyScore from user where partyScore>0";
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+@def.
+
+//初始化势力榜
+@def initPowerRank<cnn,rdObj,gameConfig>
+	rankName=gameConfig.name+"_powerRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,power from user";
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+@def.
+
+//初始化亲密榜
+@def initIntimateRank<cnn,rdObj,gameConfig>
+	rankName=gameConfig.name+"_intimateRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,intimate from user";
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+@def.
+
+//初始化关卡榜
+@def initChapterRank<cnn,rdObj,gameConfig>
+	rankName=gameConfig.name+"_chapterRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,chapterID,barrierID,sceneID from user";
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		chapterID=number(mysqlGetColVal(rs,1));
+		barrierID=number(mysqlGetColVal(rs,2));
+		sceneID=number(mysqlGetColVal(rs,3));
+		score=(chapterID*7+barrierID)*8+sceneID;
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+@def.
+
+//初始化论战积分榜
+@def initWaterBattleRank<cnn,rdObj,gameConfig,table>
+	systemOpenTab=table.systemOpen;
+	sysID=1;//议政厅
+	row=systemOpenTab.getRowFromColName("id",sysID);
+	level=int(row.getValFromColName("level"));
+	rankName=gameConfig.name+"_waterBattleRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,waterBattleScore from user where level>="+level;
+	//sql="select id,waterBattleScore from user";
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+@def.
+
+//初始化百废待兴积分榜
+@def initBuildActivityRank<cnn,rdObj,gameConfig>
+	rankName=gameConfig.name+"_buildActivityRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,buildActivityScoreTotal from user where buildActivityScoreTotal>0";
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+@def.
+
+//初始化日夜辑凶积分榜
+@def initWorldBossRank<cnn,rdObj,gameConfig>
+	rankName=gameConfig.name+"_WorldBossRank";//排行榜名称
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,worldBossScoreTotal from user where worldBossScoreTotal>0";
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+@def.
+
+//初始化日夜辑凶伤害积分榜
+@def initWorldBossHurtRank<cnn,rdObj,gameConfig>
+	rankName=gameConfig.name+"_WorldBossHurtRank";//排行榜名称
+	//删除旧榜
+	rdObj.delStr
+	(
+		rankName,
+		1000//加锁时间（毫秒），例如：1000
+	);
+	//重新创建
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	curDate=split(arr(),now()," ")[0];//当前日期字符串
+	sql="select id,worldBossHurt from user where worldBossHurtDate='"+curDate+"' and worldBossHurt>0";
+	// trace(sql);
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+@def.
+
+//循环活动阶段计划更新
+@def updateRushLoop<cnn,rd,gameConfig,rushLoopTable,game>
+	table=game.table;
+	userData=dict();
+	rd.updateRow
+	(
+		cnn,"global_var","name","rushLoop","*",
+		//修改回调
+		##<var,userData>
+			@link rushLoopTable,cnn,rd,gameConfig,table,game;
+			debug(var.json);
+			varJson=json_decode(var.json);
+			stage=varJson.stage;
+			//
+			gameServerVar=rd.getRow(cnn,"global_var","name","gameServer","*",1000);
+			gameServerJson=json_decode(gameServerVar.json);
+			if(gameServerJson.switch==0)//未开服
+			{
+				return(0);//不修改
+			}
+			else//已开服
+			{
+				if(gameServerJson.isResetStage)//需要重置阶段为0
+				{
+					stage=0;
+					rd.updateRow
+					(
+						cnn,"global_var","name","gameServer","*",
+						//修改回调
+						##<var,userData>
+							gameServerJson=json_decode(var.json);
+							gameServerJson.isResetStage=0;
+							//保存
+							var.json=json_encode(gameServerJson);
+							return(1);//修改
+						##.,
+						//修改完成回调
+						##<row,userData>
+							//...
+						##.,
+						//解锁后回调
+						##<row,userData>
+							//...
+						##.,
+						userData,//自定义数据userData
+						1000//加锁时间（毫秒），例如：1000
+					);
+				}
+			}
+			if(stage==0)//没有阶段
+			{
+				//读取开服时间
+				
+				bt=strtotime(gameServerJson.bt);
+				
+				//重置所有冲榜
+				resetActivityRank(rd,gameConfig);
+				
+				//设置为阶段1
+				stage=1;
+				varJson.bt=bt;
+				varJson.stage=stage;
+				varJson.activityMap=getStageActivity(rushLoopTable,stage);
+				varJson.dt=getStageDt(varJson.activityMap);
+				clean(varJson.oldActivityMap);
+				
+				//保存
+				var.json=json_encode(varJson);
+				
+				//修改
+				return(1);
+			}
+			else//存在阶段
+			{
+				//更新冲榜活动信息
+				modif=updateActivityInfo(game,varJson,cnn,rd,gameConfig);
+				if(isStageEnd(varJson))//当前阶段结束
+				{
+					//当前阶段结束结算
+					rushLoopReward(cnn,rd,table,gameConfig,game);//循环冲榜发奖励邮件
+					
+					//进入下一阶段
+					++stage;
+					if(!isStageExist(rushLoopTable,stage))stage=1;
+					
+					//重置所有冲榜
+					trace("重置所有冲榜");
+					resetActivityRank(rd,gameConfig);
+					
+					varJson.bt+=varJson.dt;//新阶段开始时间为旧阶段结束时间
+					varJson.stage=stage;
+					varJson.activityMap=getStageActivity(rushLoopTable,stage);
+					varJson.dt=getStageDt(varJson.activityMap);
+					modif=1;
+				}
+				if(modif)
+				{
+					//保存
+					var.json=json_encode(varJson);
+					return(1);
+				}
+			}
+			return(0);//不修改
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		userData,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+@def.
+
+//循环冲榜发奖励邮件（此函数阶段切换前、间隔若干时间时，均会调用）
+@def rushLoopReward<cnn,rd,table,gameConfig,game>
+	//发送冲榜奖励邮件
+	updateIntimateActivityReward(cnn,rd,table,gameConfig,game);//亲密冲榜发邮件奖励
+	updateBattleActivityReward(cnn,rd,table,gameConfig,game);//议政冲榜发邮件奖励
+	updatePowerActivityReward(cnn,rd,table,gameConfig,game);//势力冲榜发邮件奖励
+	updateUnionActivityReward(cnn,rd,table,gameConfig,game);//联萌冲榜邮件奖励
+	//发送小冲榜奖励邮件
+	updateWashMoneyActivityReward(cnn,rd,table,gameConfig,game);//银两冲榜邮件奖励
+	updateCasualtiesSoldierActivityReward(cnn,rd,table,gameConfig,game);//士兵冲榜邮件奖励
+	updateBarrierActivityReward(cnn,rd,table,gameConfig,game);//关卡冲榜邮件奖励
+	updateBookHouseActivityReward(cnn,rd,table,gameConfig,game);//国子监冲榜邮件奖励
+	updateAddChildActivityReward(cnn,rd,table,gameConfig,game);//子嗣冲榜邮件奖励
+	updateBeckonActivityReward(cnn,rd,table,gameConfig,game);//召唤冲榜邮件奖励
+	updateMarryActivityReward(cnn,rd,table,gameConfig,game);//联姻冲榜邮件奖励
+	updateSearchActivityReward(cnn,rd,table,gameConfig,game);//走访冲榜邮件奖励
+@def.
+
+//百废待兴活动更新
+@def updateBuildActivity<cnn,rd,gameConfig>
+	userData=dict();
+	rd.updateRow
+	(
+		cnn,"global_var","name","buildActivity","*",
+		//修改回调
+		##<var,userData>
+			@link cnn,rd,gameConfig;
+			debug(var.json);
+			varJson=json_decode(var.json);
+			curDate=split(arr(),now()," ")[0];
+			if(curDate!=varJson.updateDate)//需要更新
+			{
+				varJson.updateDate=curDate;
+				varJson.buildVal=0;//建设值清0
+				
+				//保存
+				var.json=json_encode(varJson);
+				
+				//修改
+				return(1);
+			}
+			
+			//不修改
+			return(0);
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		userData,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+@def.
+
+//群发邮件
+@def sendMail
+<
+	cnn,//mysql连接
+	userIDArr,//用户ID数组
+	title,//标题
+	body,//正文
+	soldier,//兵力
+	money,//银两
+	food,//粮草
+	gold,//元宝（充值）
+	gold2,//元宝（充值）
+	itemArr//物品奖励:itemID1,num1,itemID2,num2,...
+>
+	i=0;c=size(userIDArr);
+	while(i<c)
+	{
+		userID=userIDArr[i];
+		sendMailToPrivate(cnn,userID,title,body,soldier,money,food,gold,gold2,itemArr);
+		++i;
+	}
+@def.
+
+//单发邮件
+@def sendMailToPrivate
+<
+	cnn,//mysql连接
+	userID,//用户ID数组
+	title,//标题
+	body,//正文
+	soldier,//兵力
+	money,//银两
+	food,//粮草
+	gold,//元宝
+	gold2,//元宝（充值）
+	itemArr//物品奖励:itemID1,num1,itemID2,num2,...
+>
+	//userID=userIDArr[i];
+	tableName=createIDTable(cnn,"mail",userID);
+	curTime=now();//生成时间
+	sql="create table if not exists `"+tableName+"` like mail";
+	mysqlExec(cnn,sql);
+	sql="insert into "+tableName+" set genTime='"+curTime+"'";
+	sql+=",title='"+title+"'";
+	sql+=",body='"+body+"'";
+	sql+=",money="+money;
+	sql+=",food="+food;
+	sql+=",soldier="+soldier;
+	sql+=",gold="+gold;
+	sql+=",gold2="+gold2;
+	sql+=",item='"+itemArr+"'";
+	sql+=",`read`='"+0+"'";
+	sql+=",modifTime='"+0+"'";
+	mysqlExec(cnn,sql);
+@def.
+
+//世界BOSS系统更新
+@def updateWorldBoss<cnn,rd,table>
+
+	userData=dict();
+	rd.updateRow
+	(
+		cnn,"global_var","name","worldBoss","*",
+		//修改回调
+		##<var,userData>
+			@link cnn,rd,table,game;
+			
+			modifSign=0;
+			
+			//获取全局变量
+			globalJson=json_decode(var.json);
+			updateDate=ref(globalJson.updateDate);
+			hp=ref(globalJson.hp);
+			point=ref(globalJson.point);
+			killerUserID=ref(globalJson.killerUserID);
+			nickname=ref(globalJson.nickname);
+			killerLevel=ref(globalJson.killerLevel);
+			killerHead=ref(globalJson.killerHead);
+			days=ref(globalJson.level);
+			
+			hpMax=ref(globalJson.hpMax);
+			reward=ref(globalJson.reward);
+			nowTime=now();//今天时间
+			currentTime=strtotime(nowTime);
+			t=split(arr(),nowTime," ");
+			current_T=t[0];
+			
+			if(current_T!=updateDate)
+			{
+				updateDate=current_T;
+				
+				gameServer=rd.getRow(cnn,"global_var","name","gameServer","*",1000);
+				varJson=json_decode(gameServer.json);
+				openTime=varJson.bt;
+				switch_a=varJson.switch;
+				
+				if(switch_a==0)//未开服
+				{
+					return(0);
+				}
+				worldBossKillerTable=table.worldBossKiller;
+				num=worldBossKillerTable.size();
+
+				//重置BOSS
+				if(days==0)//初始化BOSS（首次重置）
+				{
+					days=1;
+					
+				}
+				else//重置
+				{
+					//days=ceil((number(currentTime)-strtotime(openTime))/(60*60*24));
+					
+					if(hp==0)//上次BOSS被打死
+					{
+						//BOSS升级
+						++days;
+						rowMax=worldBossKillerTable.getRow(worldBossKillerTable.size()-1);
+						
+						dayMax=int(rowMax.getValFromColName("day"));
+						
+						if(days>dayMax)days=dayMax;
+						
+						
+					}
+					else///上次BOSS没死
+					{
+						//BOSS降级
+						--days;
+						if(days<1)days=1;
+						
+						
+					}
+				}
+				// i=num-1;while(i>=0)
+				// {
+					// rowI=worldBossKillerTable.getRow(days);
+					rowI=worldBossKillerTable.getRowFromColName("day",days);
+					// if(number(days)>=number(rowI.getValFromColName("day")))
+					// {
+						hp=number(rowI.getValFromColName("life"));
+						point=number(rowI.getValFromColName("point"));
+						hpMax=number(rowI.getValFromColName("life"));
+						reward=0;
+						killerUserID=0;
+						nickname="";
+						killerLevel=0;
+						killerHead=0;
+						
+						// break;
+					// }
+					// i--;
+				// }
+				
+				//重置发送公告标记
+				globalJson.daySendMsg=0;
+				globalJson.nightSendMsg=0;
+				//
+				modifSign=1;//修改					
+			}
+			
+			worldBossConfig=table.worldBoss;
+			worldBossConfigRow=worldBossConfig.getRow(0);
+			dt=time()-strtotime(current_T);//今天已过的秒数
+			bt=dateStrToSeconds(worldBossConfigRow.getValFromColName("bt"));//日场开始时间（秒）
+			et=dateStrToSeconds(worldBossConfigRow.getValFromColName("dt"));//日场结束时间（秒）
+			bt2=dateStrToSeconds(worldBossConfigRow.getValFromColName("bt2"));//夜场开始时间（秒）
+			et2=dateStrToSeconds(worldBossConfigRow.getValFromColName("dt2"));//夜场结束时间（秒）
+			if(dt>=bt&&dt<=et&&globalJson.daySendMsg==0)//日场期间
+			{
+				//公告群发
+				worldSendMsg(game,0,"",0,0,0,"白夜缉凶侦查探案开启，请各位大人及时出发开始探案！",0,5);
+				
+				globalJson.daySendMsg=1;
+				
+				//保存
+				
+				modifSign=1;//修改
+			}
+			if(dt>=bt2&&dt<=et2 &&globalJson.nightSendMsg==0)//夜场期间
+			{
+				//公告群发
+				worldSendMsg(game,0,"",0,0,0,"白夜缉凶缉拿刺客开启，请各位大人及时捉拿！",0,5);
+				
+				globalJson.nightSendMsg=1;
+				modifSign=1;//修改
+			}
+			
+			if(modifSign)
+			{
+				//保存
+				var.json=json_encode(globalJson);
+			}
+			return(modifSign);	
+	
+		##.,
+		//修改完成回调
+		##<row,userData>
+			@link cnn,rd,gameConfig;
+			initWorldBossHurtRank(cnn,rd,gameConfig);
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		userData,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+@def.
+
+//势力冲榜发邮件奖励 
+@def updatePowerActivityReward<cnn,rd,table,gameConfig,game>
+	state=game.activityMgr.getActivityStatus(1);//势力活动
+	if(state==3)//到了发奖状态
+	{
+		//获取
+		rankName=gameConfig.name+"_activityPowerRank";//活动势力冲榜Name
+		rankRd=rd.getRedisObj(rankName);//排行榜所在的redis对象
+		rankTable=table.event1;//活动势力冲榜表
+		tableLength=rankTable.size();
+		mailTable=table.mail;
+		mailRow=mailTable.getRow(0);//活动势力
+		title=mailRow.getValFromColName("title");//title
+		body=mailRow.getValFromColName("body");//body
+		i=0;
+		userArrLength=0;
+		while(i<tableLength)
+		{
+			row=rankTable.getRow(i);
+			beginRank=number(row.getValFromColName("beginRank"));//开始名次
+			endRank=number(row.getValFromColName("endRank"));//结束名次
+			redis_zrevrange(rankRd,rankName,beginRank-1,endRank-1,0,rankUserIDArr=arr());
+			userArrLength=size(rankUserIDArr);
+			if(userArrLength==0)//排行榜空
+			{
+				exit();
+			}
+			else
+			{	
+				c=0;while(c<userArrLength)
+				{
+					unknownUser=rd.getRow(cnn,"user","id",rankUserIDArr[c],"*",1000);
+					powerReward=number(unknownUser.powerReward);//势力排名奖励领取标记
+					if(powerReward==0)//未领取
+					{
+						userData=dict();
+						rd.updateRow//修改
+						(
+							cnn,"user","id",rankUserIDArr[c],"*",
+							//修改回调
+							##<unknownUser,userData>
+								@link row;
+								playTitle=number(row.getValFromColName("title"));
+								json=json_decode(unknownUser.json);
+								if(playTitle!=0)
+								{
+									
+									titleMap=json.titleMap;//称号
+									titleMap[playTitle]=1;//value 有问题！！！
+								}
+								//keep
+								unknownUser.powerReward=1;
+								unknownUser.json=json_encode(json);
+								return(1);//修改
+							##.,
+							//修改完成回调
+							##<row,userData>
+								//...
+							##.,
+							//解锁后回调
+							##<row,userData>
+								//...
+							##.,
+							userData,//自定义数据userData
+							1000//加锁时间（毫秒），例如：1000
+						);
+						money=number(row.getValFromColName("money"));//money
+						food=number(row.getValFromColName("food"));//food
+						soldier=number(row.getValFromColName("soldier"));//soldier
+						gold=number(row.getValFromColName("gold"));//gold
+						item=row.getValFromColName("item");//gold
+						if(number(item)==0)
+						{
+							item="";
+						}
+						rankID=-1;
+						rankID=redis_zrevrank(rankRd,rankName,rankUserIDArr[c]);
+						sendMailToPrivate(cnn,rankUserIDArr[c],title,sprintf(body,rankID+1),soldier,money,food,0,gold,item);//发送邮件
+					}
+					c++;
+				}
+			}
+			i++;
+		}
+	}
+@def.
+//议政冲榜发邮件奖励 
+@def updateBattleActivityReward<cnn,rd,table,gameConfig,game>
+	state=game.activityMgr.getActivityStatus(3);//议政活动
+	if(state==3)//到了发奖状态
+	{
+		//获取
+		rankName=gameConfig.name+"_activityWaterRank";//活动议政冲榜Name
+		rankRd=rd.getRedisObj(rankName);//排行榜所在的redis对象
+		rankTable=table.event3;//活动议政冲榜表
+		tableLength=rankTable.size();
+		mailTable=table.mail;
+		mailRow=mailTable.getRow(1);//活动议政
+		title=mailRow.getValFromColName("title");//title
+		body=mailRow.getValFromColName("body");//body
+		i=0;
+		userArrLength=0;
+		while(i<tableLength)
+		{
+			row=rankTable.getRow(i);
+			beginRank=number(row.getValFromColName("beginRank"));//开始名次
+			endRank=number(row.getValFromColName("endRank"));//结束名次
+			redis_zrevrange(rankRd,rankName,beginRank-1,endRank-1,0,rankUserIDArr=arr());
+			userArrLength=size(rankUserIDArr);
+			if(userArrLength==0)//排行榜空
+			{
+				exit();
+			}
+			else
+			{	
+				c=0;while(c<userArrLength)
+				{
+					unknownUser=rd.getRow(cnn,"user","id",rankUserIDArr[c],"*",1000);
+					waterBattleScoreReward=number(unknownUser.waterBattleScoreReward);//议政排名奖励领取标记
+					if(waterBattleScoreReward==0)//未领取
+					{
+						userData=dict();
+						rd.updateRow//修改
+						(
+							cnn,"user","id",rankUserIDArr[c],"*",
+							//修改回调
+							##<unknownUser,userData>
+								@link row;
+								playTitle=number(row.getValFromColName("title"));
+								json=json_decode(unknownUser.json);
+								if(playTitle!=0)
+								{
+									
+									titleMap=json.titleMap;//称号
+									titleMap[playTitle]=0;
+								}
+								//keep
+								unknownUser.waterBattleScoreReward=1;
+								unknownUser.json=json_encode(json);
+								return(1);//修改
+							##.,
+							//修改完成回调
+							##<row,userData>
+								//...
+							##.,
+							//解锁后回调
+							##<row,userData>
+								//...
+							##.,
+							userData,//自定义数据userData
+							1000//加锁时间（毫秒），例如：1000
+						);
+						money=number(row.getValFromColName("money"));//money
+						food=number(row.getValFromColName("food"));//food
+						soldier=number(row.getValFromColName("soldier"));//soldier
+						gold=number(row.getValFromColName("gold"));//gold
+						item=row.getValFromColName("item");//gold
+						if(number(item)==0)
+						{
+							item="";
+						}
+						rankID=-1;
+						rankID=redis_zrevrank(rankRd,rankName,rankUserIDArr[c]);
+						//发送邮件
+						sendMailToPrivate(cnn,rankUserIDArr[c],title,sprintf(body,rankID+1),soldier,money,food,0,gold,item);
+					}
+					c++;
+				}
+			}
+			i++;
+		}
+	}
+@def.
+//亲密冲榜发邮件奖励 
+@def updateIntimateActivityReward<cnn,rd,table,gameConfig,game>
+	state=game.activityMgr.getActivityStatus(2);
+	if(state==3)//到了发奖状态
+	{
+		//获取
+		rankName=gameConfig.name+"_activityIntimateRank";//活动亲密冲榜Name
+		rankRd=rd.getRedisObj(rankName);//排行榜所在的redis对象
+		rankTable=table.event2;//活动亲密冲榜表
+		tableLength=rankTable.size();
+		mailTable=table.mail;
+		mailRow=mailTable.getRow(2);//活动亲密
+		title=mailRow.getValFromColName("title");//title
+		body=mailRow.getValFromColName("body");//body
+		i=0;
+		userArrLength=0;
+		while(i<tableLength)
+		{
+			row=rankTable.getRow(i);
+			beginRank=number(row.getValFromColName("beginRank"));//开始名次
+			endRank=number(row.getValFromColName("endRank"));//结束名次
+			redis_zrevrange(rankRd,rankName,beginRank-1,endRank-1,0,rankUserIDArr=arr());
+			userArrLength=size(rankUserIDArr);
+			if(userArrLength==0)//排行榜空
+			{
+				exit();
+			}
+			else
+			{	
+				c=0;while(c<userArrLength)
+				{
+					unknownUser=rd.getRow(cnn,"user","id",rankUserIDArr[c],"*",1000);
+					intimateReward=number(unknownUser.intimateReward);//亲密排名奖励领取标记
+					if(intimateReward==0)//未领取
+					{
+						userData=dict();
+						rd.updateRow//修改
+						(
+							cnn,"user","id",rankUserIDArr[c],"*",
+							//修改回调
+							##<unknownUser,userData>
+								@link row;
+								playTitle=number(row.getValFromColName("title"));
+								json=json_decode(unknownUser.json);
+								if(playTitle!=0)
+								{
+									
+									titleMap=json.titleMap;//称号
+									titleMap[playTitle]=0;
+								}
+								//keep
+								unknownUser.intimateReward=1;
+								unknownUser.json=json_encode(json);
+								return(1);//修改
+							##.,
+							//修改完成回调
+							##<row,userData>
+								//...
+							##.,
+							//解锁后回调
+							##<row,userData>
+								//...
+							##.,
+							userData,//自定义数据userData
+							1000//加锁时间（毫秒），例如：1000
+						);
+						money=number(row.getValFromColName("money"));//money
+						food=number(row.getValFromColName("food"));//food
+						soldier=number(row.getValFromColName("soldier"));//soldier
+						gold=number(row.getValFromColName("gold"));//gold
+						item=row.getValFromColName("item");//gold
+						if(number(item)==0)
+						{
+							item="";
+						}
+						rankID=-1;
+						rankID=redis_zrevrank(rankRd,rankName,rankUserIDArr[c]);
+						//发送邮件
+						sendMailToPrivate(cnn,rankUserIDArr[c],title,sprintf(body,rankID+1),soldier,money,food,0,gold,item);
+					}
+					c++;
+				}
+			}
+			i++;
+		}
+	}
+@def.
+
+//百废待兴个人发邮件奖励 
+@def updateBuildActivityReward<cnn,rd,table,gameConfig,game>
+	state=game.activityMgr.getBuildActivityStatus();
+	if(state==3)//到了发奖状态
+	{
+		//获取
+		rankName=gameConfig.name+"_buildActivityRank";//百废待兴积分榜Name
+		rankRd=rd.getRedisObj(rankName);//排行榜所在的redis对象
+		rankTable=table.buildEventRank;
+		tableLength=rankTable.size();
+		mailTable=table.mail;
+		mailRow=mailTable.getRow(4);//百废待兴
+		title=mailRow.getValFromColName("title");//title
+		body=mailRow.getValFromColName("body");//body
+		i=0;
+		userArrLength=0;
+		while(i<tableLength)
+		{
+			row=rankTable.getRow(i);
+			beginRank=number(row.getValFromColName("beginRank"));//开始名次
+			endRank=number(row.getValFromColName("endRank"));//结束名次
+			if(beginRank==endRank)
+			{
+				redis_zrevrange(rankRd,rankName,max(beginRank-1,0),endRank-1,0,rankUserIDArr=arr());
+			}
+			else
+			{
+				redis_zrevrange(rankRd,rankName,beginRank,endRank-1,0,rankUserIDArr=arr());
+			}
+			userArrLength=size(rankUserIDArr);
+			if(userArrLength==0)//排行榜空
+			{
+				exit();
+			}
+			else
+			{	
+				k=0;while(k<userArrLength)
+				{
+					userData=dict();
+					unknownUser=rd.getRow(cnn,"user","id",rankUserIDArr[k],"*",1000);
+					buildActivityRecvSign=number(unknownUser.buildActivityRecvSign);//排名奖励领取标记
+					if(buildActivityRecvSign==0)//未领取
+					{
+						rd.updateRow//修改
+						(
+							cnn,"user","id",rankUserIDArr[k],"*",
+							//修改回调
+							##<unknownUser,userData>
+							//@link buildActivityRecvSign;
+							unknownUser.buildActivityRecvSign=1;
+							return(1);//修改
+							##.,
+							//修改完成回调
+							##<row,userData>
+								//...
+							##.,
+							//解锁后回调
+							##<row,userData>
+								//...
+							##.,
+							userData,//自定义数据userData
+							1000//加锁时间（毫秒），例如：1000
+						);
+						money=number(row.getValFromColName("money"));//money
+						food=number(row.getValFromColName("food"));//food
+						soldier=number(row.getValFromColName("soldier"));//soldier
+						gold=number(row.getValFromColName("gold"));//gold
+						item=row.getValFromColName("item");//gold
+						if(number(item)==0)
+						{
+							item="";
+						}
+						rankID=-1;
+						rankID=redis_zrevrank(rankRd,rankName,rankUserIDArr[k]);
+						//发送邮件
+						sendMailToPrivate(cnn,rankUserIDArr[k],title,sprintf(body,rankID+1),soldier,money,food,0,gold,item);
+					}
+				k++;
+				}
+				
+			}
+			i++;
+		}
+	}
+@def.
+
+//联盟冲榜发邮件奖励 
+@def updateUnionActivityReward<cnn,rd,table,gameConfig,game>
+	state=game.activityMgr.getActivityStatus(4);
+	if(state==3)//到了发奖状态
+	{
+		//获取
+		rankName=gameConfig.name+"_activityUnionRank";//联萌榜Name
+		rankRd=rd.getRedisObj(rankName);//排行榜所在的redis对象
+		rankTable=table.event4;
+		tableLength=rankTable.size();
+		mailTable=table.mail;
+		mailRow=mailTable.getRow(3);//联萌冲榜
+		title=mailRow.getValFromColName("title");//title
+		body=mailRow.getValFromColName("body");//body
+		i=0;
+		unionIDArrLength=0;
+		while(i<tableLength)
+		{
+			row=rankTable.getRow(i);
+			beginRank=number(row.getValFromColName("beginRank"));//开始名次
+			endRank=number(row.getValFromColName("endRank"));//结束名次
+			if(beginRank==endRank)
+			{
+				redis_zrevrange(rankRd,rankName,max(beginRank-1,0),endRank-1,0,rankUnionIDArr=arr());
+			}
+			else
+			{
+				redis_zrevrange(rankRd,rankName,beginRank,endRank-1,0,rankUnionIDArr=arr());
+			}
+			unionIDArrLength=size(rankUnionIDArr);
+			if(unionIDArrLength==0)//排行榜空
+			{
+				exit();
+			}
+			else
+			{	
+				c=0;while(c<unionIDArrLength)
+				{
+					unionID=rankUnionIDArr[c];
+					unionObj=rd.getRow(cnn,"union","id",unionID,"*",1000);
+					//name=unionObj.name;
+					leaderUserID=int(unionObj.leaderUserID);
+					unionObjJson=json_decode(unionObj.json);
+					rewardUserIDMap=unionObjJson.rewardUserIDMap;
+					unionObj.json=json_encode(unionObjJson);
+					sql="select id from user where unionID="+rankUnionIDArr[c]; 
+					rs=mysqlCreateRs(cnn,sql);
+					userIDArr=arr();
+					while(mysqlNextRow(rs))
+					{
+						push(userIDArr,int(mysqlGetColVal(rs,0)));
+					}
+					mysqlDestroyRs(rs);
+					j=0;userIDArrLength=size(userIDArr);
+					while(j<userIDArrLength)
+					{
+						rankID=-1;
+						// k=0;while(k<unionIDArrLength)
+						// {
+						rankID=redis_zrevrank(rankRd,rankName,rankUnionIDArr[c]);
+					
+						//发送邮件
+						userData=dict();
+						rd.updateRow//修改
+						(
+							cnn,"user","id",userIDArr[j],"*",
+							//修改回调
+							##<unknownUser,userData>
+							@link cnn,row,leaderUserID,title,body,rankID,userIDArr,j,rd,rewardUserIDMap;//,unionObj;
+							unionID=unknownUser.unionID;
+							unionObj=rd.getRow(cnn,"union","id",unionID,"*",1000);
+							unknownUserJson=json_decode(unknownUser.json);
+							if(userIDArr[j]==leaderUserID)//会长
+							{
+								if(exist(rewardUserIDMap,userIDArr[j]))//已领取
+								{
+									return(0);
+								}
+								else//未领取
+								{
+									money=number(row.getValFromColName("money"));//money
+									food=number(row.getValFromColName("food"));//food
+									soldier=number(row.getValFromColName("soldier"));//soldier
+									gold=number(row.getValFromColName("gold"));//gold
+									item=row.getValFromColName("item");//item
+									playTitle=number(row.getValFromColName("title"));//title
+									if(number(item)==0)
+									{
+										item="";
+									}
+									if(playTitle!=0)
+									{
+										
+										titleMap=unknownUserJson.titleMap;//称号
+										titleMap[playTitle]=1;//value 有问题！！！
+									}
+									sendMailToPrivate(cnn,userIDArr[j],title,sprintf(body,rankID+1),soldier,money,food,0,gold,item);//发送邮件	
+								}
+							}
+							else
+							{
+								if(exist(rewardUserIDMap,userIDArr[j]))//已领取
+								{
+									return(0);
+								}
+								else//未领取
+								{
+									moneys=number(row.getValFromColName("money2"));//money
+									foods=number(row.getValFromColName("food2"));//food
+									soldiers=number(row.getValFromColName("soldier2"));//soldier
+									golds=number(row.getValFromColName("gold2"));//gold
+									items=row.getValFromColName("item2");//item
+									if(number(items)==0)
+									{
+										items="";
+									}
+									sendMailToPrivate(cnn,userIDArr[j],title,sprintf(body,rankID+1),soldiers,moneys,foods,0,golds,items);//发送邮件
+								}
+								
+							}
+							
+							unknownUser.json=json_encode(unknownUserJson);
+							return(1);//修改
+							##.,
+							//修改完成回调
+							##<row,userData>
+								//...
+							##.,
+							//解锁后回调
+							##<row,userData>
+								//...
+							##.,
+							userData,//自定义数据userData
+							1000//加锁时间（毫秒），例如：1000
+						);
+					
+						rd.updateRow//修改
+						(
+							cnn,"union","id",unionID,"*",
+							//修改回调
+							##<unknownUnion,userData>
+								@link userIDArr,j;
+								unknownUnionJson=json_decode(unknownUnion.json);
+								unknownUnionJson.rewardUserIDMap[userIDArr[j]]=0;
+								unknownUnion.json=json_encode(unknownUnionJson);
+								return(1);//修改
+							##.,
+							//修改完成回调
+							##<row,userData>
+								//...
+							##.,
+							//解锁后回调
+							##<row,userData>
+								//...
+							##.,
+							userData,//自定义数据userData
+							1000//加锁时间（毫秒），例如：1000
+						);
+							//userData=dict();
+							// k++;
+						// }
+						j++;
+					}
+					c++;
+				}
+				
+			}
+			i++;
+		}
+	}
+@def.
+
+//百废待兴联盟发邮件奖励 
+@def updateUnionBuildActivityReward<cnn,rd,table,gameConfig,game>
+	state=game.activityMgr.getBuildActivityStatus();
+	if(state==3)//到了发奖状态
+	{
+		buildActivityVar=rd.getRow(cnn,"global_var","name","buildActivity","*",1000);
+		buildActivityJson=json_decode(buildActivityVar.json);
+		if(!buildActivityJson.sendMailComplete)//未发完邮件
+		{
+			//获取
+			rankName=gameConfig.name+"_unionBuildActivityRank";//百废待兴联萌榜Name
+			rankRd=rd.getRedisObj(rankName);//排行榜所在的redis对象
+			rankTable=table.buildEventRankGuild;
+			tableLength=rankTable.size();
+			mailTable=table.mail;
+			mailRow=mailTable.getRow(5);//百废待兴
+			title=mailRow.getValFromColName("title");//title
+			body=mailRow.getValFromColName("body");//body
+			i=0;
+			unionIDArrLength=0;
+			while(i<tableLength)
+			{
+				row=rankTable.getRow(i);
+				beginRank=number(row.getValFromColName("beginRank"));//开始名次
+				endRank=number(row.getValFromColName("endRank"));//结束名次
+				if(beginRank==endRank)
+				{
+					redis_zrevrange(rankRd,rankName,max(beginRank-1,0),endRank-1,0,rankUnionIDArr=arr());
+				}
+				else
+				{
+					redis_zrevrange(rankRd,rankName,beginRank,endRank-1,0,rankUnionIDArr=arr());
+				}
+				unionIDArrLength=size(rankUnionIDArr);
+				if(unionIDArrLength==0)//排行榜空
+				{
+					break;
+				}
+				else
+				{	
+					c=0;while(c<unionIDArrLength)
+					{
+						unionID=rankUnionIDArr[c];
+						unionObj=rd.getRow(cnn,"union","id",unionID,"*",1000);
+						name=unionObj.name;
+						leaderUserID=int(unionObj.leaderUserID);
+						
+						sql="select id from user where unionID="+rankUnionIDArr[c]; 
+						rs=mysqlCreateRs(cnn,sql);
+						userIDArr=arr();
+						while(mysqlNextRow(rs))
+						{
+							push(userIDArr,int(mysqlGetColVal(rs,0)));
+						}
+						mysqlDestroyRs(rs);
+						j=0;userIDArrLength=size(userIDArr);
+						while(j<userIDArrLength)
+						{
+							rankID=-1;
+							// k=0;while(k<unionIDArrLength)
+							// {
+							rankID=redis_zrevrank(rankRd,rankName,rankUnionIDArr[c]);
+							
+							//发送邮件
+							userData=dict();
+							rd.updateRow//修改
+							(
+								cnn,"user","id",userIDArr[j],"*",
+								//修改回调
+								##<unknownUser,userData>
+									@link cnn,row,leaderUserID,title,body,name,rankID,userIDArr,j;
+									// arr=arr();
+									// push(arr,userIDArr[j]);
+									if(userIDArr[j]==leaderUserID)//会长
+									{
+										if(number(unknownUser.buildActivityUnionRecvSign)!=0)//以读
+										{
+											return(0);
+										}
+										else
+										{
+											money=number(row.getValFromColName("money"));//money
+											food=number(row.getValFromColName("food"));//food
+											soldier=number(row.getValFromColName("soldier"));//soldier
+											gold=number(row.getValFromColName("gold"));//gold
+											item=row.getValFromColName("item");//item
+											if(number(item)==0)
+											{
+												item="";
+											}
+											sendMailToPrivate(cnn,userIDArr[j],title,sprintf(body,name,rankID+1),soldier,money,food,0,gold,item);//发送邮件	
+										}
+									}
+									else
+									{
+										if(number(unknownUser.buildActivityUnionRecvSign)!=0)//以读
+										{
+											return(0);
+										}
+										else
+										{
+											moneys=number(row.getValFromColName("money2"));//money
+											foods=number(row.getValFromColName("food2"));//food
+											soldiers=number(row.getValFromColName("soldier2"));//soldier
+											golds=number(row.getValFromColName("gold2"));//gold
+											items=row.getValFromColName("item2");//item
+											if(number(items)==0)
+											{
+												items="";
+											}
+											sendMailToPrivate(cnn,userIDArr[j],title,sprintf(body,name,rankID+1),soldiers,moneys,foods,0,golds,items);//发送邮件	
+										}
+									}
+									unknownUser.buildActivityUnionRecvSign=1;
+									return(1);//修改
+								##.,
+								//修改完成回调
+								##<row,userData>
+									//...
+								##.,
+								//解锁后回调
+								##<row,userData>
+									//...
+								##.,
+								userData,//自定义数据userData
+								1000//加锁时间（毫秒），例如：1000
+							);
+								// k++;
+							// }
+							//userData=dict();
+							j++;
+						}
+						c++;
+					}
+					
+				}
+				i++;
+			}
+			
+			//标记发邮件完成
+			userData=dict();
+			rd.updateRow
+			(
+				cnn,"global_var","name","buildActivity","*",
+				//修改回调
+				##<var,userData>
+					varJson=json_decode(var.json);
+					//保存
+					varJson.sendMailComplete=1;
+					var.json=json_encode(varJson);
+					return(1);//修改
+				##.,
+				//修改完成回调
+				##<row,userData>
+					//...
+				##.,
+				//解锁后回调
+				##<row,userData>
+					//...
+				##.,
+				userData,//自定义数据userData
+				1000//加锁时间（毫秒），例如：1000
+			);
+		}
+	}
+@def.
+
+//世界BOSS系统发邮件奖励
+@def updateWorldBossReward<cnn,rdObj,table,gameConfig>
+	bt=strtotime(split(arr(),now()," ")[0]);
+	ct=time()-bt;//今日已过秒数
+	worldBossTable=table.worldBoss;
+	worldBossRow=worldBossTable.getRow(0);
+	et=dateStrToSeconds(worldBossRow.getValFromColName("dt2"));//endTime
+	if(ct>=et)//到了发奖时间
+	{
+		//获取全局变量
+		varName="worldBoss";
+		var=rdObj.getRow(cnn,"global_var","name",varName,"*",1000);
+		varJson=json_decode(var.json);
+		reward=number(varJson.reward);//发邮件奖励标记
+		var.json=json_encode(varJson);
+		if(reward==0)
+		{
+			//修改王位信息
+			userData=dict();
+			rdObj.updateRow
+			(
+				cnn,"global_var","name","worldBoss","*",
+				//修改回调
+				##<var,userData>
+					varJson=json_decode(var.json);
+					//保存
+					varJson.reward=1;
+					var.json=json_encode(varJson);
+					return(1);//修改
+				##.,
+				//修改完成回调
+				##<row,userData>
+					//...
+				##.,
+				//解锁后回调
+				##<row,userData>
+					//...
+				##.,
+				userData,//自定义数据userData
+				1000//加锁时间（毫秒），例如：1000
+			);
+			i=0;
+			//获取
+			rankName=gameConfig.name+"_WorldBossHurtRank";//白夜缉凶伤害排行榜名称
+			rankRd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+			rankTable=table.worldBossRankReward;
+			tableLength=rankTable.size();
+			userArrLength=0;
+			mailTable=table.mail;
+			mailRow=mailTable.getRow(6);//白夜缉凶
+			title=mailRow.getValFromColName("title");//title
+			body=mailRow.getValFromColName("body");//body
+			while(i<tableLength)
+			{
+				row=rankTable.getRow(i);
+				beginRank=number(row.getValFromColName("beginRank"));//开始名次
+				endRank=number(row.getValFromColName("endRank"));//结束名次
+				if(beginRank==endRank)
+				{
+					redis_zrevrange(rankRd,rankName,max(beginRank-1,0),endRank-1,0,rankUserIDArr=arr());
+				}
+				else
+				{
+					redis_zrevrange(rankRd,rankName,beginRank,endRank-1,0,rankUserIDArr=arr());
+				}
+				userArrLength=size(rankUserIDArr);
+				c=0;while(c<userArrLength)
+				{
+					money=number(row.getValFromColName("money"));//money
+					food=number(row.getValFromColName("food"));//food
+					soldier=number(row.getValFromColName("soldier"));//soldier
+					gold=number(row.getValFromColName("gold"));//gold
+					item=row.getValFromColName("item");//gold
+					if(number(item)==0)
+					{
+						item="";
+					}
+					rankID=-1;
+					rankID=redis_zrevrank(rankRd,rankName,rankUserIDArr[c]);
+					sendMailToPrivate(cnn,rankUserIDArr[c],title,sprintf(body,rankID+1),soldier,money,food,0,gold,item);//发送邮件
+					c++;
+				}
+			i++;
+			}
+		}
+	}
+@def.
+
+//银两冲榜发邮件奖励 
+@def updateWashMoneyActivityReward<cnn,rd,table,gameConfig,game>
+	state=game.activityMgr.getActivityStatus(201);//银两活动
+	if(state==3)//到了发奖状态
+	{
+		//获取
+		rankName=gameConfig.name+"_moneySubRank";//活动银两冲榜Name
+		rankRd=rd.getRedisObj(rankName);//排行榜所在的redis对象
+		rankTable=table.event201;//活动银两冲榜表
+		tableLength=rankTable.size();
+		mailTable=table.mail;
+		mailRow=mailTable.getRow(13);//活动银两
+		title=mailRow.getValFromColName("title");//title
+		body=mailRow.getValFromColName("body");//body
+		i=0;
+		userArrLength=0;
+		while(i<tableLength)
+		{
+			row=rankTable.getRow(i);
+			beginRank=number(row.getValFromColName("beginRank"));//开始名次
+			endRank=number(row.getValFromColName("endRank"));//结束名次
+			redis_zrevrange(rankRd,rankName,beginRank-1,endRank-1,0,rankUserIDArr=arr());
+			userArrLength=size(rankUserIDArr);
+			if(userArrLength==0)//排行榜空
+			{
+				exit();
+			}
+			else
+			{	
+				c=0;while(c<userArrLength)
+				{
+					unknownUser=rd.getRow(cnn,"user","id",rankUserIDArr[c],"*",1000);
+					moneySubReward=number(unknownUser.moneySubReward);//银两排名奖励领取标记
+					if(moneySubReward==0)//未领取
+					{
+						userData=dict();
+						rd.updateRow//修改
+						(
+							cnn,"user","id",rankUserIDArr[c],"*",
+							//修改回调
+							##<unknownUser,userData>
+								@link row;
+								playTitle=number(row.getValFromColName("title"));
+								json=json_decode(unknownUser.json);
+								if(playTitle!=0)
+								{
+									
+									titleMap=json.titleMap;//称号
+									titleMap[playTitle]=0;
+								}
+								//keep
+								unknownUser.moneySubReward=1;
+								unknownUser.json=json_encode(json);
+								return(1);//修改
+							##.,
+							//修改完成回调
+							##<row,userData>
+								//...
+							##.,
+							//解锁后回调
+							##<row,userData>
+								//...
+							##.,
+							userData,//自定义数据userData
+							1000//加锁时间（毫秒），例如：1000
+						);
+						money=number(row.getValFromColName("money"));//money
+						food=number(row.getValFromColName("food"));//food
+						soldier=number(row.getValFromColName("soldier"));//soldier
+						gold=number(row.getValFromColName("gold"));//gold
+						item=row.getValFromColName("item");//gold
+						if(number(item)==0)
+						{
+							item="";
+						}
+						rankID=-1;
+						rankID=redis_zrevrank(rankRd,rankName,rankUserIDArr[c]);
+						sendMailToPrivate(cnn,rankUserIDArr[c],title,sprintf(body,rankID+1),soldier,money,food,0,gold,item);//发送邮件
+					}
+					c++;
+				}
+			}
+			i++;
+		}
+	}
+@def.
+
+//士兵冲榜发邮件奖励 
+@def updateCasualtiesSoldierActivityReward<cnn,rd,table,gameConfig,game>
+	state=game.activityMgr.getActivityStatus(202);//士兵活动
+	if(state==3)//到了发奖状态
+	{
+		//获取
+		rankName=gameConfig.name+"_soldierSubRank";//活动士兵冲榜Name
+		rankRd=rd.getRedisObj(rankName);//排行榜所在的redis对象
+		rankTable=table.event202;//活动士兵冲榜表
+		tableLength=rankTable.size();
+		mailTable=table.mail;
+		mailRow=mailTable.getRow(14);//活动士兵
+		title=mailRow.getValFromColName("title");//title
+		body=mailRow.getValFromColName("body");//body
+		i=0;
+		userArrLength=0;
+		while(i<tableLength)
+		{
+			row=rankTable.getRow(i);
+			beginRank=number(row.getValFromColName("beginRank"));//开始名次
+			endRank=number(row.getValFromColName("endRank"));//结束名次
+			redis_zrevrange(rankRd,rankName,beginRank-1,endRank-1,0,rankUserIDArr=arr());
+			userArrLength=size(rankUserIDArr);
+			if(userArrLength==0)//排行榜空
+			{
+				exit();
+			}
+			else
+			{	
+				c=0;while(c<userArrLength)
+				{
+					unknownUser=rd.getRow(cnn,"user","id",rankUserIDArr[c],"*",1000);
+					soldierSubReward=number(unknownUser.soldierSubReward);//士兵排名奖励领取标记
+					if(soldierSubReward==0)//未领取
+					{
+						userData=dict();
+						rd.updateRow//修改
+						(
+							cnn,"user","id",rankUserIDArr[c],"*",
+							//修改回调
+							##<unknownUser,userData>
+								@link row;
+								playTitle=number(row.getValFromColName("title"));
+								json=json_decode(unknownUser.json);
+								if(playTitle!=0)
+								{
+									
+									titleMap=json.titleMap;//称号
+									titleMap[playTitle]=0;
+								}
+								//keep
+								unknownUser.soldierSubReward=1;
+								unknownUser.json=json_encode(json);
+								return(1);//修改
+							##.,
+							//修改完成回调
+							##<row,userData>
+								//...
+							##.,
+							//解锁后回调
+							##<row,userData>
+								//...
+							##.,
+							userData,//自定义数据userData
+							1000//加锁时间（毫秒），例如：1000
+						);
+						money=number(row.getValFromColName("money"));//money
+						food=number(row.getValFromColName("food"));//food
+						soldier=number(row.getValFromColName("soldier"));//soldier
+						gold=number(row.getValFromColName("gold"));//gold
+						item=row.getValFromColName("item");//gold
+						if(number(item)==0)
+						{
+							item="";
+						}
+						rankID=-1;
+						rankID=redis_zrevrank(rankRd,rankName,rankUserIDArr[c]);
+						sendMailToPrivate(cnn,rankUserIDArr[c],title,sprintf(body,rankID+1),soldier,money,food,0,gold,item);//发送邮件
+					}
+					c++;
+				}
+			}
+			i++;
+		}
+	}
+@def.
+
+//关卡冲榜发邮件奖励 
+@def updateBarrierActivityReward<cnn,rd,table,gameConfig,game>
+	state=game.activityMgr.getActivityStatus(203);//关卡活动
+	if(state==3)//到了发奖状态
+	{
+		//获取
+		rankName=gameConfig.name+"_barrierAddRank";//活动关卡冲榜Name
+		rankRd=rd.getRedisObj(rankName);//排行榜所在的redis对象
+		rankTable=table.event203;//活动关卡冲榜表
+		tableLength=rankTable.size();
+		mailTable=table.mail;
+		mailRow=mailTable.getRow(15);//活动关卡
+		title=mailRow.getValFromColName("title");//title
+		body=mailRow.getValFromColName("body");//body
+		i=0;
+		userArrLength=0;
+		while(i<tableLength)
+		{
+			row=rankTable.getRow(i);
+			beginRank=number(row.getValFromColName("beginRank"));//开始名次
+			endRank=number(row.getValFromColName("endRank"));//结束名次
+			redis_zrevrange(rankRd,rankName,beginRank-1,endRank-1,0,rankUserIDArr=arr());
+			userArrLength=size(rankUserIDArr);
+			if(userArrLength==0)//排行榜空
+			{
+				exit();
+			}
+			else
+			{	
+				c=0;while(c<userArrLength)
+				{
+					unknownUser=rd.getRow(cnn,"user","id",rankUserIDArr[c],"*",1000);
+					barrierAddReward=number(unknownUser.barrierAddReward);//关卡排名奖励领取标记
+					if(barrierAddReward==0)//未领取
+					{
+						userData=dict();
+						rd.updateRow//修改
+						(
+							cnn,"user","id",rankUserIDArr[c],"*",
+							//修改回调
+							##<unknownUser,userData>
+								@link row;
+								playTitle=number(row.getValFromColName("title"));
+								json=json_decode(unknownUser.json);
+								if(playTitle!=0)
+								{
+									
+									titleMap=json.titleMap;//称号
+									titleMap[playTitle]=0;
+								}
+								//keep
+								unknownUser.barrierAddReward=1;
+								unknownUser.json=json_encode(json);
+								return(1);//修改
+							##.,
+							//修改完成回调
+							##<row,userData>
+								//...
+							##.,
+							//解锁后回调
+							##<row,userData>
+								//...
+							##.,
+							userData,//自定义数据userData
+							1000//加锁时间（毫秒），例如：1000
+						);
+						money=number(row.getValFromColName("money"));//money
+						food=number(row.getValFromColName("food"));//food
+						soldier=number(row.getValFromColName("soldier"));//soldier
+						gold=number(row.getValFromColName("gold"));//gold
+						item=row.getValFromColName("item");//gold
+						if(number(item)==0)
+						{
+							item="";
+						}
+						rankID=-1;
+						rankID=redis_zrevrank(rankRd,rankName,rankUserIDArr[c]);
+						sendMailToPrivate(cnn,rankUserIDArr[c],title,sprintf(body,rankID+1),soldier,money,food,0,gold,item);//发送邮件
+					}
+					c++;
+				}
+			}
+			i++;
+		}
+	}
+@def.
+
+//国子监冲榜发邮件奖励 
+@def updateBookHouseActivityReward<cnn,rd,table,gameConfig,game>
+	state=game.activityMgr.getActivityStatus(204);//国子监活动
+	if(state==3)//到了发奖状态
+	{
+		//获取
+		rankName=gameConfig.name+"_bookHouseAddRank";//活动国子监冲榜Name
+		rankRd=rd.getRedisObj(rankName);//排行榜所在的redis对象
+		rankTable=table.event204;//活动国子监冲榜表
+		tableLength=rankTable.size();
+		mailTable=table.mail;
+		mailRow=mailTable.getRow(16);//活动国子监
+		title=mailRow.getValFromColName("title");//title
+		body=mailRow.getValFromColName("body");//body
+		i=0;
+		userArrLength=0;
+		while(i<tableLength)
+		{
+			row=rankTable.getRow(i);
+			beginRank=number(row.getValFromColName("beginRank"));//开始名次
+			endRank=number(row.getValFromColName("endRank"));//结束名次
+			redis_zrevrange(rankRd,rankName,beginRank-1,endRank-1,0,rankUserIDArr=arr());
+			userArrLength=size(rankUserIDArr);
+			if(userArrLength==0)//排行榜空
+			{
+				exit();
+			}
+			else
+			{	
+				c=0;while(c<userArrLength)
+				{
+					unknownUser=rd.getRow(cnn,"user","id",rankUserIDArr[c],"*",1000);
+					bookHouseAddReward=number(unknownUser.bookHouseAddReward);//国子监排名奖励领取标记
+					if(bookHouseAddReward==0)//未领取
+					{
+						userData=dict();
+						rd.updateRow//修改
+						(
+							cnn,"user","id",rankUserIDArr[c],"*",
+							//修改回调
+							##<unknownUser,userData>
+								@link row;
+								playTitle=number(row.getValFromColName("title"));
+								json=json_decode(unknownUser.json);
+								if(playTitle!=0)
+								{
+									
+									titleMap=json.titleMap;//称号
+									titleMap[playTitle]=0;
+								}
+								//keep
+								unknownUser.bookHouseAddReward=1;
+								unknownUser.json=json_encode(json);
+								return(1);//修改
+							##.,
+							//修改完成回调
+							##<row,userData>
+								//...
+							##.,
+							//解锁后回调
+							##<row,userData>
+								//...
+							##.,
+							userData,//自定义数据userData
+							1000//加锁时间（毫秒），例如：1000
+						);
+						money=number(row.getValFromColName("money"));//money
+						food=number(row.getValFromColName("food"));//food
+						soldier=number(row.getValFromColName("soldier"));//soldier
+						gold=number(row.getValFromColName("gold"));//gold
+						item=row.getValFromColName("item");//gold
+						if(number(item)==0)
+						{
+							item="";
+						}
+						rankID=-1;
+						rankID=redis_zrevrank(rankRd,rankName,rankUserIDArr[c]);
+						sendMailToPrivate(cnn,rankUserIDArr[c],title,sprintf(body,rankID+1),soldier,money,food,0,gold,item);//发送邮件
+					}
+					c++;
+				}
+			}
+			i++;
+		}
+	}
+@def.
+
+//子嗣冲榜发邮件奖励 
+@def updateAddChildActivityReward<cnn,rd,table,gameConfig,game>
+	state=game.activityMgr.getActivityStatus(205);//子嗣活动
+	if(state==3)//到了发奖状态
+	{
+		//获取
+		rankName=gameConfig.name+"_childAddRank";//活动子嗣冲榜Name
+		rankRd=rd.getRedisObj(rankName);//排行榜所在的redis对象
+		rankTable=table.event205;//活动子嗣冲榜表
+		tableLength=rankTable.size();
+		mailTable=table.mail;
+		mailRow=mailTable.getRow(17);//活动子嗣
+		title=mailRow.getValFromColName("title");//title
+		body=mailRow.getValFromColName("body");//body
+		i=0;
+		userArrLength=0;
+		while(i<tableLength)
+		{
+			row=rankTable.getRow(i);
+			beginRank=number(row.getValFromColName("beginRank"));//开始名次
+			endRank=number(row.getValFromColName("endRank"));//结束名次
+			redis_zrevrange(rankRd,rankName,beginRank-1,endRank-1,0,rankUserIDArr=arr());
+			userArrLength=size(rankUserIDArr);
+			if(userArrLength==0)//排行榜空
+			{
+				exit();
+			}
+			else
+			{	
+				c=0;while(c<userArrLength)
+				{
+					unknownUser=rd.getRow(cnn,"user","id",rankUserIDArr[c],"*",1000);
+					childAddReward=number(unknownUser.childAddReward);//子嗣排名奖励领取标记
+					if(childAddReward==0)//未领取
+					{
+						userData=dict();
+						rd.updateRow//修改
+						(
+							cnn,"user","id",rankUserIDArr[c],"*",
+							//修改回调
+							##<unknownUser,userData>
+								@link row;
+								playTitle=number(row.getValFromColName("title"));
+								json=json_decode(unknownUser.json);
+								if(playTitle!=0)
+								{
+									
+									titleMap=json.titleMap;//称号
+									titleMap[playTitle]=0;
+								}
+								//keep
+								unknownUser.childAddReward=1;
+								unknownUser.json=json_encode(json);
+								return(1);//修改
+							##.,
+							//修改完成回调
+							##<row,userData>
+								//...
+							##.,
+							//解锁后回调
+							##<row,userData>
+								//...
+							##.,
+							userData,//自定义数据userData
+							1000//加锁时间（毫秒），例如：1000
+						);
+						money=number(row.getValFromColName("money"));//money
+						food=number(row.getValFromColName("food"));//food
+						soldier=number(row.getValFromColName("soldier"));//soldier
+						gold=number(row.getValFromColName("gold"));//gold
+						item=row.getValFromColName("item");//gold
+						if(number(item)==0)
+						{
+							item="";
+						}
+						rankID=-1;
+						rankID=redis_zrevrank(rankRd,rankName,rankUserIDArr[c]);
+						sendMailToPrivate(cnn,rankUserIDArr[c],title,sprintf(body,rankID+1),soldier,money,food,0,gold,item);//发送邮件
+					}
+					c++;
+				}
+			}
+			i++;
+		}
+	}
+@def.
+
+//召唤冲榜发邮件奖励 
+@def updateBeckonActivityReward<cnn,rd,table,gameConfig,game>
+	state=game.activityMgr.getActivityStatus(206);//召唤活动
+	if(state==3)//到了发奖状态
+	{
+		//获取
+		rankName=gameConfig.name+"_fuckAddRank";//活动召唤冲榜Name
+		rankRd=rd.getRedisObj(rankName);//排行榜所在的redis对象
+		rankTable=table.event206;//活动召唤冲榜表
+		tableLength=rankTable.size();
+		mailTable=table.mail;
+		mailRow=mailTable.getRow(18);//活动召唤
+		title=mailRow.getValFromColName("title");//title
+		body=mailRow.getValFromColName("body");//body
+		i=0;
+		userArrLength=0;
+		while(i<tableLength)
+		{
+			row=rankTable.getRow(i);
+			beginRank=number(row.getValFromColName("beginRank"));//开始名次
+			endRank=number(row.getValFromColName("endRank"));//结束名次
+			redis_zrevrange(rankRd,rankName,beginRank-1,endRank-1,0,rankUserIDArr=arr());
+			userArrLength=size(rankUserIDArr);
+			if(userArrLength==0)//排行榜空
+			{
+				exit();
+			}
+			else
+			{	
+				c=0;while(c<userArrLength)
+				{
+					unknownUser=rd.getRow(cnn,"user","id",rankUserIDArr[c],"*",1000);
+					fuckAddReward=number(unknownUser.fuckAddReward);//召唤排名奖励领取标记
+					if(fuckAddReward==0)//未领取
+					{
+						userData=dict();
+						rd.updateRow//修改
+						(
+							cnn,"user","id",rankUserIDArr[c],"*",
+							//修改回调
+							##<unknownUser,userData>
+								@link row;
+								playTitle=number(row.getValFromColName("title"));
+								json=json_decode(unknownUser.json);
+								if(playTitle!=0)
+								{
+									
+									titleMap=json.titleMap;//称号
+									titleMap[playTitle]=0;
+								}
+								//keep
+								unknownUser.fuckAddReward=1;
+								unknownUser.json=json_encode(json);
+								return(1);//修改
+							##.,
+							//修改完成回调
+							##<row,userData>
+								//...
+							##.,
+							//解锁后回调
+							##<row,userData>
+								//...
+							##.,
+							userData,//自定义数据userData
+							1000//加锁时间（毫秒），例如：1000
+						);
+						money=number(row.getValFromColName("money"));//money
+						food=number(row.getValFromColName("food"));//food
+						soldier=number(row.getValFromColName("soldier"));//soldier
+						gold=number(row.getValFromColName("gold"));//gold
+						item=row.getValFromColName("item");//gold
+						if(number(item)==0)
+						{
+							item="";
+						}
+						rankID=-1;
+						rankID=redis_zrevrank(rankRd,rankName,rankUserIDArr[c]);
+						sendMailToPrivate(cnn,rankUserIDArr[c],title,sprintf(body,rankID+1),soldier,money,food,0,gold,item);//发送邮件
+					}
+					c++;
+				}
+			}
+			i++;
+		}
+	}
+@def.
+
+//联姻冲榜发邮件奖励 
+@def updateMarryActivityReward<cnn,rd,table,gameConfig,game>
+	state=game.activityMgr.getActivityStatus(207);//联姻活动
+	if(state==3)//到了发奖状态
+	{
+		//获取
+		rankName=gameConfig.name+"_marryAddRank";//活动联姻冲榜Name
+		rankRd=rd.getRedisObj(rankName);//排行榜所在的redis对象
+		rankTable=table.event207;//活动联姻冲榜表
+		tableLength=rankTable.size();
+		mailTable=table.mail;
+		mailRow=mailTable.getRow(19);//活动联姻
+		title=mailRow.getValFromColName("title");//title
+		body=mailRow.getValFromColName("body");//body
+		i=0;
+		userArrLength=0;
+		while(i<tableLength)
+		{
+			row=rankTable.getRow(i);
+			beginRank=number(row.getValFromColName("beginRank"));//开始名次
+			endRank=number(row.getValFromColName("endRank"));//结束名次
+			redis_zrevrange(rankRd,rankName,beginRank-1,endRank-1,0,rankUserIDArr=arr());
+			userArrLength=size(rankUserIDArr);
+			if(userArrLength==0)//排行榜空
+			{
+				exit();
+			}
+			else
+			{	
+				c=0;while(c<userArrLength)
+				{
+					unknownUser=rd.getRow(cnn,"user","id",rankUserIDArr[c],"*",1000);
+					marryAddReward=number(unknownUser.marryAddReward);//联姻排名奖励领取标记
+					if(marryAddReward==0)//未领取
+					{
+						userData=dict();
+						rd.updateRow//修改
+						(
+							cnn,"user","id",rankUserIDArr[c],"*",
+							//修改回调
+							##<unknownUser,userData>
+								@link row;
+								playTitle=number(row.getValFromColName("title"));
+								json=json_decode(unknownUser.json);
+								if(playTitle!=0)
+								{
+									
+									titleMap=json.titleMap;//称号
+									titleMap[playTitle]=0;
+								}
+								//keep
+								unknownUser.marryAddReward=1;
+								unknownUser.json=json_encode(json);
+								return(1);//修改
+							##.,
+							//修改完成回调
+							##<row,userData>
+								//...
+							##.,
+							//解锁后回调
+							##<row,userData>
+								//...
+							##.,
+							userData,//自定义数据userData
+							1000//加锁时间（毫秒），例如：1000
+						);
+						money=number(row.getValFromColName("money"));//money
+						food=number(row.getValFromColName("food"));//food
+						soldier=number(row.getValFromColName("soldier"));//soldier
+						gold=number(row.getValFromColName("gold"));//gold
+						item=row.getValFromColName("item");//gold
+						if(number(item)==0)
+						{
+							item="";
+						}
+						rankID=-1;
+						rankID=redis_zrevrank(rankRd,rankName,rankUserIDArr[c]);
+						sendMailToPrivate(cnn,rankUserIDArr[c],title,sprintf(body,rankID+1),soldier,money,food,0,gold,item);//发送邮件
+					}
+					c++;
+				}
+			}
+			i++;
+		}
+	}
+@def.
+
+//走访冲榜发邮件奖励 
+@def updateSearchActivityReward<cnn,rd,table,gameConfig,game>
+	state=game.activityMgr.getActivityStatus(208);//走访活动
+	if(state==3)//到了发奖状态
+	{
+		//获取
+		rankName=gameConfig.name+"_marryAddRank";//活动走访冲榜Name
+		rankRd=rd.getRedisObj(rankName);//排行榜所在的redis对象
+		rankTable=table.event208;//活动走访冲榜表
+		tableLength=rankTable.size();
+		mailTable=table.mail;
+		mailRow=mailTable.getRow(20);//活动走访
+		title=mailRow.getValFromColName("title");//title
+		body=mailRow.getValFromColName("body");//body
+		i=0;
+		userArrLength=0;
+		while(i<tableLength)
+		{
+			row=rankTable.getRow(i);
+			beginRank=number(row.getValFromColName("beginRank"));//开始名次
+			endRank=number(row.getValFromColName("endRank"));//结束名次
+			redis_zrevrange(rankRd,rankName,beginRank-1,endRank-1,0,rankUserIDArr=arr());
+			userArrLength=size(rankUserIDArr);
+			if(userArrLength==0)//排行榜空
+			{
+				exit();
+			}
+			else
+			{	
+				c=0;while(c<userArrLength)
+				{
+					unknownUser=rd.getRow(cnn,"user","id",rankUserIDArr[c],"*",1000);
+					searchAddReward=number(unknownUser.searchAddReward);//走访排名奖励领取标记
+					if(searchAddReward==0)//未领取
+					{
+						userData=dict();
+						rd.updateRow//修改
+						(
+							cnn,"user","id",rankUserIDArr[c],"*",
+							//修改回调
+							##<unknownUser,userData>
+								@link row;
+								playTitle=number(row.getValFromColName("title"));
+								json=json_decode(unknownUser.json);
+								if(playTitle!=0)
+								{
+									
+									titleMap=json.titleMap;//称号
+									titleMap[playTitle]=0;
+								}
+								//keep
+								unknownUser.searchAddReward=1;
+								unknownUser.json=json_encode(json);
+								return(1);//修改
+							##.,
+							//修改完成回调
+							##<row,userData>
+								//...
+							##.,
+							//解锁后回调
+							##<row,userData>
+								//...
+							##.,
+							userData,//自定义数据userData
+							1000//加锁时间（毫秒），例如：1000
+						);
+						money=number(row.getValFromColName("money"));//money
+						food=number(row.getValFromColName("food"));//food
+						soldier=number(row.getValFromColName("soldier"));//soldier
+						gold=number(row.getValFromColName("gold"));//gold
+						item=row.getValFromColName("item");//gold
+						if(number(item)==0)
+						{
+							item="";
+						}
+						rankID=-1;
+						rankID=redis_zrevrank(rankRd,rankName,rankUserIDArr[c]);
+						sendMailToPrivate(cnn,rankUserIDArr[c],title,sprintf(body,rankID+1),soldier,money,food,0,gold,item);//发送邮件
+					}
+					c++;
+				}
+			}
+			i++;
+		}
+	}
+@def.
+
+//刷新联盟信息
+@def updateUnionInfo<cnn,rd>
+	userData=dict();
+	curDate=split(arr(),now()," ")[0];//当前日期
+	sql="select id from `union`";
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		//联盟ID
+		unionID=int(mysqlGetColVal(rs,0));
+		
+		//联盟总势力
+		powerTotal=0;
+		sql="select sum(power) from user where unionID="+unionID;
+		rs2=mysqlCreateRs(cnn,sql);
+		if(mysqlNextRow(rs2))
+		{
+			powerTotal=int(mysqlGetColVal(rs2,0));
+		}
+		mysqlDestroyRs(rs2);
+		//修改联盟信息
+		rd.updateRow
+		(
+			cnn,"union","id",unionID,"*",
+			//修改回调
+			##<row,userData>
+				@link powerTotal,curDate,unionID,cnn,rd;
+				unionJson=json_decode(row.json);
+				row.power=powerTotal;
+				if(row.updateDate!=curDate)
+				{
+					//每日重置
+					row.updateDate=curDate;
+					row.catchCount=0;
+					row.buildCount=0;
+					clean(unionJson.reqUserIDMap);
+					clean(unionJson.bossMap);
+				}
+				
+				//7天不登录 换人（换给贡献最高的其它玩家）
+				leaderUserID=int(row.leaderUserID);//盟主userID
+				leaderUser=rd.getRow(cnn,"user","id",leaderUserID,"*",1000);
+				if(!empty(leaderUser))
+				{
+					trace(leaderUser.logoutTime);
+					dt=time()-strtotime(leaderUser.logoutTime);
+					if(
+						int(leaderUser.online)!=1&&//不在线
+						dt>=(7*24*60*60)//7天未登录
+					)
+					{
+						
+						//更换盟主
+						sql="select id from user where unionID="+unionID+" and id!="+leaderUserID+" order by devoteTotal desc limit 1";
+						newLeaderUserID=0;
+						rs=mysqlCreateRs(cnn,sql);
+						if(mysqlNextRow(rs))
+						{
+							newLeaderUserID=int(mysqlGetColVal(rs,0));
+						}
+						mysqlDestroyRs(rs);
+						if(newLeaderUserID>0)
+						{
+							targetXuser=rd.getRow(cnn,"user","id",newLeaderUserID,"*",1000);
+							xName=targetXuser.nickname;//New盟主昵称
+							row.leaderUserID=newLeaderUserID;//New盟主iD
+							row.leaderNickname=xName;//New盟主昵称
+							viceLeaderUserIDMap=unionJson.viceLeaderUserIDMap;//副字典
+							if(exist(viceLeaderUserIDMap,newLeaderUserID))//存在
+							{
+								remove(viceLeaderUserIDMap,newLeaderUserID);
+							}
+							pickUserIDMap=unionJson.pickUserIDMap;//英字典
+							if(exist(pickUserIDMap,newLeaderUserID))//存在
+							{
+								remove(pickUserIDMap,newLeaderUserID);
+							}
+						}
+					}
+					
+				}
+				
+				//保存
+				row.json=json_encode(unionJson);
+				return(1);//修改
+			##.,
+			//修改完成回调
+			##<row,userData>
+				//...
+			##.,
+			//解锁后回调
+			##<row,userData>
+				//...
+			##.,
+			userData,//自定义数据userData
+			1000//加锁时间（毫秒），例如：1000
+		);
+	}
+	mysqlDestroyRs(rs);
+@def.
+
+//刷新联盟榜
+@def updateUnionRank<cnn,rd>
+	//生成联盟榜函数
+	genUnionRankFunc=##<rankJson>
+		return(rankJson);
+	##.;
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//生成前50名榜单
+	rankJson50=arr();
+	sql="select id,name,level,leaderNickname,peopleNum,power,effect,peopleNumMax  from `union` order by level desc,power desc,effect desc limit 50";
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		arr=arr();
+		push(arr,mysqlGetColVal(rs,0));
+		push(arr,mysqlGetColVal(rs,1));
+		push(arr,mysqlGetColVal(rs,2));
+		push(arr,mysqlGetColVal(rs,3));
+		push(arr,mysqlGetColVal(rs,4));
+		push(arr,mysqlGetColVal(rs,5));
+		push(arr,mysqlGetColVal(rs,6));
+		push(arr,mysqlGetColVal(rs,7));
+		push(rankJson50,arr);
+	}
+	mysqlDestroyRs(rs);
+	rankName="unionRank50";
+	rd.getStr
+	(
+		rankName,//字符串名
+		genUnionRankFunc,//字符串生成函数
+		json_encode(rankJson50),//回调$genStrFunc时传入的用户自定义数据
+		1000,//加锁时间（毫秒），例如：1000
+		-1//存活时间（毫秒）：0=无限；-1=先清理缓存并设置无限存活；
+	);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//生成前100名榜单
+	rankJson100=arr();
+	sql="select id,name,level,leaderNickname,peopleNum,power,effect,peopleNumMax from `union` order by level desc,power desc,effect desc limit 100";
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		arr=arr();
+		push(arr,mysqlGetColVal(rs,0));
+		push(arr,mysqlGetColVal(rs,1));
+		push(arr,mysqlGetColVal(rs,2));
+		push(arr,mysqlGetColVal(rs,3));
+		push(arr,mysqlGetColVal(rs,4));
+		push(arr,mysqlGetColVal(rs,5));
+		push(arr,mysqlGetColVal(rs,6));
+		push(arr,mysqlGetColVal(rs,7));
+		push(rankJson100,arr);
+	}
+	mysqlDestroyRs(rs);
+	rankName="unionRank100";
+	rd.getStr
+	(
+		rankName,//字符串名
+		genUnionRankFunc,//字符串生成函数
+		json_encode(rankJson100),//回调$genStrFunc时传入的用户自定义数据
+		1000,//加锁时间（毫秒），例如：1000
+		-1//存活时间（毫秒）：0=无限；-1=先清理缓存并设置无限存活；
+	);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//生成所有联盟榜单
+	rankJsonAll=dict();
+	sql="select id from `union` order by level desc,power desc,effect desc";
+	i=0;
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		unionID=mysqlGetColVal(rs,0);
+		rankJsonAll[unionID]=i;
+		++i;
+	}
+	mysqlDestroyRs(rs);
+	rankName="unionRankAll";
+	rd.getStr
+	(
+		rankName,//字符串名
+		genUnionRankFunc,//字符串生成函数
+		json_encode(rankJsonAll),//回调$genStrFunc时传入的用户自定义数据
+		1000,//加锁时间（毫秒），例如：1000
+		-1//存活时间（毫秒）：0=无限；-1=先清理缓存并设置无限存活；
+	);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/*
+	参考：
+		[
+			["xx盟",power,...],
+			["yy盟",power,...],
+		]
+	*/
+@def.
+
+//发送帐号信息队列
+@def send_account_info_queue<cnn,account_php_config>
+	idArr=arr();
+	json=arr();
+	sql="select id,uid,platformID,serverID,nickname from account_info_queue";
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		id=int(mysqlGetColVal(rs,0));
+		uid=mysqlGetColVal(rs,1);
+		platformID=int(mysqlGetColVal(rs,2));
+		serverID=int(mysqlGetColVal(rs,3));
+		nickname=mysqlGetColVal(rs,4);
+		
+		push(idArr,id);
+		push
+		(
+			json,
+			dict
+			(
+				"uid",uid,
+				"platformID",platformID,
+				"serverID",serverID,
+				"nickname",nickname,
+			)
+		);
+	}
+	mysqlDestroyRs(rs);
+	
+	@try
+		if(size(json)>0)
+		{
+			domain=account_php_config.domain;
+			port=account_php_config.port;
+			url="/api/account.php";
+			params="action=batchSaveAccountInfo&json="+urlencode(base64_encode(json_encode(json)));
+			trace("send_account_info_queue");
+			debug(json);
+			rt=form(domain,port,url,params,10000);
+			// trace("rt="+rt);
+			rtJson=json_decode(rt);
+			if(rtJson.result==1)
+			{
+				sql="delete from account_info_queue where id in ("+join(idArr,",")+")";
+				// trace(sql);
+				mysqlExec(cnn,sql);
+			}
+		}
+	@catch
+		log("send_account_info_queue.log",rt+"\r\n");
+		trace(error());
+	@catch.
+@def.
+
+//议政日涨幅榜更新
+@def updateWaterBattleDayRank<cnn,rdObj,table,gameConfig>
+	userData=dict();
+	userData.nextDaySign=0;
+	rdObj.updateRow
+	(
+		cnn,"global_var","name","waterBattleDayRank","*",
+		//修改回调
+		##<var,userData>
+			@link cnn,rdObj,table,game,gameConfig;
+			
+			modifSign=0;
+			
+			//获取全局变量
+			globalJson=json_decode(var.json);
+			updateDate=ref(globalJson.updateDate);
+			
+			nowTime=now();//今天时间
+			t=split(arr(),nowTime," ");
+			current_T=t[0];
+			if(updateDate=="")//首天
+			{
+				updateDate=current_T;
+				modifSign=1;//修改
+			}
+			else if(updateDate!=current_T)//跨天
+			{
+				updateDate=current_T;
+				modifSign=1;//修改
+				userData.nextDaySign=1;//标记跨天
+				
+				//发奖励邮件
+				//获取
+				rankName=gameConfig.name+"_waterBattleDayRank";//议政日榜Name
+				rankRd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+				rankTable=table.waterBattleRank;//议政日榜表
+				tableLength=rankTable.size();
+				mailTable=table.mail;
+				mailRow=mailTable.getRow(12);//活动议政
+				title=mailRow.getValFromColName("title");//title
+				body=mailRow.getValFromColName("body");//body
+				i=0;
+				
+				while(i<tableLength)
+				{
+					row=rankTable.getRow(i);
+					beginRank=number(row.getValFromColName("beginRank"));//开始名次
+					endRank=number(row.getValFromColName("endRank"));//结束名次
+					redis_zrevrange(rankRd,rankName,beginRank-1,endRank-1,0,rankUserIDArr=arr());
+					userArrLength=size(rankUserIDArr);
+					if(userArrLength==0)//排行榜空
+					{
+						break;
+					}
+					else
+					{	
+						c=0;while(c<userArrLength)
+						{// money=number(row.getValFromColName("money"));//money
+							// food=number(row.getValFromColName("food"));//food
+							// soldier=number(row.getValFromColName("soldier"));//soldier
+							// gold=number(row.getValFromColName("gold"));//gold
+							
+							item=row.getValFromColName("item");//
+							if(number(item)==0)
+							{
+								item="";
+							}
+							rankID=-1;
+							rankID=redis_zrevrank(rankRd,rankName,rankUserIDArr[c]);
+							//发送邮件
+							sendMailToPrivate(cnn,rankUserIDArr[c],title,sprintf(body,rankID+1),0,0,0,0,0,item);
+							
+							c++;
+						}
+					}
+					i++;
+				}	
+			}
+			if(modifSign)
+			{
+				//保存
+				var.json=json_encode(globalJson);
+			}
+			return(modifSign);	
+	
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			if(userData.nextDaySign)//跨天
+			{
+				@link cnn,rdObj,gameConfig;
+				//重置榜单
+				initWaterBattleDayRank(cnn,rdObj,gameConfig);
+			}
+		##.,
+		userData,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+@def.
+
+//初始化议政日涨幅榜
+@def initWaterBattleDayRank<cnn,rdObj,gameConfig>
+	//当前议政日涨幅榜信息
+	waterBattleDayRankVar=rdObj.getRow(cnn,"global_var","name","waterBattleDayRank","*",1000);
+	waterBattleDayRankJson=json_decode(waterBattleDayRankVar.json);
+	waterBattleDayRankUpdateDate=waterBattleDayRankJson.updateDate;//当前议政日涨幅榜日期
+	
+	rankName=gameConfig.name+"_waterBattleDayRank";//排行榜名称
+	//删除旧榜
+	rdObj.delStr
+	(
+		rankName,
+		1000//加锁时间（毫秒），例如：1000
+	);
+	//重新创建
+	rd=rdObj.getRedisObj(rankName);//排行榜所在的redis对象
+	sql="select id,waterBattleScoreDayAdd from user where waterBattleScoreDayDate='"+waterBattleDayRankUpdateDate+"'";
+	// trace(sql);
+	rs=mysqlCreateRs(cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		userID=number(mysqlGetColVal(rs,0));
+		score=number(mysqlGetColVal(rs,1));
+		redis_zadd(rd,rankName,score,userID);
+	}
+	mysqlDestroyRs(rs);
+@def.
+
+//记录在线人数日志
+@def logOnlineCount<cnn>
+	sql="select count(*) from user where online=1";
+	rs=mysqlCreateRs(cnn,sql);
+	mysqlNextRow(rs);
+	onlineCount=int(mysqlGetColVal(rs,0));
+	mysqlDestroyRs(rs);
+	tableName=createDayTable(cnn,"online");
+	sql="insert into "+tableName+" set count="+onlineCount+",genTime='"+now()+"'";
+	// trace(sql);
+	mysqlExec(cnn,sql);
+@def.

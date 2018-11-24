@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="n" n="__sys__t4">3</v>
+<v t="n" n="__sys__t5">4</v>
+<v t="n" n="__sys__t6">5</v>
+<v t="n" n="__sys__t7">6</v>
+<v t="s" n="__sys__t8">.chat/unionRt.</v>
+<v t="n" n="__sys__t9">0</v>
+<v t="n" n="__sys__t10">0</v>
+<v t="n" n="__sys__t11">0</v>
+<v t="n" n="__sys__t12">0</v>
+<v t="s" n="__sys__t13">.chat_union.</v>
+<v t="s" n="__sys__t14">.insert into .</v>
+<v t="s" n="__sys__t15">. set genTime='.</v>
+<v t="s" n="__sys__t16">.'.</v>
+<v t="s" n="__sys__t17">.,nickname='.</v>
+<v t="s" n="__sys__t18">.'.</v>
+<v t="s" n="__sys__t19">.,txt='.</v>
+<v t="s" n="__sys__t20">.'.</v>
+<v t="s" n="__sys__t21">.,type='.</v>
+<v t="s" n="__sys__t22">.'.</v>
+<v t="s" n="__sys__t23">.,unionID='.</v>
+<v t="s" n="__sys__t24">.'.</v>
+<o n="input"><o>__sys__t25</o><i>__sys__t1</i></o>
+<o n="="><o>game</o><i>__sys__t25</i></o>
+<o n="input"><o>__sys__t27</o><i>__sys__t2</i></o>
+<o n="="><o>userID</o><i>__sys__t27</i></o>
+<o n="input"><o>__sys__t29</o><i>__sys__t3</i></o>
+<o n="="><o>nickname</o><i>__sys__t29</i></o>
+<o n="input"><o>__sys__t31</o><i>__sys__t4</i></o>
+<o n="="><o>outStr</o><i>__sys__t31</i></o>
+<o n="input"><o>__sys__t33</o><i>__sys__t5</i></o>
+<o n="="><o>userIDMap</o><i>__sys__t33</i></o>
+<o n="input"><o>__sys__t35</o><i>__sys__t6</i></o>
+<o n="="><o>unionID</o><i>__sys__t35</i></o>
+<o n="input"><o>__sys__t37</o><i>__sys__t7</i></o>
+<o n="="><o>type</o><i>__sys__t37</i></o>
+<o n="now" r="5"><o>__sys__t39</o></o>
+<o n="=" r="5"><o>genTime</o><i>__sys__t39</i></o>
+<o n="arr" r="6"><o>__sys__t41</o><i>__sys__t8</i><i>userID</i><i>nickname</i><i>__sys__t9</i><i>__sys__t10</i><i>__sys__t11</i><i>outStr</i><i>genTime</i><i>__sys__t12</i><i>type</i></o>
+<o n="=" r="6"><o>rtMsg</o><i>__sys__t41</i></o>
+<v t="s" n="__sys__t44">.sendMsgToAnyUser.</v>
+<o n="." r="7"><o>__sys__t43</o><i>game</i><i>__sys__t44</i></o>
+<o n="__sys__t43" r="7"><o>__sys__t46</o><i>game</i><i>rtMsg</i><i>userIDMap</i><i>userID</i></o>
+<o n="push" r="10"><o>__sys__t47</o><i>rtMsg</i><i>userIDMap</i><i>userID</i></o>
+<v t="s" n="__sys__t49">.sendMsgToHub.</v>
+<o n="." r="11"><o>__sys__t48</o><i>game</i><i>__sys__t49</i></o>
+<o n="__sys__t48" r="11"><o>__sys__t51</o><i>game</i><i>rtMsg</i></o>
+<v t="s" n="__sys__t53">.cnn.</v>
+<o n="." r="12"><o>__sys__t52</o><i>game</i><i>__sys__t53</i></o>
+<o n="=" r="12"><o>cnn</o><i>__sys__t52</i></o>
+<o n="createDayTable" r="15"><o>__sys__t56</o><i>cnn</i><i>__sys__t13</i></o>
+<o n="=" r="15"><o>tableName</o><i>__sys__t56</i></o>
+<o n="+" r="16"><o>__sys__t58</o><i>__sys__t14</i><i>tableName</i></o>
+<o n="+" r="16"><o>__sys__t59</o><i>__sys__t58</i><i>__sys__t15</i></o>
+<o n="+" r="16"><o>__sys__t60</o><i>__sys__t59</i><i>genTime</i></o>
+<o n="+" r="16"><o>__sys__t61</o><i>__sys__t60</i><i>__sys__t16</i></o>
+<o n="=" r="16"><o>sql</o><i>__sys__t61</i></o>
+<o n="+" r="17"><o>__sys__t63</o><i>__sys__t17</i><i>nickname</i></o>
+<o n="+" r="17"><o>__sys__t64</o><i>__sys__t63</i><i>__sys__t18</i></o>
+<o n="+=" r="17"><o>sql</o><i>__sys__t64</i></o>
+<o n="+" r="18"><o>__sys__t66</o><i>__sys__t19</i><i>outStr</i></o>
+<o n="+" r="18"><o>__sys__t67</o><i>__sys__t66</i><i>__sys__t20</i></o>
+<o n="+=" r="18"><o>sql</o><i>__sys__t67</i></o>
+<o n="+" r="19"><o>__sys__t69</o><i>__sys__t21</i><i>type</i></o>
+<o n="+" r="19"><o>__sys__t70</o><i>__sys__t69</i><i>__sys__t22</i></o>
+<o n="+=" r="19"><o>sql</o><i>__sys__t70</i></o>
+<o n="+" r="20"><o>__sys__t72</o><i>__sys__t23</i><i>unionID</i></o>
+<o n="+" r="20"><o>__sys__t73</o><i>__sys__t72</i><i>__sys__t24</i></o>
+<o n="+=" r="20"><o>sql</o><i>__sys__t73</i></o>
+<o n="mysqlExec" r="21"><o>__sys__t75</o><i>cnn</i><i>sql</i></o>
+<v n="__sys__t25" />
+<v n="__sys__t27" />
+<v n="__sys__t29" />
+<v n="__sys__t31" />
+<v n="__sys__t33" />
+<v n="__sys__t35" />
+<v n="__sys__t37" />
+<v n="__sys__t39" />
+<v n="__sys__t41" />
+<v n="__sys__t43" />
+<v n="__sys__t46" />
+<v n="__sys__t47" />
+<v n="__sys__t48" />
+<v n="__sys__t51" />
+<v n="__sys__t52" />
+<v n="__sys__t56" />
+<v n="__sys__t58" />
+<v n="__sys__t59" />
+<v n="__sys__t60" />
+<v n="__sys__t61" />
+<v n="__sys__t63" />
+<v n="__sys__t64" />
+<v n="__sys__t66" />
+<v n="__sys__t67" />
+<v n="__sys__t69" />
+<v n="__sys__t70" />
+<v n="__sys__t72" />
+<v n="__sys__t73" />
+<v n="__sys__t75" />
+<v n="cnn" />
+<v n="game" />
+<v n="genTime" />
+<v n="nickname" />
+<v n="outStr" />
+<v n="rtMsg" />
+<v n="sql" />
+<v n="tableName" />
+<v n="type" />
+<v n="unionID" />
+<v n="userID" />
+<v n="userIDMap" />
+</script>

@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t197">116</v>
+<v t="n" n="__sys__t194">114</v>
+<v t="n" n="__sys__t193">114</v>
+<v t="n" n="__sys__t184">106</v>
+<v t="n" n="__sys__t183">106</v>
+<v t="n" n="__sys__t174">98</v>
+<v t="n" n="__sys__t173">98</v>
+<v t="n" n="__sys__t163">89</v>
+<v t="n" n="__sys__t162">89</v>
+<v t="n" n="__sys__t154">82</v>
+<v t="n" n="__sys__t153">82</v>
+<v t="n" n="__sys__t141">71</v>
+<v t="n" n="__sys__t140">71</v>
+<v t="n" n="__sys__t123">59</v>
+<v t="s" n="__sys__t1">.api/init.aks.</v>
+<v t="s" n="__sys__t2">.game/common/api.aks.</v>
+<v t="s" n="__sys__t3">.game/class/Game.aks.</v>
+<v t="s" n="__sys__t4">.game/class/NumMgr.aks.</v>
+<v t="s" n="__sys__t5">.game/class/StoryMgr.aks.</v>
+<v t="s" n="__sys__t6">.game/class/ActivityMgr.aks.</v>
+<v t="s" n="__sys__t7">.game/class/ChildMgr.aks.</v>
+<v t="s" n="__sys__t8">.game/class/RebotMgr.aks.</v>
+<v t="s" n="__sys__t9">.?common.aks.</v>
+<v t="s" n="__sys__t10">.scanner_error.log.</v>
+<v t="s" n="__sys__t11">.config/account_php.json.</v>
+<v t="s" n="__sys__t12">.www/json_table/rushLoop.json.</v>
+<v t="n" n="__sys__t13">0</v>
+<v t="n" n="__sys__t14">0</v>
+<v t="n" n="__sys__t15">0</v>
+<v t="n" n="__sys__t16">0</v>
+<v t="n" n="__sys__t17">0</v>
+<v t="n" n="__sys__t18">1</v>
+<v t="n" n="__sys__t19">0</v>
+<v t="n" n="__sys__t20">1000</v>
+<v t="n" n="__sys__t21">30</v>
+<v t="n" n="__sys__t22">0</v>
+<v t="n" n="__sys__t23">1000</v>
+<v t="n" n="__sys__t24">5</v>
+<v t="n" n="__sys__t25">0</v>
+<v t="n" n="__sys__t26">1000</v>
+<v t="n" n="__sys__t27">10</v>
+<v t="n" n="__sys__t28">0</v>
+<v t="n" n="__sys__t29">10</v>
+<v t="n" n="__sys__t30">60</v>
+<v t="n" n="__sys__t31">1000</v>
+<v t="n" n="__sys__t32">0</v>
+<v t="n" n="__sys__t33">5</v>
+<v t="n" n="__sys__t34">60</v>
+<v t="n" n="__sys__t35">1000</v>
+<v t="n" n="__sys__t36">0</v>
+<v t="n" n="__sys__t37">5</v>
+<v t="n" n="__sys__t38">60</v>
+<v t="n" n="__sys__t39">1000</v>
+<v t="n" n="__sys__t40">0</v>
+<v t="n" n="__sys__t41">100</v>
+<o n="__sys__t1" r="2"><o>__sys__t42</o></o>
+<o n="__sys__t2" r="3"><o>__sys__t43</o></o>
+<o n="__sys__t3" r="4"><o>__sys__t44</o></o>
+<o n="__sys__t4" r="5"><o>__sys__t45</o></o>
+<o n="__sys__t5" r="6"><o>__sys__t46</o></o>
+<o n="__sys__t6" r="7"><o>__sys__t47</o></o>
+<o n="__sys__t7" r="8"><o>__sys__t48</o></o>
+<o n="__sys__t8" r="9"><o>__sys__t49</o></o>
+<o n="__sys__t9" r="10"><o>__sys__t50</o></o>
+<o n="time" r="12"><o>__sys__t51</o></o>
+<o n="srand" r="12"><o>__sys__t52</o><i>__sys__t51</i></o>
+<o n="errorLog" r="13"><o>__sys__t53</o><i>__sys__t10</i></o>
+<o n="file_get_contents" r="16"><o>__sys__t54</o><i>__sys__t11</i></o>
+<o n="json" r="16"><o>__sys__t55</o><i>__sys__t54</i></o>
+<o n="=" r="16"><o>account_php_config</o><i>__sys__t55</i></o>
+<o n="file_get_contents" r="19"><o>__sys__t57</o><i>__sys__t12</i></o>
+<o n="AKJsonTable" r="19"><o>__sys__t58</o><i>__sys__t57</i></o>
+<o n="=" r="19"><o>rushLoopTable</o><i>__sys__t58</i></o>
+<o n="Game" r="22"><o>__sys__t60</o></o>
+<o n="=" r="22"><o>game</o><i>__sys__t60</i></o>
+<v t="s" n="__sys__t63">.initJsonTable.</v>
+<o n="." r="23"><o>__sys__t62</o><i>game</i><i>__sys__t63</i></o>
+<o n="__sys__t62" r="23"><o>__sys__t65</o><i>game</i></o>
+<v t="s" n="__sys__t67">.initGame.</v>
+<o n="." r="24"><o>__sys__t66</o><i>game</i><i>__sys__t67</i></o>
+<o n="__sys__t66" r="24"><o>__sys__t69</o><i>game</i></o>
+<v t="s" n="__sys__t71">.initHubClient.</v>
+<o n="." r="25"><o>__sys__t70</o><i>game</i><i>__sys__t71</i></o>
+<o n="__sys__t70" r="25"><o>__sys__t73</o><i>game</i></o>
+<v t="s" n="__sys__t75">.initDB.</v>
+<o n="." r="26"><o>__sys__t74</o><i>game</i><i>__sys__t75</i></o>
+<o n="__sys__t74" r="26"><o>__sys__t77</o><i>game</i></o>
+<v t="s" n="__sys__t79">.initRedis.</v>
+<o n="." r="27"><o>__sys__t78</o><i>game</i><i>__sys__t79</i></o>
+<o n="__sys__t78" r="27"><o>__sys__t81</o><i>game</i></o>
+<v t="s" n="__sys__t83">.loadManyGlobalVar.</v>
+<o n="." r="28"><o>__sys__t82</o><i>game</i><i>__sys__t83</i></o>
+<o n="__sys__t82" r="28"><o>__sys__t85</o><i>game</i></o>
+<v t="s" n="__sys__t87">.createRebot.</v>
+<o n="." r="30"><o>__sys__t86</o><i>game</i><i>__sys__t87</i></o>
+<o n="__sys__t86" r="30"><o>__sys__t89</o><i>game</i></o>
+<v t="s" n="__sys__t91">.gameConfig.</v>
+<o n="." r="33"><o>__sys__t90</o><i>game</i><i>__sys__t91</i></o>
+<o n="=" r="33"><o>gameConfig</o><i>__sys__t90</i></o>
+<v t="s" n="__sys__t95">.cnn.</v>
+<o n="." r="36"><o>__sys__t94</o><i>game</i><i>__sys__t95</i></o>
+<o n="=" r="36"><o>cnn</o><i>__sys__t94</i></o>
+<v t="s" n="__sys__t99">.rd.</v>
+<o n="." r="37"><o>__sys__t98</o><i>game</i><i>__sys__t99</i></o>
+<o n="=" r="37"><o>rd</o><i>__sys__t98</i></o>
+<v t="s" n="__sys__t103">.table.</v>
+<o n="." r="38"><o>__sys__t102</o><i>game</i><i>__sys__t103</i></o>
+<o n="=" r="38"><o>table</o><i>__sys__t102</i></o>
+<o n="initActivityRank" r="41"><o>__sys__t106</o><i>cnn</i><i>rd</i><i>gameConfig</i></o>
+<o n="initTowerBattleRank" r="42"><o>__sys__t107</o><i>cnn</i><i>rd</i><i>gameConfig</i></o>
+<o n="initPowerRank" r="43"><o>__sys__t108</o><i>cnn</i><i>rd</i><i>gameConfig</i></o>
+<o n="initIntimateRank" r="44"><o>__sys__t109</o><i>cnn</i><i>rd</i><i>gameConfig</i></o>
+<o n="initChapterRank" r="45"><o>__sys__t110</o><i>cnn</i><i>rd</i><i>gameConfig</i></o>
+<o n="initWaterBattleRank" r="46"><o>__sys__t111</o><i>cnn</i><i>rd</i><i>gameConfig</i><i>table</i></o>
+<o n="initBuildActivityRank" r="47"><o>__sys__t112</o><i>cnn</i><i>rd</i><i>gameConfig</i></o>
+<o n="initUnionBuildActivityRank" r="48"><o>__sys__t113</o><i>cnn</i><i>rd</i><i>gameConfig</i></o>
+<o n="initWorldBossRank" r="49"><o>__sys__t114</o><i>cnn</i><i>rd</i><i>gameConfig</i></o>
+<o n="initWorldBossHurtRank" r="50"><o>__sys__t115</o><i>cnn</i><i>rd</i><i>gameConfig</i></o>
+<o n="initWaterBattleDayRank" r="51"><o>__sys__t116</o><i>cnn</i><i>rd</i><i>gameConfig</i></o>
+<o n="initPartyRank" r="52"><o>__sys__t117</o><i>cnn</i><i>rd</i><i>gameConfig</i></o>
+<o n="=" r="56"><o>updateUnionRankTimer</o><i>__sys__t13</i></o>
+<o n="=" r="57"><o>timer001</o><i>__sys__t14</i></o>
+<o n="=" r="58"><o>timer002</o><i>__sys__t15</i></o>
+<o n="=" r="59"><o>timer003</o><i>__sys__t16</i></o>
+<o n="=" r="60"><o>timer004</o><i>__sys__t17</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t18</i></o>
+<o n="=="><o>__sys__t125</o><i>__sys__rt</i><i>__sys__t19</i></o>
+<o n="if_goto"><o>__sys__t126</o><i>__sys__t125</i><i>__sys__t197</i></o>
+<v t="s" n="__sys__t128">.timer.</v>
+<o n="." r="67"><o>__sys__t127</o><i>game</i><i>__sys__t128</i></o>
+<o n="*" r="67"><o>__sys__t130</o><i>__sys__t20</i><i>__sys__t21</i></o>
+<o n="isTimeout" r="67"><o>__sys__t131</o><i>__sys__t127</i><i>__sys__t130</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t131</i></o>
+<o n="=="><o>__sys__t133</o><i>__sys__rt</i><i>__sys__t22</i></o>
+<o n="if_goto"><o>__sys__t134</o><i>__sys__t133</i><i>__sys__t140</i></o>
+<v t="s" n="__sys__t136">.loadManyGlobalVar.</v>
+<o n="." r="73"><o>__sys__t135</o><i>game</i><i>__sys__t136</i></o>
+<o n="__sys__t135" r="73"><o>__sys__t138</o><i>game</i></o>
+<o n="goto"><o>__sys__t139</o><i>__sys__t141</i></o>
+<o n="*" r="76"><o>__sys__t142</o><i>__sys__t23</i><i>__sys__t24</i></o>
+<o n="isTimeout" r="76"><o>__sys__t143</o><i>timer001</i><i>__sys__t142</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t143</i></o>
+<o n="=="><o>__sys__t145</o><i>__sys__rt</i><i>__sys__t25</i></o>
+<o n="if_goto"><o>__sys__t146</o><i>__sys__t145</i><i>__sys__t153</i></o>
+<o n="updateRushLoop" r="79"><o>__sys__t147</o><i>cnn</i><i>rd</i><i>gameConfig</i><i>rushLoopTable</i><i>game</i></o>
+<o n="updateBuildActivity" r="82"><o>__sys__t148</o><i>cnn</i><i>rd</i><i>gameConfig</i></o>
+<o n="updateWorldBoss" r="85"><o>__sys__t149</o><i>cnn</i><i>rd</i><i>table</i></o>
+<o n="updateWorldBossReward" r="86"><o>__sys__t150</o><i>cnn</i><i>rd</i><i>table</i><i>gameConfig</i></o>
+<o n="updateWaterBattleDayRank" r="91"><o>__sys__t151</o><i>cnn</i><i>rd</i><i>table</i><i>gameConfig</i></o>
+<o n="goto"><o>__sys__t152</o><i>__sys__t154</i></o>
+<o n="*" r="94"><o>__sys__t155</o><i>__sys__t26</i><i>__sys__t27</i></o>
+<o n="isTimeout" r="94"><o>__sys__t156</o><i>timer002</i><i>__sys__t155</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t156</i></o>
+<o n="=="><o>__sys__t158</o><i>__sys__rt</i><i>__sys__t28</i></o>
+<o n="if_goto"><o>__sys__t159</o><i>__sys__t158</i><i>__sys__t162</i></o>
+<o n="send_account_info_queue" r="97"><o>__sys__t160</o><i>cnn</i><i>account_php_config</i></o>
+<o n="goto"><o>__sys__t161</o><i>__sys__t163</i></o>
+<o n="*" r="100"><o>__sys__t164</o><i>__sys__t29</i><i>__sys__t30</i></o>
+<o n="*" r="100"><o>__sys__t165</o><i>__sys__t164</i><i>__sys__t31</i></o>
+<o n="isTimeout" r="100"><o>__sys__t166</o><i>updateUnionRankTimer</i><i>__sys__t165</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t166</i></o>
+<o n="=="><o>__sys__t168</o><i>__sys__rt</i><i>__sys__t32</i></o>
+<o n="if_goto"><o>__sys__t169</o><i>__sys__t168</i><i>__sys__t173</i></o>
+<o n="updateUnionInfo" r="102"><o>__sys__t170</o><i>cnn</i><i>rd</i></o>
+<o n="updateUnionRank" r="103"><o>__sys__t171</o><i>cnn</i><i>rd</i></o>
+<o n="goto"><o>__sys__t172</o><i>__sys__t174</i></o>
+<o n="*" r="106"><o>__sys__t175</o><i>__sys__t33</i><i>__sys__t34</i></o>
+<o n="*" r="106"><o>__sys__t176</o><i>__sys__t175</i><i>__sys__t35</i></o>
+<o n="isTimeout" r="106"><o>__sys__t177</o><i>timer003</i><i>__sys__t176</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t177</i></o>
+<o n="=="><o>__sys__t179</o><i>__sys__rt</i><i>__sys__t36</i></o>
+<o n="if_goto"><o>__sys__t180</o><i>__sys__t179</i><i>__sys__t183</i></o>
+<o n="logOnlineCount" r="108"><o>__sys__t181</o><i>cnn</i></o>
+<o n="goto"><o>__sys__t182</o><i>__sys__t184</i></o>
+<o n="*" r="111"><o>__sys__t185</o><i>__sys__t37</i><i>__sys__t38</i></o>
+<o n="*" r="111"><o>__sys__t186</o><i>__sys__t185</i><i>__sys__t39</i></o>
+<o n="isTimeout" r="111"><o>__sys__t187</o><i>timer004</i><i>__sys__t186</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t187</i></o>
+<o n="=="><o>__sys__t189</o><i>__sys__rt</i><i>__sys__t40</i></o>
+<o n="if_goto"><o>__sys__t190</o><i>__sys__t189</i><i>__sys__t193</i></o>
+<o n="rushLoopReward" r="113"><o>__sys__t191</o><i>cnn</i><i>rd</i><i>table</i><i>gameConfig</i><i>game</i></o>
+<o n="goto"><o>__sys__t192</o><i>__sys__t194</i></o>
+<o n="sleep" r="116"><o>__sys__t195</o><i>__sys__t41</i></o>
+<o n="goto"><o>__sys__t196</o><i>__sys__t123</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t102" />
+<v n="__sys__t106" />
+<v n="__sys__t107" />
+<v n="__sys__t108" />
+<v n="__sys__t109" />
+<v n="__sys__t110" />
+<v n="__sys__t111" />
+<v n="__sys__t112" />
+<v n="__sys__t113" />
+<v n="__sys__t114" />
+<v n="__sys__t115" />
+<v n="__sys__t116" />
+<v n="__sys__t117" />
+<v n="__sys__t125" />
+<v n="__sys__t126" />
+<v n="__sys__t127" />
+<v n="__sys__t130" />
+<v n="__sys__t131" />
+<v n="__sys__t133" />
+<v n="__sys__t134" />
+<v n="__sys__t135" />
+<v n="__sys__t138" />
+<v n="__sys__t139" />
+<v n="__sys__t142" />
+<v n="__sys__t143" />
+<v n="__sys__t145" />
+<v n="__sys__t146" />
+<v n="__sys__t147" />
+<v n="__sys__t148" />
+<v n="__sys__t149" />
+<v n="__sys__t150" />
+<v n="__sys__t151" />
+<v n="__sys__t152" />
+<v n="__sys__t155" />
+<v n="__sys__t156" />
+<v n="__sys__t158" />
+<v n="__sys__t159" />
+<v n="__sys__t160" />
+<v n="__sys__t161" />
+<v n="__sys__t164" />
+<v n="__sys__t165" />
+<v n="__sys__t166" />
+<v n="__sys__t168" />
+<v n="__sys__t169" />
+<v n="__sys__t170" />
+<v n="__sys__t171" />
+<v n="__sys__t172" />
+<v n="__sys__t175" />
+<v n="__sys__t176" />
+<v n="__sys__t177" />
+<v n="__sys__t179" />
+<v n="__sys__t180" />
+<v n="__sys__t181" />
+<v n="__sys__t182" />
+<v n="__sys__t185" />
+<v n="__sys__t186" />
+<v n="__sys__t187" />
+<v n="__sys__t189" />
+<v n="__sys__t190" />
+<v n="__sys__t191" />
+<v n="__sys__t192" />
+<v n="__sys__t195" />
+<v n="__sys__t196" />
+<v n="__sys__t42" />
+<v n="__sys__t43" />
+<v n="__sys__t44" />
+<v n="__sys__t45" />
+<v n="__sys__t46" />
+<v n="__sys__t47" />
+<v n="__sys__t48" />
+<v n="__sys__t49" />
+<v n="__sys__t50" />
+<v n="__sys__t51" />
+<v n="__sys__t52" />
+<v n="__sys__t53" />
+<v n="__sys__t54" />
+<v n="__sys__t55" />
+<v n="__sys__t57" />
+<v n="__sys__t58" />
+<v n="__sys__t60" />
+<v n="__sys__t62" />
+<v n="__sys__t65" />
+<v n="__sys__t66" />
+<v n="__sys__t69" />
+<v n="__sys__t70" />
+<v n="__sys__t73" />
+<v n="__sys__t74" />
+<v n="__sys__t77" />
+<v n="__sys__t78" />
+<v n="__sys__t81" />
+<v n="__sys__t82" />
+<v n="__sys__t85" />
+<v n="__sys__t86" />
+<v n="__sys__t89" />
+<v n="__sys__t90" />
+<v n="__sys__t94" />
+<v n="__sys__t98" />
+<v n="account_php_config" />
+<v n="cnn" />
+<v n="game" />
+<v n="gameConfig" />
+<v n="rd" />
+<v n="rushLoopTable" />
+<v n="table" />
+<v n="timer001" />
+<v n="timer002" />
+<v n="timer003" />
+<v n="timer004" />
+<v n="updateUnionRankTimer" />
+</script>

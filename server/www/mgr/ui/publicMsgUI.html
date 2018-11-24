@@ -1,0 +1,103 @@
+<style>
+#publicMsgUI_pannel{
+	position:fixed;
+	width:100%;
+	top:25px;
+}
+#publicMsgUI_listView{
+	position:fixed;
+	width:100%;
+	top:50px;
+	bottom:25px;
+	overflow:auto;
+}
+#publicMsgUI_listView table{
+	width:100%;
+}
+#publicMsgUI_listView td{
+	height:50px;
+	border-bottom:1px solid;
+	text-align:center;
+	vertical-align:middle;
+}
+#publicMsgUI_listView table tbody tr:first-child{
+	background:#cccccc;
+}
+#publicMsgUI_listView table tbody tr{
+	background:#eeeeee;
+}
+#publicMsgUI table:first-child{
+	width:100%;
+}
+</style>
+
+<div id="publicMsgUI">
+	<div id="publicMsgUI_pannel">
+        <!--<button id="publicMsgUI_queryBtn">查询</button>-->
+        <button id="publicMsgUI_addBtn">添加服内公告</button>
+        <button id="publicMsgUI_editGlobalBtn">编辑全局公告</button>
+    </div>
+	<div id="publicMsgUI_listView">无公告数据</div>
+</div>
+
+<div id="addPublicMsgUI" class="am-popup" id="my-popup">
+  <div class="am-popup-inner">
+    <div class="am-popup-hd">
+      <h4 class="am-popup-title">添加公告</h4>
+      <span data-am-modal-close
+            class="am-close">&times;</span>
+    </div>
+    <div class="am-popup-bd">
+    	<input id="addPublicMsgUI_title" type="text" placeholder="标题" style="width:100%;" />
+       	<br />
+        <textarea id="addPublicMsgUI_body" placeholder="正文" style="width:100%;height:400px;"></textarea>
+		<br />
+		<button id="addPublicMsgUI_saveBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<div id="editPublicMsgUI" class="am-popup" id="my-popup">
+  <div class="am-popup-inner">
+    <div class="am-popup-hd">
+      <h4 class="am-popup-title">编辑公告</h4>
+      <span data-am-modal-close
+            class="am-close">&times;</span>
+    </div>
+    <div class="am-popup-bd">
+    	<input id="editPublicMsgUI_title" type="text" placeholder="标题" style="width:100%;" />
+       	<br />
+        <textarea id="editPublicMsgUI_body" placeholder="正文" style="width:100%;height:400px;"></textarea>
+		<br />
+		<button id="editPublicMsgUI_saveBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<div id="publicMsgUI_removeUI" class="am-modal am-modal-confirm" tabindex="-1">
+  <div class="am-modal-dialog">
+    <div class="am-modal-hd">删除公告</div>
+    <div class="am-modal-bd">
+    确定要删除吗？
+    </div>
+    <div class="am-modal-footer">
+      <span class="am-modal-btn" data-am-modal-cancel>取消</span>
+      <span class="am-modal-btn" data-am-modal-confirm>确定</span>
+    </div>
+  </div>
+</div>
+
+<div id="editGlobalPublicMsgUI" class="am-popup" id="my-popup">
+  <div class="am-popup-inner">
+    <div class="am-popup-hd">
+      <h4 class="am-popup-title">编辑全局公告</h4>
+      <span data-am-modal-close
+            class="am-close">&times;</span>
+    </div>
+    <div class="am-popup-bd">
+    	<textarea id="editGlobalPublicMsgUI_body" placeholder="正文" style="width:100%;height:400px;"></textarea>
+		<br />
+		<button id="editGlobalPublicMsgUI_saveBtn">保存</button>
+    </div>
+  </div>
+</div>

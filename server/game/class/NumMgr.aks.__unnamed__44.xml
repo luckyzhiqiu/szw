@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t59">33</v>
+<v t="n" n="__sys__t48">27</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="n" n="__sys__t4">0</v>
+<v t="n" n="__sys__t5">0</v>
+<v t="n" n="__sys__t6">0</v>
+<v t="n" n="__sys__t7">5000</v>
+<v t="n" n="__sys__t8">5000</v>
+<o n="input"><o>__sys__t9</o><i>__sys__t1</i></o>
+<o n="="><o>self</o><i>__sys__t9</i></o>
+<o n="input"><o>__sys__t11</o><i>__sys__t2</i></o>
+<o n="="><o>hero</o><i>__sys__t11</i></o>
+<o n="input"><o>__sys__t13</o><i>__sys__t3</i></o>
+<o n="="><o>json</o><i>__sys__t13</i></o>
+<v t="s" n="__sys__t16">.wifePlus.</v>
+<o n="." r="1352"><o>__sys__t15</o><i>json</i><i>__sys__t16</i></o>
+<o n="=" r="1352"><o>wifePlus</o><i>__sys__t15</i></o>
+<v t="s" n="__sys__t20">.strengthGrows.</v>
+<o n="." r="1353"><o>__sys__t19</o><i>wifePlus</i><i>__sys__t20</i></o>
+<o n="=" r="1353"><o>wifeSG</o><i>__sys__t19</i></o>
+<v t="s" n="__sys__t24">.strengthGrows.</v>
+<o n="." r="1354"><o>__sys__t23</o><i>hero</i><i>__sys__t24</i></o>
+<o n="=" r="1354"><o>heroSG</o><i>__sys__t23</i></o>
+<v t="s" n="__sys__t28">.heroIndex.</v>
+<o n="." r="1355"><o>__sys__t27</o><i>hero</i><i>__sys__t28</i></o>
+<o n="=" r="1355"><o>heroIndex</o><i>__sys__t27</i></o>
+<o n="=" r="1356"><o>attack</o><i>__sys__t4</i></o>
+<o n="==" r="1357"><o>__sys__t32</o><i>heroIndex</i><i>__sys__t5</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t32</i></o>
+<o n="=="><o>__sys__t34</o><i>__sys__rt</i><i>__sys__t6</i></o>
+<o n="if_goto"><o>__sys__t35</o><i>__sys__t34</i><i>__sys__t48</i></o>
+<v t="s" n="__sys__t37">.level.</v>
+<o n="." r="1359"><o>__sys__t36</o><i>hero</i><i>__sys__t37</i></o>
+<v t="s" n="__sys__t40">.strengthTotal.</v>
+<o n="." r="1359"><o>__sys__t39</o><i>hero</i><i>__sys__t40</i></o>
+<o n="+" r="1359"><o>__sys__t42</o><i>wifeSG</i><i>heroSG</i></o>
+<o n="*" r="1359"><o>__sys__t43</o><i>__sys__t42</i><i>__sys__t7</i></o>
+<o n="*" r="1359"><o>__sys__t44</o><i>__sys__t43</i><i>__sys__t36</i></o>
+<o n="+" r="1359"><o>__sys__t45</o><i>__sys__t44</i><i>__sys__t39</i></o>
+<o n="=" r="1359"><o>attack</o><i>__sys__t45</i></o>
+<o n="goto"><o>__sys__t47</o><i>__sys__t59</i></o>
+<v t="s" n="__sys__t50">.level.</v>
+<o n="." r="1363"><o>__sys__t49</o><i>hero</i><i>__sys__t50</i></o>
+<v t="s" n="__sys__t53">.strengthTotal.</v>
+<o n="." r="1363"><o>__sys__t52</o><i>hero</i><i>__sys__t53</i></o>
+<o n="*" r="1363"><o>__sys__t55</o><i>heroSG</i><i>__sys__t8</i></o>
+<o n="*" r="1363"><o>__sys__t56</o><i>__sys__t55</i><i>__sys__t49</i></o>
+<o n="+" r="1363"><o>__sys__t57</o><i>__sys__t56</i><i>__sys__t52</i></o>
+<o n="=" r="1363"><o>attack</o><i>__sys__t57</i></o>
+<o n="return" r="1366"><o>__sys__t60</o><i>attack</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t11" />
+<v n="__sys__t13" />
+<v n="__sys__t15" />
+<v n="__sys__t19" />
+<v n="__sys__t23" />
+<v n="__sys__t27" />
+<v n="__sys__t32" />
+<v n="__sys__t34" />
+<v n="__sys__t35" />
+<v n="__sys__t36" />
+<v n="__sys__t39" />
+<v n="__sys__t42" />
+<v n="__sys__t43" />
+<v n="__sys__t44" />
+<v n="__sys__t45" />
+<v n="__sys__t47" />
+<v n="__sys__t49" />
+<v n="__sys__t52" />
+<v n="__sys__t55" />
+<v n="__sys__t56" />
+<v n="__sys__t57" />
+<v n="__sys__t60" />
+<v n="__sys__t9" />
+<v n="attack" />
+<v n="hero" />
+<v n="heroIndex" />
+<v n="heroSG" />
+<v n="json" />
+<v n="self" />
+<v n="wifePlus" />
+<v n="wifeSG" />
+</script>

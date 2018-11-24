@@ -1,0 +1,80 @@
+<style>
+#accountUI_pannel{
+	position:fixed;
+	width:100%;
+	top:25px;
+}
+#accountUI_accountListView{
+	position:fixed;
+	width:100%;
+	top:50px;
+	bottom:25px;
+	overflow:auto;
+}
+#accountUI_accountListView table{
+	width:100%;
+}
+#accountUI_accountListView td{
+	height:50px;
+	border-bottom:1px solid;
+	text-align:center;
+	vertical-align:middle;
+}
+#accountUI_accountListView table tbody tr:first-child{
+	background:#cccccc;
+}
+#accountUI_accountListView table tbody tr{
+	background:#eeeeee;
+}
+#accountUI table:first-child{
+	width:100%;
+}
+</style>
+
+<div id="accountUI">
+	<div id="accountUI_pannel">
+    	<input id="accountUI_uid" size="10" placeholder="uid" />
+        <select id="accountUI_type">
+        	<option value="-1">全部</option>
+            <option value="0">普通</option>
+            <option value="1">测试</option>
+        </select>
+        <button id="accountUI_queryBtn">查询</button>
+    </div>
+	<div id="accountUI_accountListView">无帐号数据</div>
+</div>
+
+
+<div id="editAccountUI" class="am-modal am-modal-loading am-modal-no-btn" tabindex="-1">
+  <div class="am-modal-dialog">
+    <div class="am-modal-hd">编辑帐号
+      <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+    </div>
+    <div class="am-modal-bd">
+    	帐号类型：
+    	<select id="editAccountUI_type">
+        	<option value="0">普通用户</option>
+            <option value="1">测试用户</option>
+        </select>
+	<br />
+	<button id="editAccountUI_saveBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<div id="banAccountUI" class="am-modal am-modal-loading am-modal-no-btn" tabindex="-1">
+  <div class="am-modal-dialog">
+    <div class="am-modal-hd">封禁帐号
+      <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+    </div>
+    <div class="am-modal-bd">
+    	封禁：
+    	<select id="banAccountUI_ban">
+        	<option value="0">否</option>
+            <option value="1">是</option>
+        </select>
+	<br />
+	<button id="banAccountUI_saveBtn">保存</button>
+    </div>
+  </div>
+</div>

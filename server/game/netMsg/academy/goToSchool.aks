@@ -1,0 +1,142 @@
+//读书
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+heroIndex=int(netMsg[3]);//豪杰位置
+index=int(netMsg[4]);//座位位置
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID,heroIndex,index;
+		json=json_decode(user.json);
+		bookHouse=json.bookHouse;
+		seatCount=bookHouse.seatCount;
+		heroArrB=bookHouse.heroArr;
+		count=size(heroArrB);
+		i=0;
+		while(i<count)
+		{
+			info=heroArrB[i];
+			heroIndexS=info.heroIndex;
+			if(heroIndexS==heroIndex)//豪杰正在上课
+			{
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)
+				);
+				return(0);//不修改
+			}
+			++i;
+		}
+		
+		structMgr=game.structMgr;
+		if(count==0)
+		{
+			map=structMgr_upgradeObj(structMgr,"BookHouseHero",dict());
+			map["heroIndex"]=-1;
+			map["bt"]=0;
+			push(heroArrB,map);
+		}
+		
+		seatInfo=heroArrB[index];
+		heroIndexZ=seatInfo.heroIndex;
+		if(heroIndexZ!=-1)//座位已满
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		
+		heroIDStudy=0;
+		heroStudyCountMap=bookHouse.heroStudyCountMap;
+		heroArr=json.hero;
+		hero=heroArr[heroIndex];
+		heroID=hero.heroID;
+		if(exist(heroStudyCountMap,heroID))
+		{
+			heroIDStudy=heroStudyCountMap[heroID];//已培养次数（资质系数）
+		}
+
+		table=game.table;
+		schoolTable=table.school;
+		rowS=schoolTable.getRow(0);
+		maxLearn=number(rowS.getValFromColName("maxLearn"));//最大培养次数（资质系数）
+		
+		allGrows=hero.strengthGrows+hero.wisdomGrows+hero.charmGrows+hero.politicsGrows;//总资质
+		if(heroIndex==0)
+		{
+			wifePlus=json.wifePlus;
+			allWifePlusGrows=wifePlus.strengthGrows+wifePlus.wisdomGrows+wifePlus.charmGrows+wifePlus.politicsGrows;
+			allGrows+=allWifePlusGrows;
+		}
+		allGrows*=maxLearn;
+		
+		if(heroIDStudy>=allGrows)//读书次数已达到最大值
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		//入座
+		nowTime=time();
+		seatInfo.heroIndex=heroIndex;
+		seatInfo.bt=nowTime;
+	
+		//保存
+		heroIDStudy+=1;
+		heroStudyCountMap[heroID]=heroIDStudy;
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,bookHouse)
+		);
+		
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

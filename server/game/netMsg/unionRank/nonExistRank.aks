@@ -1,0 +1,36 @@
+//联萌榜® 未存在
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2]; // 通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//生成联盟榜函数
+genUnionRankFunc=##<rankJson>
+	return(rankJson);
+##.;
+
+str=game.rd.getStr(
+"unionRank50",
+genUnionRankFunc,
+"[]",
+1000,//加锁时间（毫秒），例如：1000
+0//存活时间（毫秒）：0=无限；
+);
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,str)//,rankUserIDArr,userInfoArr)
+);

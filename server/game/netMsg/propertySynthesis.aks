@@ -1,0 +1,110 @@
+//道具合成
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+itemID=netMsg[3];//道具Id
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+itemTable=game.table.item;//道具表格.
+idRow=itemTable.getRowFromColName("id",itemID);
+if(empty(idRow))
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-4)//商品不存在
+	);
+	exit();
+}
+syntheticMaterial=idRow.getValFromColName("compose");//合成材料
+
+if(syntheticMaterial==0)
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-5)//道具无法合成
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,itemID,idRow,syntheticMaterial,itemTable;
+		json=json_decode(user.json);
+		itemDict=json.item;
+		arr=split(arr(),syntheticMaterial,",");
+		needPropertyId=arr[0];
+		needPropertyCount=arr[1];
+		numMgr=game.numMgr;
+		if(!exist(itemDict,needPropertyId))
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)//没这道具
+			);
+			return(-1);
+		}
+		else if(itemDict[needPropertyId]<needPropertyCount)
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)//道具不足
+			);
+			return(-1);
+		}
+		else
+		{
+			numMgr.addItem(itemID,1,itemDict);
+			numMgr.subItem(needPropertyId,needPropertyCount,itemDict);
+		}
+		
+		//保存
+		user.json=json_encode(json);
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,needPropertyId,needPropertyCount)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

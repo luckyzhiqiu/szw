@@ -1,0 +1,235 @@
+//拒绝提亲
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+childID=netMsg[3];//孩子id
+hisID=netMsg[4];//对方玩家ID
+type=netMsg[5];//0:单个 1:全部
+
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+if(userID==hisID)
+{
+	//不能向自己拒绝
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",2)
+	);
+	exit();
+}
+
+//update对方
+updateHisUser=##<game,userID,childID,hisID>
+	returnType=1;
+	
+	//修改行数据
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link methodName,sessionID,childID,returnType,hisID;
+			
+				
+			jsonExt=json_decode(user.jsonExt);
+			pairSys=ref(jsonExt.pairSys);
+
+			childArr=ref(pairSys.children);
+			hadChild=0;
+			c=size(childArr);
+			i=0;while(i<c){
+				if(childArr[i].id==childID &&childArr[i].targetUserID==hisID)
+				{
+					hadChild=1;
+					returnType=1;	
+					childArr[i].targetUserID=-2;
+					//保存
+					user.jsonExt=json_encode(jsonExt);		
+					
+					return(1);//修改
+					
+					break;
+				}
+				i++;
+			}
+			if(hadChild==0)
+			{
+				//没有这请求
+
+				returnType=-5;
+				
+				//不保存
+				return(0);
+				
+			}
+			
+			
+		
+		
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	
+	if(empty(user))
+	{
+		//对方不存在
+		return(-7);	
+	}
+	else
+	{
+		return(returnType);
+	}
+	
+##.;
+
+
+
+	//修改行数据
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link methodName,sessionID,childID,hisID,userID,updateHisUser,type;
+			
+			
+			jsonExt=json_decode(user.jsonExt);
+			pairSys=ref(jsonExt.pairSys);
+
+			pairReqArr=ref(pairSys.pairReqArr);
+			
+			c=size(pairReqArr);
+			if(type==0)
+			{
+				hadChild=0;
+				i=0;while(i<c){
+					if(pairReqArr[i].userID==hisID &&pairReqArr[i].childID==childID)
+					{
+						hadChild=1;
+						
+										
+						hisUser=updateHisUser(game,hisID,childID,userID);
+						
+						if(hisUser==1){//对方已更新
+							remove(pairReqArr,i);
+							
+						}else if(hisUser==-5)
+						{
+							//没有这请求
+							game.sendMsg
+							(
+								sessionID,
+								arr(methodName+"Result",-5)
+							);
+							return(0);
+						}			
+									
+						else if(hisUser==-7)//对方用户不存在
+						{
+							//回复
+							game.sendMsg
+							(
+								sessionID,
+								arr(methodName+"Result",-7)
+							);
+							return(0);
+						}	
+									
+						break;
+					}
+					i++;
+				}
+				if(hadChild==0)
+				{
+					//没有这请求
+					game.sendMsg
+					(
+						sessionID,
+						arr(methodName+"Result",-5)
+					);
+					//不保存
+					return(0);	
+				}
+				
+			}else if(type==1)
+			{
+				i=0;while(i<c){
+					updateHisUser(game,pairReqArr[i].userID,pairReqArr[i].childID,userID);
+					i++;	
+				}
+				pairReqArr=clean(pairReqArr);//清空
+				
+			}else{
+				//没有类型
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-11)
+				);
+				//不保存
+				return(0);	
+				
+			}
+		
+			
+	
+			//保存
+			user.jsonExt=json_encode(jsonExt);
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1)
+			);
+			
+			return(1);//修改
+		
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	
+	
+
+
+
+
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}

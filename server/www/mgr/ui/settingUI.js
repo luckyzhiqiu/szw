@@ -1,0 +1,44 @@
+uiMgr.addUI
+(
+	"settingUI",
+	function()
+	{
+		settingUI=new SettingUI();
+		$("#settingUI_modifPasswordBtn").click(function(){
+			$("#modifPasswordUI").modal("open");
+		});
+		$("#modifPasswordUI_modifBtn").click(function(){
+			settingUI.modifPassword();
+		});
+	},
+	function()
+	{
+	}
+);
+
+SettingUI=function()
+{
+	this.modifPassword=function()
+	{
+		var newPassword=$.md5($("#modifPasswordUI_password").val());
+		reqJson
+		(
+			"post",
+			"web_api/setting.php",
+			{
+				action:'modifPassword',
+				userID:cache.get('userID'),
+				tick:cache.get('tick'),
+				password:newPassword,
+			},
+			function(json)
+			{
+				if(json.result==1)
+				{
+					$("#modifPasswordUI").modal("close");
+					myAlert("修改成功");
+				}
+			}
+		);
+	}
+}

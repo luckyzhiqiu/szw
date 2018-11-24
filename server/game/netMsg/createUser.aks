@@ -1,0 +1,212 @@
+//创建用户
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+platformID=netMsg[1];//第三方平台ID
+//////////////////////////////////////////
+uid=netMsg[2];//第三方平台帐号唯一ID
+platform=netMsg[3];//第三方平台
+//////////////////////////////////////////
+head=number(netMsg[4]);//头像ID
+nickname=netMsg[5];//昵称
+serverID=netMsg[6];//游戏服ID
+platform=netMsg[7];//第三方平台标识
+ostype=netMsg[8];//账号创建时的操作系统
+ip=netMsg[9];//账号创建时的IP
+genTime=netMsg[10];//帐号创建时间
+sex=netMsg[11];//性别
+accountID=netMsg[12];//帐号ID
+
+//检查昵称合法性
+if(strFind(nickname,"'")>=0||strFind(nickname,"\"")>=0 || nickname=="")//昵称不合法
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}
+
+//检查uid是否存在
+sql="select id from index_my_platform where uid='"+uid+"' limit 1";
+rs=mysqlCreateRs(game.cnn,sql);
+uidRow=mysqlNextRow(rs);
+mysqlDestroyRs(rs);
+if(uidRow)//uid已存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-4)
+	);
+	exit();
+}
+
+//检查重名
+sql="select id from user where nickname='"+nickname+"'";
+rs=mysqlCreateRs(game.cnn,sql);
+hasRow=mysqlNextRow(rs);
+mysqlDestroyRs(rs);
+
+if(hasRow)//昵称重名
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+numMgr=game.numMgr;
+structMgr=game.structMgr;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//填写用户json
+json=structMgr_upgradeObj(structMgr,"Json",dict());
+//上阵豪杰列表
+heroArr=arr();
+makeHero=structMgr_upgradeObj(structMgr,"MakeResHeroUp",dict());
+push(heroArr,makeHero,makeHero,makeHero,makeHero,makeHero);
+//经营:商业
+makeMoney=json.makeMoney;
+makeMoney.beginTime=0;//资源增长开始时间戳（毫秒）
+makeMoney.hero=heroArr;//上阵豪杰列表
+//经营:农业
+makeFood=json.makeFood;
+makeFood.beginTime=0;//资源增长开始时间戳（毫秒）
+makeFood.hero=heroArr;//上阵豪杰列表
+//经营:征兵
+makeSoldier=json.makeSoldier;
+makeSoldier.beginTime=0;//资源增长开始时间戳（毫秒）
+makeSoldier.hero=heroArr;//上阵豪杰列表
+//经营:兵营
+push(json.battle.hero,-1,-1,-1,-1,-1);
+//剧情
+json.story.date=split(arr(),now()," ")[0];
+//红颜随机宠幸
+json.wifeRandomFuck.beginTime=0;//开始时间戳（毫秒）
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//创建主角豪杰
+heroArr=json.hero;
+numMgr.createHero(1,heroArr,json);
+//heroArr[0].growsExp=150;
+numMgr.createHero(2,heroArr,json);
+numMgr.createHero(7,heroArr,json);
+numMgr.createHero(11,heroArr,json);
+//创建红颜
+//numMgr.createWife(1,json.wife);
+//计算加成
+numMgr.computeHeroArr(json);
+//////////////////////////////////////////////////////////
+tableData=game.table;
+//计算势力属性
+strength=numMgr.getTotalStrength(json,handle());//总武力
+wisdom=numMgr.getTotalWisdom(json,handle());//总智力
+charm=numMgr.getTotalCharm(json,handle());//总魅力
+politics=numMgr.getTotalPolitics(json,handle());//总政治
+power=strength+wisdom+charm+politics;
+//子嗣席位
+rowC=tableData.childConfigure.getRow(0);
+json.childSys.childMaxCount=number(rowC.getValFromColName("seat"));//默认席位
+//增加道具
+itemDict=json.item;
+numMgr.addItem(85,1,itemDict);
+numMgr.addItem(88,1,itemDict);
+numMgr.addItem(91,1,itemDict);
+numMgr.addItem(94,1,itemDict);
+numMgr.addItem(97,1,itemDict);
+numMgr.addItem(100,1,itemDict);
+
+map=json.decorate.map;
+map[1]=85;
+map[2]=88;
+map[3]=91;
+map[4]=94;
+map[5]=97;
+map[6]=100;
+
+//填写用户扩展json
+jsonExt=structMgr_upgradeObj(structMgr,"JsonExt",dict());
+
+//编码
+jsonStr=json_encode(json);
+jsonExtStr=json_encode(jsonExt);
+
+newUserID=game.allocUserID();
+if(newUserID==0)//分配用户ID错误
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-3)
+	);
+	exit();
+}
+
+cnn=game.cnn;
+
+row=tableData.createRole.getRow(0);
+vip=number(row.getValFromColName("VIP"));//默认VIP
+
+//创建用户
+sql="insert into user set ";
+sql+="id='"+newUserID+"'";
+sql+=",first_account_id='"+accountID+"'";
+sql+=",first_uid='"+uid+"'";
+sql+=",first_platform='"+platform+"'";
+sql+=",first_ostype='"+ostype+"'";
+sql+=",first_ip='"+ip+"'";
+sql+=",first_genTime='"+genTime+"'";
+sql+=",genTime='"+now()+"'";
+sql+=",sex='"+sex+"'";
+sql+=",nickname='"+nickname+"'";
+sql+=",soldier='"+5000+"'";
+sql+=",money='"+10000+"'";
+sql+=",food='"+10000+"'";
+sql+=",strength='"+strength+"'";
+sql+=",wisdom='"+wisdom+"'";
+sql+=",charm='"+charm+"'";
+sql+=",politics='"+politics+"'";
+sql+=",power='"+power+"'";
+sql+=",head='"+head+"'";
+sql+=",vip='"+vip+"'";
+//sql+=",jsonVer='"+game.structVer+"'";
+sql+=",json='"+jsonStr+"'";
+sql+=",jsonExt='"+jsonExtStr+"'";
+mysqlExec(cnn,sql);
+//newUserID=mysqlInsertID(cnn);//新建用户ID
+
+//创建用户扩展数据
+sql="insert into user_ext set ";
+sql+="id="+newUserID;
+sql+="json=''";
+
+//创建通行证
+sql="insert into index_my_platform set ";
+sql+="genTime='"+now()+"'";
+sql+=",uid='"+uid+"'";
+sql+=",userID="+newUserID;
+mysqlExec(cnn,sql);
+
+//加入排行榜
+game.addToRank(newUserID);
+
+//帐号信息加入到队列
+sql="insert into account_info_queue set ";
+sql+="uid='"+uid+"'";
+sql+=",platformID="+platformID;
+sql+=",serverID="+serverID;
+sql+=",nickname='"+nickname+"'";
+mysqlExec(cnn,sql);
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1)
+);

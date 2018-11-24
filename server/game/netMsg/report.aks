@@ -1,0 +1,44 @@
+//举报
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+hisID=netMsg[3];//其它玩家id
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+sql="select id from user_report where srcUserID="+userID+" and destUserID="+hisID;
+rs=mysqlCreateRs(game.cnn,sql);
+existSign=mysqlNextRow(rs);
+mysqlDestroyRs(rs);
+if(existSign)
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",2)//已举报
+	);
+}else
+{
+	sql="INSERT INTO user_report (srcUserID,destUserID,genTime) VALUES ("+userID+","+hisID+",'"+now()+"')";
+	rs=mysqlCreateRs(game.cnn,sql);
+	mysqlDestroyRs(rs);
+	
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",1)//举报成功
+	);
+	
+}
+
+
+

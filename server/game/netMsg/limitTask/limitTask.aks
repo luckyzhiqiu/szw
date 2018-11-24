@@ -1,0 +1,367 @@
+//限时任务
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+limitID=int(netMsg[3]);//限时任务ID
+eventID=int(netMsg[4]);//活动ID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+if(eventID!=5 && eventID!=8 && eventID!=11 && eventID!=14)//没有此活动ID
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-5)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,limitID,eventID,userID;
+		//判断活动是否领奖时间
+		status=game.activityMgr.getActivityStatus(eventID);
+		if(status!=1)//活动不再进行中
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-6)
+			);
+			return(0);//不修改
+		}
+		
+		json=json_decode(user.json);
+		limitTask=json.limitTask;
+		limitTaskBt=limitTask.bt;
+		
+		global_var=game.global_var;
+		rushLoop=global_var.rushLoop;
+		bt=rushLoop.bt;;//阶段开始时间（秒）
+		if(limitTaskBt!=bt)//确认活动时间
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-7)
+			);
+			return(0);//不修改
+		}
+		
+		row=game.table.limitedReward.getRowFromColName("id",limitID);//限时活动编号
+		if(empty(row))//没有此编号
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		idMap=limitTask.idMap;
+		if(exist(idMap,limitID))//已领取奖励
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+		//1=元宝消耗，2士兵消耗，3银两消耗，4资质果消耗itemID9,10,11,12，5势力涨幅，6累登天数，7精力丸消耗itemID4，8联姻次数，9击杀世界boss，10赴宴次数，11联盟副本伤害，12联盟副本击杀次数，13亲密度涨幅，14惩戒犯人次数，15体力丹消耗itemID71，16政务次数，17经营商产，18经营农产，19征兵次数，20寻访次数，21挑战书消耗itemID50，22议政厅权威涨幅，23红颜魅力值涨幅
+		type=number(row.getValFromColName("type"));//类型
+		num=number(row.getValFromColName("num"));//目标数值
+		recvSign=0;
+		
+		if(type==1)//元宝消耗
+		{
+			useGold=limitTask.useGold;
+			if(useGold>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==2)//士兵消耗
+		{
+			useSoldier=limitTask.useSoldier;
+			if(useSoldier>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==3)//银两消耗
+		{
+			useMoney=limitTask.useMoney;
+			if(useMoney>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==4)//资质果消耗
+		{
+			useItem9_12=limitTask.useItem9_12;
+			if(useItem9_12>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==5)//势力涨幅
+		{
+			powerAdd=limitTask.powerAdd;
+			if(powerAdd>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==6)//累登天数
+		{
+			loginDay=limitTask.loginDay;
+			if(loginDay>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==7)//精力丸消耗
+		{
+			useItem4=limitTask.useItem4;
+			if(useItem4>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==8)//联姻次数
+		{
+			pairCount=limitTask.pairCount;
+			if(pairCount>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==9)//击杀世界boss
+		{
+			killWorldBoss=limitTask.killWorldBoss;
+			if(killWorldBoss>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==10)//
+		{
+			
+		}
+		else if(type==11)//联盟副本伤害
+		{
+			unionBossHit=limitTask.unionBossHit;
+			if(unionBossHit>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==12)//联盟副本击杀次数
+		{
+			killUnionBoss=limitTask.killUnionBoss;
+			if(killUnionBoss>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==13)//亲密度涨幅
+		{
+			addIntimate=limitTask.addIntimate;
+			if(addIntimate>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==14)//惩戒犯人次数
+		{
+			hitPrisonerCount=limitTask.hitPrisonerCount;
+			if(hitPrisonerCount>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==15)//体力丹消耗
+		{
+			useItem71=limitTask.useItem71;
+			if(useItem71>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==16)//政务次数
+		{
+			workCount=limitTask.workCount;
+			if(workCount>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==17)//经营商产
+		{
+			makeMoneyCount=limitTask.makeMoneyCount;
+			if(makeMoneyCount>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==18)//经营农产
+		{
+			makeFoodCount=limitTask.makeFoodCount;
+			if(makeFoodCount>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==19)//征兵次数
+		{
+			makeSoldierCount=limitTask.makeSoldierCount;
+			if(makeSoldierCount>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==20)//寻访次数
+		{
+			visitCount=limitTask.visitCount;
+			if(visitCount>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==21)//挑战书消耗
+		{
+			useItem50=limitTask.useItem50;
+			if(useItem50>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==22)//议政厅权威涨幅
+		{
+			waterScoreAdd=limitTask.waterScoreAdd;
+			if(waterScoreAdd>=num)
+			{
+				recvSign=1;
+			}
+		}
+		else if(type==23)//红颜魅力值涨幅
+		{
+			beautyAdd=limitTask.beautyAdd;
+			if(beautyAdd>=num)
+			{
+				recvSign=1;
+			}
+		}
+
+		if(recvSign)
+		{
+			money=number(row.getValFromColName("money"));//奖励银两
+			food=number(row.getValFromColName("food"));//奖励粮草
+			soldier=number(row.getValFromColName("soldier"));//奖励士兵
+			gold2=number(row.getValFromColName("gold"));//奖励元宝
+			item=row.getValFromColName("item");//奖励物品	
+		
+			moneyU=number(user.money);
+			foodU=number(user.food);
+			soldierU=number(user.soldier);
+			gold2U=number(user.gold2);
+			itemDict=json.item;
+			numMgr=game.numMgr;
+		
+			moneyU+=money;//奖励银两
+			foodU+=food;//奖励粮草
+			soldierU+=soldier;//奖励士兵
+			gold2U+=gold2;//奖励元宝
+			if(gold2>0)
+			{
+				allGold=number(user.gold)+gold2U;//元宝余额
+				game.saveResIO(userID,28,0,1,gold2,allGold);//限时奖励(type,itemID,（0=消耗，1=获得）,count,allGold)
+			}
+			
+			addItemArr=split(arr(),item,",");
+			addIDCount=size(addItemArr);
+			if(addIDCount>=2)
+			{
+				i=0;j=0;addCount=addIDCount/2;
+				while(i<addCount)
+				{
+					itemID=number(addItemArr[j]);
+					itemCount=number(addItemArr[j+1]);
+					numMgr.addItem(itemID,itemCount,itemDict);//奖励道具
+					j+=2;
+					++i;
+				}
+			}
+		
+			//保存
+			limitTask.idMap[limitID]=1;
+			user.money=moneyU;
+			user.food=foodU;
+			user.soldier=soldierU;
+			if(gold2U!=0)
+			{
+				user.gold2=gold2U;
+			}
+			user.json=json_encode(json);
+
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,limitTask.idMap,moneyU,foodU,soldierU,gold2U,itemDict)
+			);
+			return(1);//修改
+		}
+		else//任条件不满足
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

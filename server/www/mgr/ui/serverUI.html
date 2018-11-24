@@ -1,0 +1,109 @@
+<style>
+#serverUI_pannel{
+	position:fixed;
+	width:100%;
+	top:25px;
+}
+#serverUI_serverListView{
+	position:fixed;
+	width:100%;
+	top:50px;
+	bottom:25px;
+	overflow:auto;
+}
+#serverUI_serverListView table{
+	width:100%;
+}
+#serverUI_serverListView td{
+	height:50px;
+	border-bottom:1px solid;
+	text-align:center;
+	vertical-align:middle;
+}
+#serverUI_serverListView table tbody tr:first-child{
+	background:#cccccc;
+}
+#serverUI_serverListView table tbody tr{
+	background:#eeeeee;
+}
+#serverUI table:first-child{
+	width:100%;
+}
+#serverUI_createBtn{
+	width:100%;
+}
+</style>
+
+<div id="serverUI">
+	<div id="serverUI_pannel">
+        <table>
+            <tr>
+                <td><button id="serverUI_createBtn">增加游戏服</button></td>
+                <td><button id="serverUI_createCacheBtn" style="width:100%">更新游戏服列表缓存</button></td>
+                <td><button id="serverUI_cdnBtn" style="width:100%">刷新CDN</button></td>
+            </tr>
+        </table>
+    </div>
+	<div id="serverUI_serverListView">无游戏服数据</div>
+</div>
+
+
+<div id="createServerUI" class="am-modal am-modal-loading am-modal-no-btn" tabindex="-1">
+  <div class="am-modal-dialog">
+    <div class="am-modal-hd">增加游戏服
+      <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+    </div>
+    <div class="am-modal-bd">
+    游戏服名称：<input id="createServerUI_serverName" type="text" placeholder="游戏服名称" value="我的游戏服" /><br />
+    游戏服IP：<input id="createServerUI_serverIP" type="text" placeholder="游戏服IP" value="127.0.0.1" /><br />
+    游戏服PORT：<input id="createServerUI_serverPort" type="text" placeholder="游戏服PORT" value="10050" /><br />
+    数据库IP：<input id="createServerUI_dbIP" type="text" placeholder="数据库IP" value="127.0.0.1" /><br />
+    数据库PORT：<input id="createServerUI_dbPort" type="text" placeholder="数据库PORT" value="3306" /><br />
+    数据库名称：<input id="createServerUI_dbName" type="text" placeholder="数据库名称" value="jipin_game" /><br />
+    数据库用户：<input id="createServerUI_dbUser" type="text" placeholder="数据库用户" value="root" /><br />
+    数据库密码：<input id="createServerUI_dbPassword" type="text" placeholder="数据库密码" value="123456" /><br />
+	<button id="createServerUI_createBtn">确定</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="editServerUI" class="am-modal am-modal-loading am-modal-no-btn" tabindex="-1">
+  <div class="am-modal-dialog">
+    <div class="am-modal-hd">编辑游戏服
+      <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+    </div>
+    <div class="am-modal-bd">
+    游戏服名称：<input id="editServerUI_serverName" type="text" placeholder="游戏服名称" /><br />
+    游戏服状态：
+    <select id="editServerUI_status">
+    <option value="0">待开</option>
+    <option value="1">新服</option>
+    <option value="2">火爆</option>
+    <option value="3">维护</option>
+    </select>
+    <br />
+    游戏服IP：<input id="editServerUI_serverIP" type="text" placeholder="游戏服IP" /><br />
+    游戏服PORT：<input id="editServerUI_serverPort" type="text" placeholder="游戏服PORT" /><br />
+    数据库IP：<input id="editServerUI_dbIP" type="text" placeholder="数据库IP" /><br />
+    数据库PORT：<input id="editServerUI_dbPort" type="text" placeholder="数据库PORT" /><br />
+    数据库名称：<input id="editServerUI_dbName" type="text" placeholder="数据库名称" /><br />
+    数据库用户：<input id="editServerUI_dbUser" type="text" placeholder="数据库用户" /><br />
+    数据库密码：<input id="editServerUI_dbPassword" type="text" placeholder="数据库密码" /><br />
+	<button id="editServerUI_saveBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="startServerUI" class="am-modal am-modal-loading am-modal-no-btn" tabindex="-1">
+  <div class="am-modal-dialog">
+    <div class="am-modal-hd">开服
+      <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+    </div>
+    <div class="am-modal-bd">
+    日期时间：<input id="startServerUI_bt" type="date" value="2017-01-01" />
+	<button id="startServerUI_yesBtn">确定</button>
+    </div>
+  </div>
+</div>

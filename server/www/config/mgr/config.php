@@ -1,0 +1,14 @@
+<?php
+header("Content-Type:text/html;charset=utf-8");
+date_default_timezone_set("PRC");
+set_time_limit(0);
+$cachePreName="game_jipin_mgr";
+////////////////////////////////////////////////////////////////
+include_once(dirname(__FILE__)."/../../ak/AKCommon.php");
+include_once(dirname(__FILE__)."/../../ak/AKGlobal.php");
+include_once(dirname(__FILE__)."/../../ak/AKCnn.php");
+include_once(dirname(__FILE__)."/../../ak/AKRedis.php");
+include_once(dirname(__FILE__)."/../../ak/AKXml.php");
+include_once(dirname(__FILE__)."/../../ak/AKJsonTable.php");
+include_once(dirname(__FILE__)."/db.php");
+include_once(dirname(__FILE__)."/rd.php");

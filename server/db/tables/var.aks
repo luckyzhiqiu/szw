@@ -1,0 +1,4 @@
+//变量表（根据json_table/var.json文件创建和初始化变量）
+mysqlCol("key","id");
+mysqlCol("varchar","name");//变型名
+mysqlCol("varchar","val");//值

@@ -1,0 +1,15 @@
+//游戏兑换码表
+mysqlCol("key","id");
+mysqlCol("datetime","genTime");//生成时间
+mysqlCol("varchar","sn");//序列号（唯一）
+mysqlCol("varchar","ref_sn");//引用的序列号
+mysqlCol("int","type",0);//类型：0=一次性（只可使用一次）；1=通用（每角色可使用一次）；
+mysqlCol("int","useCount",0);//使用次数
+mysqlCol("bigint","soldier",0);//兵力
+mysqlCol("bigint","money",0);//银两
+mysqlCol("bigint","food",0);//粮草
+mysqlCol("bigint","gold",0);//元宝（充值，优先使用）
+mysqlCol("bigint","gold2",0);//元宝（赠送）
+mysqlCol("blob","item");//物品奖励:itemID1,num1,itemID2,num2,...
+mysqlCol("int","heroID",0);//豪杰ID
+mysqlCol("int","wifeID",0);//红颜ID

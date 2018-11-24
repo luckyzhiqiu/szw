@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t232">132</v>
+<v t="n" n="__sys__t229">130</v>
+<v t="n" n="__sys__t226">128</v>
+<v t="n" n="__sys__t225">128</v>
+<v t="n" n="__sys__t223">127</v>
+<v t="n" n="__sys__t222">127</v>
+<v t="n" n="__sys__t193">107</v>
+<v t="n" n="__sys__t192">107</v>
+<v t="n" n="__sys__t190">106</v>
+<v t="n" n="__sys__t189">106</v>
+<v t="n" n="__sys__t151">77</v>
+<v t="n" n="__sys__t121">50</v>
+<v t="n" n="__sys__t112">44</v>
+<v t="n" n="__sys__t111">44</v>
+<v t="n" n="__sys__t82">26</v>
+<v t="n" n="__sys__t81">26</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="n" n="__sys__t4">3</v>
+<v t="n" n="__sys__t5">0</v>
+<v t="n" n="__sys__t6">1</v>
+<v t="n" n="__sys__t7">2</v>
+<v t="n" n="__sys__t8">0</v>
+<v t="s" n="__sys__t9">.Result.</v>
+<v t="n" n="__sys__t10">0</v>
+<v t="s" n="__sys__t11">.user.</v>
+<v t="s" n="__sys__t12">.id.</v>
+<v t="s" n="__sys__t13">.*.</v>
+<v t="n" n="__sys__t14">1000</v>
+<v t="n" n="__sys__t15">0</v>
+<v t="n" n="__sys__t16">0</v>
+<v t="s" n="__sys__t17">.Result.</v>
+<v t="n" n="__sys__t18">2</v>
+<v t="s" n="__sys__t19">.select id,unionID,catchTime,json,keepTime from union_richman.</v>
+<v t="n" n="__sys__t20">0</v>
+<v t="s" n="__sys__t21">.id.</v>
+<v t="n" n="__sys__t22">0</v>
+<v t="n" n="__sys__t23">1</v>
+<v t="s" n="__sys__t24">.unionID.</v>
+<v t="s" n="__sys__t25">.catchTime.</v>
+<v t="n" n="__sys__t26">2</v>
+<v t="s" n="__sys__t27">.keepTime.</v>
+<v t="n" n="__sys__t28">4</v>
+<v t="n" n="__sys__t29">3</v>
+<v t="n" n="__sys__t30">0</v>
+<v t="n" n="__sys__t31">0</v>
+<v t="s" n="__sys__t32">.pertainFriendVal.</v>
+<v t="n" n="__sys__t33">10001</v>
+<v t="n" n="__sys__t34">0</v>
+<v t="s" n="__sys__t35">.union.</v>
+<v t="s" n="__sys__t36">.id.</v>
+<v t="s" n="__sys__t37">.*.</v>
+<v t="n" n="__sys__t38">1000</v>
+<v t="s" n="__sys__t39">.belongUnionName.</v>
+<v t="n" n="__sys__t40">0</v>
+<v t="s" n="__sys__t41">.friendVal.</v>
+<v t="n" n="__sys__t42">10001</v>
+<v t="n" n="__sys__t43">0</v>
+<v t="s" n="__sys__t44">.union.</v>
+<v t="s" n="__sys__t45">.id.</v>
+<v t="s" n="__sys__t46">.*.</v>
+<v t="n" n="__sys__t47">1000</v>
+<v t="s" n="__sys__t48">.unionName.</v>
+<v t="s" n="__sys__t49">.Result.</v>
+<v t="n" n="__sys__t50">1</v>
+<o n="input"><o>__sys__t51</o><i>__sys__t1</i></o>
+<o n="="><o>server</o><i>__sys__t51</i></o>
+<o n="input"><o>__sys__t53</o><i>__sys__t2</i></o>
+<o n="="><o>sessionID</o><i>__sys__t53</i></o>
+<o n="input"><o>__sys__t55</o><i>__sys__t3</i></o>
+<o n="="><o>game</o><i>__sys__t55</i></o>
+<o n="input"><o>__sys__t57</o><i>__sys__t4</i></o>
+<o n="="><o>netMsg</o><i>__sys__t57</i></o>
+<o n="[]" r="3"><o>__sys__t59</o><i>netMsg</i><i>__sys__t5</i></o>
+<o n="=" r="3"><o>methodName</o><i>__sys__t59</i></o>
+<o n="[]" r="4"><o>__sys__t61</o><i>netMsg</i><i>__sys__t6</i></o>
+<o n="=" r="4"><o>userID</o><i>__sys__t61</i></o>
+<o n="[]" r="5"><o>__sys__t63</o><i>netMsg</i><i>__sys__t7</i></o>
+<o n="=" r="5"><o>tick</o><i>__sys__t63</i></o>
+<v t="s" n="__sys__t66">.checkTick.</v>
+<o n="." r="7"><o>__sys__t65</o><i>game</i><i>__sys__t66</i></o>
+<o n="__sys__t65" r="7"><o>__sys__t68</o><i>game</i><i>userID</i><i>tick</i></o>
+<o n="!" r="7"><o>__sys__t69</o><i>__sys__t68</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t69</i></o>
+<o n="=="><o>__sys__t71</o><i>__sys__rt</i><i>__sys__t8</i></o>
+<o n="if_goto"><o>__sys__t72</o><i>__sys__t71</i><i>__sys__t81</i></o>
+<v t="s" n="__sys__t74">.sendMsg.</v>
+<o n="." r="10"><o>__sys__t73</o><i>game</i><i>__sys__t74</i></o>
+<o n="+" r="13"><o>__sys__t76</o><i>methodName</i><i>__sys__t9</i></o>
+<o n="arr" r="13"><o>__sys__t77</o><i>__sys__t76</i><i>__sys__t10</i></o>
+<o n="__sys__t73" r="10"><o>__sys__t78</o><i>game</i><i>sessionID</i><i>__sys__t77</i></o>
+<o n="exit" r="15"><o>__sys__t79</o></o>
+<o n="goto"><o>__sys__t80</o><i>__sys__t82</i></o>
+<v t="s" n="__sys__t84">.rd.</v>
+<o n="." r="18"><o>__sys__t83</o><i>game</i><i>__sys__t84</i></o>
+<v t="s" n="__sys__t87">.getRow.</v>
+<o n="." r="18"><o>__sys__t86</o><i>__sys__t83</i><i>__sys__t87</i></o>
+<v t="s" n="__sys__t90">.cnn.</v>
+<o n="." r="18"><o>__sys__t89</o><i>game</i><i>__sys__t90</i></o>
+<o n="__sys__t86" r="18"><o>__sys__t92</o><i>__sys__t83</i><i>__sys__t89</i><i>__sys__t11</i><i>__sys__t12</i><i>userID</i><i>__sys__t13</i><i>__sys__t14</i></o>
+<o n="=" r="18"><o>user</o><i>__sys__t92</i></o>
+<v t="s" n="__sys__t95">.unionID.</v>
+<o n="." r="19"><o>__sys__t94</o><i>user</i><i>__sys__t95</i></o>
+<o n="=" r="19"><o>myUnionID</o><i>__sys__t94</i></o>
+<o n="==" r="20"><o>__sys__t98</o><i>myUnionID</i><i>__sys__t15</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t98</i></o>
+<o n="=="><o>__sys__t100</o><i>__sys__rt</i><i>__sys__t16</i></o>
+<o n="if_goto"><o>__sys__t101</o><i>__sys__t100</i><i>__sys__t111</i></o>
+<v t="s" n="__sys__t103">.sendMsg.</v>
+<o n="." r="22"><o>__sys__t102</o><i>game</i><i>__sys__t103</i></o>
+<o n="+" r="25"><o>__sys__t105</o><i>methodName</i><i>__sys__t17</i></o>
+<o n=" -" r="25"><o>__sys__t106</o><i>__sys__t18</i></o>
+<o n="arr" r="25"><o>__sys__t107</o><i>__sys__t105</i><i>__sys__t106</i></o>
+<o n="__sys__t102" r="22"><o>__sys__t108</o><i>game</i><i>sessionID</i><i>__sys__t107</i></o>
+<o n="exit" r="27"><o>__sys__t109</o></o>
+<o n="goto"><o>__sys__t110</o><i>__sys__t112</i></o>
+<o n="arr" r="30"><o>__sys__t113</o></o>
+<o n="=" r="30"><o>richmanInfoArr</o><i>__sys__t113</i></o>
+<o n="=" r="31"><o>sql</o><i>__sys__t19</i></o>
+<v t="s" n="__sys__t117">.cnn.</v>
+<o n="." r="32"><o>__sys__t116</o><i>game</i><i>__sys__t117</i></o>
+<o n="mysqlCreateRs" r="32"><o>__sys__t119</o><i>__sys__t116</i><i>sql</i></o>
+<o n="=" r="32"><o>rs</o><i>__sys__t119</i></o>
+<o n="mysqlNextRow" r="33"><o>__sys__t122</o><i>rs</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t122</i></o>
+<o n="=="><o>__sys__t124</o><i>__sys__rt</i><i>__sys__t20</i></o>
+<o n="if_goto"><o>__sys__t125</o><i>__sys__t124</i><i>__sys__t232</i></o>
+<o n="dict" r="35"><o>__sys__t126</o></o>
+<o n="=" r="35"><o>richmanInDict</o><i>__sys__t126</i></o>
+<o n="[]" r="36"><o>__sys__t128</o><i>richmanInDict</i><i>__sys__t21</i></o>
+<o n="mysqlGetColVal" r="36"><o>__sys__t129</o><i>rs</i><i>__sys__t22</i></o>
+<o n="=" r="36"><o>__sys__t128</o><i>__sys__t129</i></o>
+<o n="mysqlGetColVal" r="37"><o>__sys__t131</o><i>rs</i><i>__sys__t23</i></o>
+<o n="=" r="37"><o>unionID</o><i>__sys__t131</i></o>
+<o n="[]" r="38"><o>__sys__t133</o><i>richmanInDict</i><i>__sys__t24</i></o>
+<o n="=" r="38"><o>__sys__t133</o><i>unionID</i></o>
+<o n="[]" r="39"><o>__sys__t135</o><i>richmanInDict</i><i>__sys__t25</i></o>
+<o n="mysqlGetColVal" r="39"><o>__sys__t136</o><i>rs</i><i>__sys__t26</i></o>
+<o n="=" r="39"><o>__sys__t135</o><i>__sys__t136</i></o>
+<o n="[]" r="40"><o>__sys__t138</o><i>richmanInDict</i><i>__sys__t27</i></o>
+<o n="mysqlGetColVal" r="40"><o>__sys__t139</o><i>rs</i><i>__sys__t28</i></o>
+<o n="=" r="40"><o>__sys__t138</o><i>__sys__t139</i></o>
+<o n="mysqlGetColVal" r="41"><o>__sys__t141</o><i>rs</i><i>__sys__t29</i></o>
+<o n="json_decode" r="41"><o>__sys__t142</o><i>__sys__t141</i></o>
+<o n="=" r="41"><o>json</o><i>__sys__t142</i></o>
+<v t="s" n="__sys__t145">.unionFriendMap.</v>
+<o n="." r="42"><o>__sys__t144</o><i>json</i><i>__sys__t145</i></o>
+<o n="=" r="42"><o>unionFriendMap</o><i>__sys__t144</i></o>
+<o n="dictIt" r="44"><o>__sys__t148</o></o>
+<o n="=" r="44"><o>it</o><i>__sys__t148</i></o>
+<o n="dictItBegin" r="45"><o>__sys__t150</o><i>unionFriendMap</i><i>it</i></o>
+<o n="dictItEmpty" r="46"><o>__sys__t152</o><i>it</i></o>
+<o n="!" r="46"><o>__sys__t153</o><i>__sys__t152</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t153</i></o>
+<o n="=="><o>__sys__t155</o><i>__sys__rt</i><i>__sys__t30</i></o>
+<o n="if_goto"><o>__sys__t156</o><i>__sys__t155</i><i>__sys__t229</i></o>
+<o n="dictItKey" r="48"><o>__sys__t157</o><i>it</i></o>
+<o n="=" r="48"><o>selectUnionID</o><i>__sys__t157</i></o>
+<o n="dictItVal" r="49"><o>__sys__t159</o><i>it</i></o>
+<o n="=" r="49"><o>friendVal</o><i>__sys__t159</i></o>
+<o n="==" r="50"><o>__sys__t161</o><i>selectUnionID</i><i>unionID</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t161</i></o>
+<o n="=="><o>__sys__t163</o><i>__sys__rt</i><i>__sys__t31</i></o>
+<o n="if_goto"><o>__sys__t164</o><i>__sys__t163</i><i>__sys__t192</i></o>
+<o n="[]" r="52"><o>__sys__t165</o><i>richmanInDict</i><i>__sys__t32</i></o>
+<o n="=" r="52"><o>__sys__t165</o><i>friendVal</i></o>
+<o n=">=" r="53"><o>__sys__t167</o><i>unionID</i><i>__sys__t33</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t167</i></o>
+<o n="=="><o>__sys__t169</o><i>__sys__rt</i><i>__sys__t34</i></o>
+<o n="if_goto"><o>__sys__t170</o><i>__sys__t169</i><i>__sys__t189</i></o>
+<v t="s" n="__sys__t172">.rd.</v>
+<o n="." r="55"><o>__sys__t171</o><i>game</i><i>__sys__t172</i></o>
+<v t="s" n="__sys__t175">.getRow.</v>
+<o n="." r="55"><o>__sys__t174</o><i>__sys__t171</i><i>__sys__t175</i></o>
+<v t="s" n="__sys__t178">.cnn.</v>
+<o n="." r="55"><o>__sys__t177</o><i>game</i><i>__sys__t178</i></o>
+<o n="__sys__t174" r="55"><o>__sys__t180</o><i>__sys__t171</i><i>__sys__t177</i><i>__sys__t35</i><i>__sys__t36</i><i>unionID</i><i>__sys__t37</i><i>__sys__t38</i></o>
+<o n="=" r="55"><o>unionData</o><i>__sys__t180</i></o>
+<v t="s" n="__sys__t183">.name.</v>
+<o n="." r="56"><o>__sys__t182</o><i>unionData</i><i>__sys__t183</i></o>
+<o n="=" r="56"><o>unionName</o><i>__sys__t182</i></o>
+<o n="[]" r="57"><o>__sys__t186</o><i>richmanInDict</i><i>__sys__t39</i></o>
+<o n="=" r="57"><o>__sys__t186</o><i>unionName</i></o>
+<o n="goto"><o>__sys__t188</o><i>__sys__t190</i></o>
+<o n="goto"><o>__sys__t191</o><i>__sys__t193</i></o>
+<o n="==" r="61"><o>__sys__t194</o><i>selectUnionID</i><i>myUnionID</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t194</i></o>
+<o n="=="><o>__sys__t196</o><i>__sys__rt</i><i>__sys__t40</i></o>
+<o n="if_goto"><o>__sys__t197</o><i>__sys__t196</i><i>__sys__t225</i></o>
+<o n="[]" r="63"><o>__sys__t198</o><i>richmanInDict</i><i>__sys__t41</i></o>
+<o n="=" r="63"><o>__sys__t198</o><i>friendVal</i></o>
+<o n=">=" r="64"><o>__sys__t200</o><i>unionID</i><i>__sys__t42</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t200</i></o>
+<o n="=="><o>__sys__t202</o><i>__sys__rt</i><i>__sys__t43</i></o>
+<o n="if_goto"><o>__sys__t203</o><i>__sys__t202</i><i>__sys__t222</i></o>
+<v t="s" n="__sys__t205">.rd.</v>
+<o n="." r="66"><o>__sys__t204</o><i>game</i><i>__sys__t205</i></o>
+<v t="s" n="__sys__t208">.getRow.</v>
+<o n="." r="66"><o>__sys__t207</o><i>__sys__t204</i><i>__sys__t208</i></o>
+<v t="s" n="__sys__t211">.cnn.</v>
+<o n="." r="66"><o>__sys__t210</o><i>game</i><i>__sys__t211</i></o>
+<o n="__sys__t207" r="66"><o>__sys__t213</o><i>__sys__t204</i><i>__sys__t210</i><i>__sys__t44</i><i>__sys__t45</i><i>unionID</i><i>__sys__t46</i><i>__sys__t47</i></o>
+<o n="=" r="66"><o>unionData</o><i>__sys__t213</i></o>
+<v t="s" n="__sys__t216">.name.</v>
+<o n="." r="67"><o>__sys__t215</o><i>unionData</i><i>__sys__t216</i></o>
+<o n="=" r="67"><o>unionName</o><i>__sys__t215</i></o>
+<o n="[]" r="68"><o>__sys__t219</o><i>richmanInDict</i><i>__sys__t48</i></o>
+<o n="=" r="68"><o>__sys__t219</o><i>unionName</i></o>
+<o n="goto"><o>__sys__t221</o><i>__sys__t223</i></o>
+<o n="goto"><o>__sys__t224</o><i>__sys__t226</i></o>
+<o n="dictItNext" r="71"><o>__sys__t227</o><i>it</i></o>
+<o n="goto"><o>__sys__t228</o><i>__sys__t151</i></o>
+<o n="push" r="73"><o>__sys__t230</o><i>richmanInfoArr</i><i>richmanInDict</i></o>
+<o n="goto"><o>__sys__t231</o><i>__sys__t121</i></o>
+<o n="mysqlDestroyRs" r="75"><o>__sys__t233</o><i>rs</i></o>
+<v t="s" n="__sys__t235">.sendMsg.</v>
+<o n="." r="78"><o>__sys__t234</o><i>game</i><i>__sys__t235</i></o>
+<o n="+" r="81"><o>__sys__t237</o><i>methodName</i><i>__sys__t49</i></o>
+<o n="arr" r="81"><o>__sys__t238</o><i>__sys__t237</i><i>__sys__t50</i><i>richmanInfoArr</i></o>
+<o n="__sys__t234" r="78"><o>__sys__t239</o><i>game</i><i>sessionID</i><i>__sys__t238</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t100" />
+<v n="__sys__t101" />
+<v n="__sys__t102" />
+<v n="__sys__t105" />
+<v n="__sys__t106" />
+<v n="__sys__t107" />
+<v n="__sys__t108" />
+<v n="__sys__t109" />
+<v n="__sys__t110" />
+<v n="__sys__t113" />
+<v n="__sys__t116" />
+<v n="__sys__t119" />
+<v n="__sys__t122" />
+<v n="__sys__t124" />
+<v n="__sys__t125" />
+<v n="__sys__t126" />
+<v n="__sys__t128" />
+<v n="__sys__t129" />
+<v n="__sys__t131" />
+<v n="__sys__t133" />
+<v n="__sys__t135" />
+<v n="__sys__t136" />
+<v n="__sys__t138" />
+<v n="__sys__t139" />
+<v n="__sys__t141" />
+<v n="__sys__t142" />
+<v n="__sys__t144" />
+<v n="__sys__t148" />
+<v n="__sys__t150" />
+<v n="__sys__t152" />
+<v n="__sys__t153" />
+<v n="__sys__t155" />
+<v n="__sys__t156" />
+<v n="__sys__t157" />
+<v n="__sys__t159" />
+<v n="__sys__t161" />
+<v n="__sys__t163" />
+<v n="__sys__t164" />
+<v n="__sys__t165" />
+<v n="__sys__t167" />
+<v n="__sys__t169" />
+<v n="__sys__t170" />
+<v n="__sys__t171" />
+<v n="__sys__t174" />
+<v n="__sys__t177" />
+<v n="__sys__t180" />
+<v n="__sys__t182" />
+<v n="__sys__t186" />
+<v n="__sys__t188" />
+<v n="__sys__t191" />
+<v n="__sys__t194" />
+<v n="__sys__t196" />
+<v n="__sys__t197" />
+<v n="__sys__t198" />
+<v n="__sys__t200" />
+<v n="__sys__t202" />
+<v n="__sys__t203" />
+<v n="__sys__t204" />
+<v n="__sys__t207" />
+<v n="__sys__t210" />
+<v n="__sys__t213" />
+<v n="__sys__t215" />
+<v n="__sys__t219" />
+<v n="__sys__t221" />
+<v n="__sys__t224" />
+<v n="__sys__t227" />
+<v n="__sys__t228" />
+<v n="__sys__t230" />
+<v n="__sys__t231" />
+<v n="__sys__t233" />
+<v n="__sys__t234" />
+<v n="__sys__t237" />
+<v n="__sys__t238" />
+<v n="__sys__t239" />
+<v n="__sys__t51" />
+<v n="__sys__t53" />
+<v n="__sys__t55" />
+<v n="__sys__t57" />
+<v n="__sys__t59" />
+<v n="__sys__t61" />
+<v n="__sys__t63" />
+<v n="__sys__t65" />
+<v n="__sys__t68" />
+<v n="__sys__t69" />
+<v n="__sys__t71" />
+<v n="__sys__t72" />
+<v n="__sys__t73" />
+<v n="__sys__t76" />
+<v n="__sys__t77" />
+<v n="__sys__t78" />
+<v n="__sys__t79" />
+<v n="__sys__t80" />
+<v n="__sys__t83" />
+<v n="__sys__t86" />
+<v n="__sys__t89" />
+<v n="__sys__t92" />
+<v n="__sys__t94" />
+<v n="__sys__t98" />
+<v n="friendVal" />
+<v n="game" />
+<v n="it" />
+<v n="json" />
+<v n="methodName" />
+<v n="myUnionID" />
+<v n="netMsg" />
+<v n="richmanInDict" />
+<v n="richmanInfoArr" />
+<v n="rs" />
+<v n="selectUnionID" />
+<v n="server" />
+<v n="sessionID" />
+<v n="sql" />
+<v n="tick" />
+<v n="unionData" />
+<v n="unionFriendMap" />
+<v n="unionID" />
+<v n="unionName" />
+<v n="user" />
+<v n="userID" />
+</script>

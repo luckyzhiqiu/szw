@@ -1,0 +1,124 @@
+"?common/api.aks"();
+"?class/Game.aks"();
+"?class/NumMgr.aks"();
+"?class/StoryMgr.aks"();
+"?class/ActivityMgr.aks"();
+"?class/ChildMgr.aks"();
+"?class/RebotMgr.aks"();
+
+//游戏会话类
+@class Session
+	self.id=0;
+@class.
+
+//进程编号
+processNum=argv(5);
+
+//启动游戏服进程
+config=json(file_get_contents("config/gameServer.json"));
+webSocketServer_s2
+(
+	config.bindDomain,//绑定域名或IP
+	config.port[processNum],//端口
+	config.connectTimeout,//连接超时（毫秒）
+	config.maxRecvBytes,//最大接收字节数
+	config.maxSendBytes,//最大发送字节数
+	//userData
+	Game(),
+	//onInit
+	##<server,game>
+		game.initServer(server);
+		game.initJsonTable();
+		game.initGame();
+		game.initStory();
+		game.initHubClient();
+		game.initDB();
+		game.initRedis();
+		game.loadManyGlobalVar();
+	##.,
+	//onConnect
+	##<server,serverSession,game>
+		sessionID=serverSession.id;
+		sessionMap=game.sessionMap;
+		session=Session();
+		session.id=sessionID;
+		session.platformID=0;//登录平台ID
+		session.userID=0;//登录用户ID
+		session.loginID=0;//登录日志ID
+		sessionMap[sessionID]=session;
+		trace("connect "+sessionID);
+	##.,
+	//onData
+	##<server,serverSession,game>
+		sessionID=serverSession.id;
+		@try
+			netMsg=unserialize(serverSession.msgBuf);
+			netMsgName=netMsg[0];
+			if(netMsgName=="")//心跳
+			{
+				exit();
+			}
+			// trace(size(serverSession.msgBuf));
+			if(game.gameConfig.debug)
+			{
+				showMsgArr=game.showMsgArr;
+				debug(netMsg);
+				t0=tick();
+				("?netMsg/"+netMsgName+".aks")(server,sessionID,game,netMsg);
+				dt=tick()-t0;
+				i=0;c=size(showMsgArr);
+				while(i<c)
+				{
+					debug(showMsgArr[i]);
+					++i;
+				}
+				trace("========"+dt);
+				clean(showMsgArr);
+			}
+			else
+			{
+				("?netMsg/"+netMsgName+".aks")(server,sessionID,game,netMsg);
+			}
+		@catch
+			s2CloseClient(server,sessionID);
+			if(game.gameConfig.debug)
+			{
+				trace(error());
+			}
+		@catch.
+	##.,
+	//onDisconnect
+	##<server,serverSession,game>
+		sessionMap=game.sessionMap;
+		session=sessionMap[serverSession.id];
+		
+		@try
+			//记录登录日志
+			game.saveLogin(session);
+		@catch
+			trace(error());
+		@catch.
+		
+		userSessionMap=game.userSessionMap;
+		remove(userSessionMap,session.userID);
+		remove(sessionMap,serverSession.id);
+		trace("disconnect "+serverSession.id);
+	##.,
+	//onUpdate
+	##<server,game>
+		game.updateHubClient();
+		if(isTimeout(game.timer,1000*30))
+		{
+			//加载环境变量
+			// game.loadVar();
+			
+			//加载若干全局变量
+			game.loadManyGlobalVar();
+		}
+		if(isTimeout(game.cleanTmpDataTimer,1000*5))
+		{
+			//清理临时数据
+			game.cleanTmpData();
+		}
+	##.,
+);

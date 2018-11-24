@@ -1,0 +1,190 @@
+//创建联盟
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+nickname=netMsg[3];//联盟名称
+password=netMsg[4];//联盟密码
+qq=netMsg[5];//联盟QQ
+remark=netMsg[6];//联盟宣言
+allowJoin=netMsg[7];//允许其它玩家随机加盟 0=否；1=是
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//检查昵称合法性
+if(strFind(nickname,"'")>=0||strFind(nickname,"\"")>=0 || nickname=="")//昵称不合法
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-6)
+	);
+	exit();
+}
+
+if(password=="" || allowJoin=="")//值不能为空
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+//检查uid是否存在
+sql="select id from `union` where name='"+nickname+"' limit 1";
+rs=mysqlCreateRs(game.cnn,sql);
+rowU=mysqlNextRow(rs);
+mysqlDestroyRs(rs);
+if(rowU)//联盟名称已存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-5)
+	);
+	exit();
+}
+
+
+
+
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link sessionID,methodName,userID,nickname,password,qq,remark,allowJoin;
+		unionID=number(user.unionID);
+		if(unionID!=0)//已创建联盟
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);
+		}
+		
+		rowAC=game.table.allianceConfigure.getRow(0);
+		createCost=number(rowAC.getValFromColName("createCost"));//创建联盟消耗元宝
+		gold=number(user.gold);//元宝（充值，优先使用）
+		gold2=number(user.gold2);//元宝（赠送）
+		
+		if(createCost>(gold+gold2))//元宝不足
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+		
+		//扣减元宝
+		if(createCost>gold)
+		{
+			createCost-=gold;
+			gold=0;
+			gold2-=createCost;
+		}
+		else
+		{
+			gold-=createCost;
+		}
+		
+		if(createCost>0)
+		{
+			//流水
+			allGold=gold+gold2;//元宝余额
+			game.saveResIO(userID,23,0,0,createCost,allGold);//建立联盟(type,itemID,（0=消耗，1=获得）,count,allGold)
+		}
+		
+		//分配联盟ID
+		unionAllocID=game.allocUnionID();
+		if(unionAllocID==0)//分配联盟ID错误
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-7)
+			);
+			exit();
+		}
+		
+		//创建json
+		structMgr=game.structMgr;
+		unionJson=structMgr_upgradeObj(structMgr,"UnionJson",dict());
+		unionJson.userIDMap[userID]=0;
+		
+		rowA=game.table.alliance.getRowFromColName("level",1);
+		memberMax=number(rowA.getValFromColName("memberMax"));//成员上限
+		
+		//创建联盟
+		sql="insert into `union` set ";
+		sql+="id='"+unionAllocID+"'";
+		sql+=",genTime='"+now()+"'";
+		sql+=",userID='"+userID+"'";
+		sql+=",name='"+nickname+"'";
+		sql+=",password='"+password+"'";
+		sql+=",qq='"+qq+"'";
+		sql+=",remark='"+remark+"'";
+		sql+=",allowJoin='"+allowJoin+"'";
+		sql+=",json='"+json_encode(unionJson)+"'";
+		sql+=",leaderUserID='"+userID+"'";
+		sql+=",leaderNickname='"+user.nickname+"'";
+		sql+=",peopleNumMax='"+memberMax+"'";
+		mysqlExec(game.cnn,sql);
+		
+		//保存
+		user.unionID=unionAllocID;
+		user.gold=gold;
+		user.gold2=gold2;
+		
+		myname=user.nickname;
+		//公告群发
+		worldSendMsg(game,0,myname,0,0,0,"<font color=\"#33CC00\">"+myname+"</font>创建了联盟<font color=\"#33CC00\">"+nickname+"</font>，在此诚邀各位有识之士共创联盟之辉煌！",0,3);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,unionAllocID,gold,gold2)
+		);
+		return(1);
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

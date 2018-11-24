@@ -1,0 +1,96 @@
+//子嗣培养
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+childID=netMsg[3];//子嗣ID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,childID;
+		json=json_decode(user.json);
+		
+		fosterArr=game.childMgr.childFoster(childID,json,user,1);
+		type=fosterArr[0];
+		sign=0;
+		if(type==-4)//当前资质最大等级
+		{
+			sign=-4;
+		}
+		else if(type==-3)//爆级
+		{
+			sign=-3;
+		}
+		else if(type==-2)//无轮数
+		{
+			sign=-2;
+		}
+		else if(type==1)//成功
+		{
+			sign=1;
+		}
+
+		if(sign==1)
+		{
+			childrenArr=json.childSys.children;
+			userAttribute=arr();
+			push(userAttribute,user.strengthAdd3,user.wisdomAdd3,user.charmAdd3,user.politicsAdd3,user.strength,user.wisdom,user.charm,user.politics,user.power,json.vip.childCount);
+			upChild=json.dailyTask.upChild;//日常任务培养子女次数
+			aUpChild=json.achievement.upChild;//成就//培养子女次数
+			
+			//保存
+			user.json=json_encode(json);
+						
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,childrenArr,userAttribute,fosterArr,upChild,aUpChild)
+			);
+			return(1);//修改
+		}
+		else
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",sign)
+			);
+			return(0);//不修改
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

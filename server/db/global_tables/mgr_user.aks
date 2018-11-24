@@ -1,0 +1,5 @@
+//后台用户表
+mysqlCol("key","id");
+mysqlCol("datetime","genTime");//生成时间
+mysqlCol("varchar","account");//帐号
+mysqlCol("varchar","password");//密码

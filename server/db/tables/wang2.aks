@@ -1,0 +1,5 @@
+//历任王爷表2
+mysqlCol("key","id");
+mysqlCol("datetime","genTime");//创建时间
+mysqlCol("int","userID",0);//用户ID
+mysqlCol("varchar","nickname");//玩家昵称

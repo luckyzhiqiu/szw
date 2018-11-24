@@ -1,0 +1,105 @@
+//百废待兴-每日领取®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//获取全局变量
+varName="buildActivity";
+var=game.rd.getRow(game.cnn,"global_var","name",varName,"*",1000);
+varJson=json_decode(var.json);
+buildVal=varJson.buildVal;//建设值（每天清0）
+eventXTable=game.table.buildEvent;
+row=eventXTable.getRow(0);
+buildNumAll=number(row.getValFromColName("buildNumAll"));//建设度总值
+
+if(buildVal<buildNumAll)//未够建设度
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+item=row.getValFromColName("completeReward");//每日物品
+var.json=json_encode(varJson);
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,item;
+		json=json_decode(user.json);
+		buildActivity=json.buildActivity;//开服活动百废待兴
+		buildRewardSign=buildActivity.buildRewardSign;//建设领奖标记：0=未领取；1=已领取；
+		if(buildRewardSign!=0)
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)//已领取过
+			);
+			return(0);
+		}
+		arr=split(arr(),item,",");
+		getItem=size(arr);//物品
+		if(getItem!=0)
+		{
+			numMgr=game.numMgr;
+			itemDict=json.item;
+			i=0;
+			while(i<getItem)
+			{
+				itemID=arr[i];
+				itemCount=number(arr[i+1]);
+				numMgr.addItem(itemID,itemCount,itemDict);
+				i+=2;
+			}
+		}
+		//保存
+		json.buildActivity.buildRewardSign=1;
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

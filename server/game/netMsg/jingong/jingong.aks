@@ -1,0 +1,142 @@
+//进贡
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID,;
+		json=json_decode(user.json);
+		
+	
+		
+		tabelData=game.table;
+		rowCY=tabelData.tribute.getRow(0);
+		getGold=number(rowCY.getValFromColName("gold"));
+		max=number(rowCY.getValFromColName("max"));
+		
+		gold2=ref(user.gold2);
+		
+		
+		tribute=ref(json.tribute);
+		getTime=ref(tribute.getTime);
+		curTime=time_milli();//当前时间
+		one=number(rowCY.getValFromColName("time"))*60*1000;
+		hadTime=0;
+		hadNum=0;
+		if(getTime!=0)
+		{		
+			if((getTime+one)>curTime)
+			{
+				//时间未到
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-5)
+				);
+				return(0);
+			}
+			passTime=curTime-getTime;
+			hadTime=passTime%one;
+			hadNum=floor(passTime/one);
+			
+				
+		}else
+		{
+			hadNum=max;
+		}
+		
+		if(hadNum>max)
+		{
+			gold2=number(gold2)+getGold*max;
+			getTime=curTime;		
+		}else
+		{
+			gold2=number(gold2)+getGold*hadNum;
+			getTime=curTime-hadTime;
+			
+		}
+		
+		if(getGold>0)
+		{
+			//流水
+			allGold=number(user.gold)+number(gold2);//元宝余额
+			game.saveResIO(userID,50,0,1,getGold,allGold);//进贡(type,itemID,（0=消耗，1=获得）,count,allGold)
+		}
+		
+		
+	
+		
+		// itemArr=arr();
+		// itemStr=rowCY.getValFromColName("item");
+		// if(itemStr!="0")
+		// {
+			// split(itemArr,itemStr,",");
+		// }	
+		
+		
+		// itemDict=json.item;
+		// numMgr=game.numMgr;
+		// c=size(itemArr);
+		// i=0;while(i<c)
+		// {
+			// numMgr.addItem(number(itemArr[i]),number(itemArr[i+1]),itemDict);//返回数量
+			// i+=2;
+		// }
+				
+		//保存
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,gold2,getTime)
+		);
+		
+		return(1);//修改
+	
+				
+		
+		
+		
+		
+	
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

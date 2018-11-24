@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t32">22</v>
+<v t="n" n="__sys__t30">21</v>
+<v t="n" n="__sys__t28">20</v>
+<v t="n" n="__sys__t15">8</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="s" n="__sys__t2">. .</v>
+<v t="n" n="__sys__t3">0</v>
+<v t="n" n="__sys__t4">0</v>
+<v t="s" n="__sys__t5">..</v>
+<v t="n" n="__sys__t6">0</v>
+<o n="input"><o>__sys__t7</o><i>__sys__t1</i></o>
+<o n="="><o>cmdStr</o><i>__sys__t7</i></o>
+<o n="arr" r="31"><o>__sys__t9</o></o>
+<o n="split" r="31"><o>__sys__t10</o><i>__sys__t9</i><i>cmdStr</i><i>__sys__t2</i></o>
+<o n="=" r="31"><o>arr</o><i>__sys__t10</i></o>
+<o n="=" r="32"><o>i</o><i>__sys__t3</i></o>
+<o n="size" r="32"><o>__sys__t13</o><i>arr</i></o>
+<o n="=" r="32"><o>c</o><i>__sys__t13</i></o>
+<o n="&lt;" r="33"><o>__sys__t16</o><i>i</i><i>c</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t16</i></o>
+<o n="=="><o>__sys__t18</o><i>__sys__rt</i><i>__sys__t4</i></o>
+<o n="if_goto"><o>__sys__t19</o><i>__sys__t18</i><i>__sys__t32</i></o>
+<o n="[]" r="35"><o>__sys__t20</o><i>arr</i><i>i</i></o>
+<o n="==" r="35"><o>__sys__t21</o><i>__sys__t20</i><i>__sys__t5</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t21</i></o>
+<o n="=="><o>__sys__t23</o><i>__sys__rt</i><i>__sys__t6</i></o>
+<o n="if_goto"><o>__sys__t24</o><i>__sys__t23</i><i>__sys__t28</i></o>
+<o n="remove" r="37"><o>__sys__t25</o><i>arr</i><i>i</i></o>
+<o n="--" r="38"><o>c</o><i>c</i></o>
+<o n="goto"><o>__sys__t27</o><i>__sys__t30</i></o>
+<o n="++" r="42"><o>i</o><i>i</i></o>
+<o n="goto"><o>__sys__t31</o><i>__sys__t15</i></o>
+<o n="return" r="45"><o>__sys__t33</o><i>arr</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t10" />
+<v n="__sys__t13" />
+<v n="__sys__t16" />
+<v n="__sys__t18" />
+<v n="__sys__t19" />
+<v n="__sys__t20" />
+<v n="__sys__t21" />
+<v n="__sys__t23" />
+<v n="__sys__t24" />
+<v n="__sys__t25" />
+<v n="__sys__t27" />
+<v n="__sys__t31" />
+<v n="__sys__t33" />
+<v n="__sys__t7" />
+<v n="__sys__t9" />
+<v n="arr" />
+<v n="c" />
+<v n="cmdStr" />
+<v n="i" />
+</script>

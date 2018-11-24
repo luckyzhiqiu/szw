@@ -1,0 +1,53 @@
+<style>
+#orderUI_pannel{
+	position:fixed;
+	width:100%;
+	top:25px;
+}
+#orderUI_orderListView{
+	position:fixed;
+	width:100%;
+	top:50px;
+	bottom:25px;
+	overflow:auto;
+}
+#orderUI_orderListView table{
+	width:100%;
+}
+#orderUI_orderListView td{
+	height:50px;
+	border-bottom:1px solid;
+	text-align:center;
+	vertical-align:middle;
+}
+#orderUI_orderListView table tbody tr:first-child{
+	background:#cccccc;
+}
+#orderUI_orderListView table tbody tr{
+	background:#eeeeee;
+}
+#orderUI table:first-child{
+	width:100%;
+}
+</style>
+
+<div id="orderUI">
+	<div id="orderUI_pannel">
+    	<input id="orderUI_userID" size="10" placeholder="userID" />
+    	<input id="orderUI_num" size="10" placeholder="游戏订单" />
+        <input id="orderUI_order_no" size="10" placeholder="平台订单" />
+        <select id="orderUI_status">
+			<option value="-1">付款状态</option>
+            <option value="0">未付款</option>
+            <option value="1">已付款</option>
+        </select>
+        <select id="orderUI_get">
+			<option value="-1">发货状态</option>
+            <option value="0">未发货</option>
+            <option value="1">已发货</option>
+        </select>
+        <button id="orderUI_queryBtn">查询</button>
+        <button id="orderUI_rmbBtn">收入</button>
+    </div>
+	<div id="orderUI_orderListView">无订单数据</div>
+</div>

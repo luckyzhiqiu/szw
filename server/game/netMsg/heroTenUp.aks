@@ -1,0 +1,132 @@
+//豪杰连升10级
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+heroIndex=netMsg[3];//豪杰位置
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,heroIndex,userID;
+		json=json_decode(user.json);
+		heroArr=json.hero;
+		heroCount=size(heroArr);
+		
+		if(heroIndex<0||heroIndex>=heroCount)//豪杰位置不存在
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+
+		hero=heroArr[heroIndex];
+		level=hero.level;//豪杰等级
+		levelExp=hero.levelExp;
+		
+		//最大等级（根据爵位）
+		tableData=game.table;
+		promotionID=hero.promotion;//提拔等级
+		pRow=tableData.promotion.getRowFromColName("id",promotionID);
+		limit=number(pRow.getValFromColName("limit"));//等级上限
+		needUpLevel=limit-level;
+		needUpLevel=limit(needUpLevel,0,10);
+		
+		if(needUpLevel==0)//已爆级
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		heroLevelTable=game.table.heroLevel;
+		i=0;needMoney=0;
+		while(i<needUpLevel)
+		{
+			level+=1;//目标等级
+			row=heroLevelTable.getRowFromColName("heroLevel",level);
+			needMoney+=number(row.getValFromColName("cost"));//消耗银两
+			++i;
+		}
+		realityNeedMoney=needMoney-levelExp;//需要的银两
+		money=number(user.money);
+		if(money<realityNeedMoney)//银两不足
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+		
+		//扣减银两和等级经验
+		money-=realityNeedMoney;
+		user.money=money;
+		hero.levelExp=0;
+
+		//流水
+		game.saveResIO(userID,1001,0,0,realityNeedMoney,money);//升级豪杰(type,itemID,（0=消耗，1=获得）,count,money)
+
+		heroUpCount=ref(json.dailyTask.heroUpCount);
+		heroUpCount+=needUpLevel;//豪杰升级次数
+		
+		//增加等级
+		hero.level+=needUpLevel;
+		
+		//重新计算加成
+		numMgr=game.numMgr;
+		numMgr.computeHero(hero,json);
+		numMgr.computeUser(user,json);
+
+		//保存
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,money,hero,heroUpCount,user.strength,user.wisdom,user.charm,user.politics,user.power,needUpLevel)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

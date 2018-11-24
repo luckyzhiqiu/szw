@@ -1,0 +1,491 @@
+//选亲
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+myChildID=netMsg[3];//我的孩子id
+childID=netMsg[4];//孩子id
+hisID=netMsg[5];//对方玩家ID
+type=netMsg[6];//选亲类型 0:向全服提亲1:向玩家提亲 
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+if(userID==hisID)
+{
+	//不能向自己选亲
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",2)
+	);
+	exit();
+}
+
+//update对方
+updateHisUser=##<game,userID,PairReqMsg,childID,type>
+	hisPairChild=arr(); //对方联姻
+	returnType=1;
+
+	//修改行数据
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link methodName,sessionID,PairReqMsg,childID,type,hisPairChild,returnType;
+			
+			json=json_decode(user.json);
+			achievement=ref(json.achievement);
+			
+			jsonExt=json_decode(user.jsonExt);
+			pairSys=ref(jsonExt.pairSys);
+			childArr=ref(pairSys.children);
+			pairArr=ref(pairSys.pairArr);
+			AgreeArr=ref(pairSys.AgreeArr);
+			
+			hadChild=0;
+			
+			c=size(childArr);
+			i=0;while(i<c){
+				if(childArr[i].id==childID)
+				{
+					hadChild=1;
+					if(type>0)
+					{
+						if(childArr[i].targetUserID!=PairReqMsg["userID"])
+						{
+							//对方没提这类型的亲
+							
+							returnType=-4;
+							return(0);
+						}
+						
+					}else if(type==0)
+					{
+						if(childArr[i].targetUserID!=0)
+						{
+							//对方没提这类型的亲
+							
+							returnType=-4;	
+							return(0);
+						}
+						
+					}
+					
+					
+					if(childArr[i].sex==PairReqMsg["sex"])
+					{
+						//对方说不能搞基
+						
+						returnType=-6;	
+						return(0);
+					}
+					
+					if(childArr[i].grows!=PairReqMsg["grows"])
+					{
+						//对方说资质不同
+						
+						returnType=-8;	
+						return(0);
+					}
+					
+					achievement.marryCount+=1;
+					
+					//增加联姻次数和刷新联姻冲榜
+					addAndUpdateMarryRank(game,user);
+					
+					//限时任务//联姻次数
+					limitTask=json.limitTask;
+					limitTask.pairCount+=1;
+					user.strengthAdd3=number(user.strengthAdd3)+number(PairReqMsg["strengthTotal"]);
+					user.wisdomAdd3=number(user.wisdomAdd3)+number(PairReqMsg["wisdomTotal"]);
+					user.charmAdd3=number(user.charmAdd3)+number(PairReqMsg["charmTotal"]);
+					user.politicsAdd3=number(user.politicsAdd3)+number(PairReqMsg["politicsTotal"]);	
+					
+					game.numMgr.computeUser(user,json);
+					
+					
+					currentTime=time();
+					pairChild=dict();
+					
+					
+					
+					pairChild["name"]=childArr[i].name;
+					pairChild["sex"]=childArr[i].sex;
+					pairChild["grows"]=childArr[i].grows;
+					pairChild["num"]=number(childArr[i].strengthTotal)+number(childArr[i].wisdomTotal)+number(childArr[i].charmTotal)+number(childArr[i].politicsTotal);
+					
+					pairChild["name2"]=PairReqMsg["name"];
+					pairChild["sex2"]=PairReqMsg["sex"];
+					pairChild["grows2"]=PairReqMsg["grows"];
+					pairChild["num2"]=number(PairReqMsg["strengthTotal"])+number(PairReqMsg["wisdomTotal"])+number(PairReqMsg["charmTotal"])+number(PairReqMsg["politicsTotal"]);
+					pairChild["nickname"]=PairReqMsg["nickname"];
+					pairChild["time"]=currentTime;
+					push(pairArr,pairChild);
+					push(AgreeArr,pairChild);
+					
+					
+					pairChild2=dict(); //对方
+					
+					pairChild2["name2"]=childArr[i].name;
+					pairChild2["sex2"]=childArr[i].sex;
+					pairChild2["grows2"]=childArr[i].grows;
+					pairChild2["num2"]=number(childArr[i].strengthTotal)+number(childArr[i].wisdomTotal)+number(childArr[i].charmTotal)+number(childArr[i].politicsTotal);
+					
+					pairChild2["name"]=PairReqMsg["name"];
+					pairChild2["sex"]=PairReqMsg["sex"];
+					pairChild2["grows"]=PairReqMsg["grows"];
+					pairChild2["num"]=number(PairReqMsg["strengthTotal"])+number(PairReqMsg["wisdomTotal"])+number(PairReqMsg["charmTotal"])+number(PairReqMsg["politicsTotal"]);
+					pairChild2["nickname"]=user.nickname;
+					pairChild2["time"]=currentTime;
+					
+					push(hisPairChild,pairChild2);
+					push(hisPairChild,childArr[i].strengthTotal);	
+					push(hisPairChild,childArr[i].wisdomTotal);
+					push(hisPairChild,childArr[i].charmTotal);
+					push(hisPairChild,childArr[i].politicsTotal);
+						
+					
+					remove(childArr,i);
+					
+					
+					break;
+				}
+				i++;
+			}
+			if(hadChild==0)
+			{
+				//对方孩子不存在
+
+				returnType=-5;
+				return(0);
+				
+			}
+			
+			
+			//保存
+			user.json=json_encode(json);
+			user.jsonExt=json_encode(jsonExt);		
+			
+			return(1);//修改
+		
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	
+	if(returnType==1)
+	{
+		return(hisPairChild);
+	}		
+	else if(empty(user))
+	{
+		//对方不存在
+		return(-7);	
+	}
+	else
+	{
+		return(returnType);
+	}
+	
+##.;
+
+
+
+	//修改行数据
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link methodName,sessionID,childID,hisID,userID,myChildID,type,updateHisUser;
+			
+			json=json_decode(user.json);
+			achievement=ref(json.achievement);
+			jsonExt=json_decode(user.jsonExt);
+			pairSys=ref(jsonExt.pairSys);
+			childArr=ref(pairSys.children);
+			pairArr=ref(pairSys.pairArr);
+			pairReqArr=ref(pairSys.pairReqArr);
+			hadChild=0;
+			itemDict=ref(json.item);
+			
+			
+			
+			
+			c=size(childArr);
+			i=0;while(i<c){
+				if(childArr[i].id==myChildID)
+				{
+					childConfigureTable=game.table.childConfigure.getRow(0);
+					itemID=childConfigureTable.getValFromColName("talentMarrigeCost"+childArr[i].grows);
+					
+					
+					talentMarketCostStr=childConfigureTable.getValFromColName("talentMarketCost"+childArr[i].grows);
+					
+					t=split(arr(),talentMarketCostStr,",");
+					t_a=number(t[0]);
+					t_b=number(t[1]);
+					
+					hadChild=1;
+					if(childArr[i].targetUserID!=-1)
+					{
+						//回复已提过亲不能选亲
+						game.sendMsg
+						(
+							sessionID,
+							arr(methodName+"Result",-2)
+						);
+						return(0);	
+					}
+					
+					if(type==0)
+					{
+						if(game.numMgr.subItem(t_a,t_b,itemDict)==-1)
+						{
+							//道具不足
+							game.sendMsg
+							(
+								sessionID,
+								arr(methodName+"Result",5)
+							);
+							return(0);	
+							
+						}
+						
+						sql="select id from unmarry_child where childID="+childID+" and userID="+hisID;
+						rs=mysqlCreateRs(game.cnn,sql);
+						existSign=mysqlNextRow(rs);
+						mysqlDestroyRs(rs);
+						if(!existSign)
+						{
+							game.sendMsg
+							(
+								sessionID,
+								arr(methodName+"Result",-9)//全服没有这条记录
+							);
+						}
+						
+					}else
+					{
+						
+						if(game.numMgr.subItem(itemID,1,itemDict)==-1)
+						{
+							//道具不足
+							game.sendMsg
+							(
+								sessionID,
+								arr(methodName+"Result",5)
+							);
+							return(0);	
+							
+						}
+					}
+					
+				
+			
+					
+					PairReqMsg=dict();
+					PairReqMsg["name"]=childArr[i].name;
+					PairReqMsg["nickname"]=user.nickname;
+					PairReqMsg["grows"]=childArr[i].grows;
+					
+					PairReqMsg["sex"]=childArr[i].sex;
+					PairReqMsg["skin"]=childArr[i].skin;
+					PairReqMsg["childID"]=myChildID;
+					PairReqMsg["userID"]=userID;	
+						
+					PairReqMsg["strengthTotal"]=childArr[i].strengthTotal;
+					PairReqMsg["wisdomTotal"]=childArr[i].wisdomTotal;
+					PairReqMsg["charmTotal"]=childArr[i].charmTotal;
+					PairReqMsg["politicsTotal"]=childArr[i].politicsTotal;
+						
+							
+					hisUser=updateHisUser(game,hisID,PairReqMsg,childID,type);
+					
+					if(type(hisUser)=="arr"){//对方已更新
+						user.strengthAdd3=number(user.strengthAdd3)+number(hisUser[1]);
+						user.wisdomAdd3=number(user.wisdomAdd3)+number(hisUser[2]);
+						user.charmAdd3=number(user.charmAdd3)+number(hisUser[3]);
+						user.politicsAdd3=number(user.politicsAdd3)+number(hisUser[4]);	
+						
+						game.numMgr.computeUser(user,json);
+						push(pairArr,hisUser[0]);
+						remove(childArr,i);
+						achievement.marryCount+=1;
+						
+						//增加联姻次数和刷新联姻冲榜
+						addAndUpdateMarryRank(game,user);
+						
+						if(type==1)
+						{
+							c=size(pairReqArr);
+							j=0;while(j<c){
+								if(pairReqArr[j].childID==childID)
+								{
+									remove(pairReqArr,j);
+									break;
+								}
+								j++;
+								
+							}
+							
+						}else if(type==0)
+						{
+							sql="delete from unmarry_child where childID="+childID+" and userID= "+hisID;
+							mysqlExec(game.cnn,sql);
+							
+						}else
+						{
+							//类型不存在
+							game.sendMsg
+							(
+								sessionID,
+								arr(methodName+"Result",-3)
+							);
+							exit();
+							
+							
+						}
+						
+						
+						
+					}
+					
+					else if(hisUser==-4)
+					{
+						//对方没提这类型的亲
+						game.sendMsg
+						(
+							sessionID,
+							arr(methodName+"Result",-4)
+						);
+						return(0);
+					}
+					
+					else if(hisUser==-5)
+					{
+						//对方孩子不存在
+						game.sendMsg
+						(
+							sessionID,
+							arr(methodName+"Result",-5)
+						);
+						return(0);
+					}
+					
+					else if(hisUser==-6)
+					{
+						//对方说不能搞基
+						game.sendMsg
+						(
+							sessionID,
+							arr(methodName+"Result",-6)
+						);
+						return(0);
+					}
+					else if(hisUser==-8)
+					{
+						//对方说资质不同
+						game.sendMsg
+						(
+							sessionID,
+							arr(methodName+"Result",-8)
+						);
+						return(0);
+					}
+					
+					
+					else if(hisUser==-7)//对方用户不存在
+					{
+						//回复
+						game.sendMsg
+						(
+							sessionID,
+							arr(methodName+"Result",-7)
+						);
+						return(0);
+					}	
+					
+					
+						
+					
+					
+					break;
+				}
+				i++;
+			}
+			if(hadChild==0)
+			{
+				//回复孩子不存在
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",4)
+				);
+				return(0);
+				
+			}
+			
+			//限时任务//联姻次数
+			limitTask=json.limitTask;
+			limitTask.pairCount+=1;
+			
+			//保存
+			user.json=json_encode(json);
+			user.jsonExt=json_encode(jsonExt);
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,achievement.marryCount,limitTask.pairCount,itemDict,user.power)
+			);
+			
+			return(1);//修改
+		
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	
+		
+
+
+
+
+
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}

@@ -1,0 +1,262 @@
+//场景战斗
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID;
+		
+		//我方兵力
+		mySoldier=number(user.soldier);
+		if(mySoldier<=0)
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		
+		numMgr=game.numMgr;
+		chapterArr=game.storyMgr.chapterArr;
+		modifSign=0;//修改user数据标记
+		chapterID=number(user.chapterID);//章节ID
+		barrierID=number(user.barrierID);//关卡ID
+		sceneID=number(user.sceneID);//场景ID
+		sceneSoldier=number(user.sceneSoldier);//当前场景剩余兵力（-1代表恢复兵力）
+		
+		//章节信息
+		chapterInfo=chapterArr[chapterID];
+		//关卡信息
+		barrierArr=chapterInfo.barrierArr;
+		barrier=barrierArr[barrierID];
+		barrierType=number(barrier.row.getValFromColName("type"));//关卡类型
+		if(barrierType!=1)//非小兵关卡
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		//场景信息
+		sceneArr=barrier.sceneArr;
+		scene=sceneArr[sceneID];
+		//info=scene.getObj(arr("strength","type","weTalk","enemyTalk","background"));
+		//兵力
+		if(sceneSoldier==-1)//恢复兵力
+		{
+			modifSign=1;
+			sceneSoldier=int(scene.getValFromColName("soldier"));
+			user.sceneSoldier=sceneSoldier;
+		}
+		enemyStrength=int(scene.getValFromColName("strength"));//敌方武力
+		// enemySoldier=sceneSoldier;//敌方兵力
+		
+		json=json_decode(user.json);
+		battle=ref(json.battle);//经营:军营
+		
+		//我方武力
+		myStrength=0;
+		heroArr=battle.hero;
+		c=size(heroArr);
+		i=0;while(i<c)
+		{
+			heroIndex=heroArr[i];
+			if(heroIndex>=0)
+			{
+				myStrength+=numMgr.getHeroStrength(json.hero[heroIndex],json);
+			}
+			++i;
+		}
+		myStrength+=number(user.strength);
+		
+		//战斗计算
+		modifSign=1;
+		attackCount1=sceneSoldier/myStrength;
+		attackCount2=mySoldier/enemyStrength;
+		if(attackCount1<=attackCount2)//我方胜利
+		{
+			//扣减我方兵力
+			mySoldier-=floor(min(attackCount1,attackCount2)*enemyStrength);
+			//重置敌方兵力
+			sceneSoldier=-1;
+			user.sceneSoldier=sceneSoldier;
+			//奖励
+			dropMoney=number(scene.getValFromColName("dropMoney"));//获得银两
+			dropScore=number(scene.getValFromColName("dropScore"));//获得政绩
+			dropItem=scene.getValFromColName("dropItem");//获得道具
+			dropGold=number(scene.getValFromColName("dropGold"));//获得元宝
+			
+			//奖励元宝
+			gold=number(user.gold);
+			gold2=number(user.gold2);
+			gold2+=dropGold;
+			if(dropGold>0)
+			{
+				//流水
+				allGold=gold+gold2;//元宝余额
+				game.saveResIO(userID,36,0,1,dropGold,allGold);//关卡(type,itemID,（0=消耗，1=获得）,count,allGold)
+			}
+			//奖励银两
+			money=number(user.money)+dropMoney;
+			//奖励政绩
+			score=number(user.score)+dropScore;
+			//奖励物品
+			newAddItemArr=arr();
+			addItemArr=split(arr(),dropItem,",");
+			addItemCount=size(addItemArr);
+			if(addItemCount>=2)
+			{
+				itemDict=json.item;
+				i=0;j=0;count=size(addItemArr)/2;
+				while(i<count)
+				{
+					itemID=number(addItemArr[j]);
+					itemCount=number(addItemArr[j+1]);
+					numMgr.addItem(itemID,itemCount,itemDict);//道具奖励
+					push(newAddItemArr,itemID,itemCount);
+					j+=2;
+					++i;
+				}
+			}	
+			
+			barrierSign=number(user.barrierSign);
+			chapterSign=number(user.chapterSign);
+			
+			barrierCount=ref(json.dailyTask.barrierCount);
+			//进入下一场景
+			++sceneID;
+			//增加分数和刷新关卡冲榜
+			addAndUpdateBarrierAddRank(game,user);
+			if(!exist(sceneArr,sceneID))//下一场景不存在
+			{
+				//////////////////////////////////////////////////////////////////////////////////
+				//增加通关次数
+				barrierCount+=1;
+				//////////////////////////////////////////////////////////////////////////////////
+				sceneID=0;
+				++barrierID;//进入下一关卡
+				barrierSign=0;//标记关卡剧情未看
+				if(!exist(barrierArr,barrierID))//下一关卡不存在
+				{
+					barrierID=0;
+					++chapterID;//进入下一章节
+					if(!exist(chapterArr,chapterID))//下一章节不存在
+					{
+						//停留在本章节本关卡本场景
+						chapterID=number(user.chapterID);//章节ID
+						barrierID=number(user.barrierID);//关卡ID
+						sceneID=number(user.sceneID);//场景ID
+						//重置敌方兵力
+						// user.sceneSoldier=-1;
+					}
+					else//下一章节存在
+					{
+						chapterSign=0;//标记章节剧情未看
+					}
+				}
+			}
+			
+			chapterTab=game.table.chapter;
+			row=chapterTab.getRowFromColName("id",chapterID+1);
+			name=row.getValFromColName("name");
+			title=name+"("+(barrierID+1)+")";
+			user.chapter_barrier=title;
+			
+			//保存
+			if(gold2!=0)
+			{
+				user.gold2=gold2;	
+			}
+			
+			user.chapterID=chapterID;
+			user.barrierID=barrierID;
+			user.sceneID=sceneID;
+			user.soldier=mySoldier;
+			user.money=money;
+			user.score=score;
+			user.barrierSign=barrierSign;
+			user.chapterSign=chapterSign;
+			user.json=json_encode(json);
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,chapterID,barrierID,sceneID,mySoldier,dropMoney,dropScore,newAddItemArr,chapterSign,barrierSign,barrierCount,title,dropGold)
+			);
+			
+			//更新关卡榜
+			rankName=game.gameConfig.name+"_chapterRank";//排行榜名称
+			rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+			score=(chapterID*7+barrierID)*8+sceneID;
+			redis_zadd(rd,rankName,score,user.id);
+		}
+		else//我方失败
+		{
+			//我方兵力清0
+			mySoldier=0;
+			
+			//扣减敌方兵力
+			sceneSoldier-=floor(min(attackCount1,attackCount2)*myStrength);
+			if(sceneSoldier<=0)sceneSoldier=1;//保底兵力1
+			
+			lostCount=number(user.lostCount);
+			lostCount+=1;
+			
+			//保存
+			user.sceneSoldier=sceneSoldier;
+			user.soldier=mySoldier;
+			user.lostCount=lostCount;
+			
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",2,sceneSoldier,lostCount)
+			);
+		}
+		
+		//按modifSign判断是否修改user数据
+		return(modifSign);
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

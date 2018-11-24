@@ -1,0 +1,126 @@
+//书院双倍加成
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+index=int(netMsg[3]);//豪杰位置
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID,index;
+		json=json_decode(user.json);
+		bookHouse=json.bookHouse;
+		heroArr=bookHouse.heroArr;
+
+		needMin=0;//经过多少分钟
+		heroInfo=heroArr[index];
+		bt=heroInfo.bt;
+		doubleExp=heroInfo.doubleExp;
+		if(doubleExp==1)//已触发双倍
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+		
+		nowTime=time();
+		remainTime=nowTime-bt;
+		needMin=floor(remainTime/60);
+		
+		table=game.table;
+		schoolTable=table.school;
+		rowS=schoolTable.getRow(0);
+		timeCost=number(rowS.getValFromColName("timeCost"));//等待时间(分钟)
+		if(needMin>=timeCost)//时间已过，不能加倍
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		
+		goldCost=number(rowS.getValFromColName("goldCost"));//双倍元宝消耗
+		
+		gold=number(user.gold);//元宝（充值，优先使用）
+		gold2=number(user.gold2);//元宝（赠送）
+		if(goldCost>(gold+gold2))//元宝不足
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		//扣减元宝
+		if(goldCost>gold)
+		{
+			goldCost-=gold;
+			gold=0;
+			gold2-=goldCost;
+		}
+		else
+		{
+			gold-=goldCost;
+		}
+		
+		//流水
+		allGold=gold+gold2;//元宝余额
+		game.saveResIO(userID,39,0,0,goldCost,allGold);//书院秒CD(type,itemID,（0=消耗，1=获得）,count,allGold)
+		
+		//保存
+		heroInfo.doubleExp=1;
+		user.gold=gold;
+		user.gold2=gold2;
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,gold,gold2,heroArr)
+		);
+		
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

@@ -1,0 +1,140 @@
+//vip专属礼包
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+vipLevel=netMsg[3];//购买VIP等级礼包
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link sessionID,methodName,vipLevel,userID;
+		vipL=number(user.vip);
+		if(vipL<vipLevel)//vip等级不足
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);
+		}
+		
+		json=json_decode(user.json);
+		itemDict=json.item;
+		numMgr=game.numMgr;
+		
+		vip=json.vip;
+		vipGetItemMap=vip.vipGetItemMap;
+		if(exist(vipGetItemMap,vipLevel))//已购买此等级VIP大礼包福利
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);
+		}
+			
+		rowV=game.table.vip.getRowFromColName("level",vipLevel);//任务数据
+		
+		//扣减元宝
+		needGold=number(rowV.getValFromColName("itemOnlyCost"));//VIP专属礼包元宝消耗
+		gold=number(user.gold);//元宝（充值，优先使用）
+		gold2=number(user.gold2);//元宝（赠送）
+		if(needGold>(gold+gold2))//元宝不足
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+
+		if(needGold>gold)
+		{
+			needGold-=gold;
+			gold=0;
+			gold2-=needGold;
+		}
+		else
+		{
+			gold-=needGold;
+		}
+		
+		if(needGold>0)
+		{
+			//流水
+			allGold=gold+gold2;//元宝余额
+			game.saveResIO(userID,53,0,0,needGold,allGold);//VIP专属礼包(type,itemID,（0=消耗，1=获得）,count,allGold)
+		}
+		
+		//奖励道具
+		newItemArr=arr();
+		itemOnlyID=rowV.getValFromColName("itemOnlyID");//VIP专属礼包（物品id,物品数量）
+		addItemArr=split(arr(),itemOnlyID,",");
+		addIDCount=size(addItemArr);
+		if(addIDCount>=2)
+		{
+			i=0;j=0;addCount=addIDCount/2;
+			while(i<addCount)
+			{
+				itemID=number(addItemArr[j]);
+				itemCount=number(addItemArr[j+1]);
+				numMgr.addItem(itemID,itemCount,itemDict);//奖励道具
+				push(newItemArr,itemID,itemCount);
+				j+=2;
+				++i;
+			}
+		}
+		
+		//保存
+		user.gold=gold;
+		user.gold2=gold2;
+		vipGetItemMap[vipLevel]=1;
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,itemDict,vipGetItemMap,newItemArr,gold,gold2)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

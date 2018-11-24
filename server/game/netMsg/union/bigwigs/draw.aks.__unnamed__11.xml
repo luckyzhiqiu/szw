@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="n" n="__sys__t4">3</v>
+<v t="s" n="__sys__t5">.user.</v>
+<v t="s" n="__sys__t6">.id.</v>
+<v t="s" n="__sys__t7">.*.</v>
+<v t="s" n="__sys__t8">.@__unnamed__8.</v>
+<v t="s" n="__sys__t9">.@__unnamed__9.</v>
+<v t="s" n="__sys__t10">.@__unnamed__10.</v>
+<v t="n" n="__sys__t11">1000</v>
+<o n="input"><o>__sys__t12</o><i>__sys__t1</i></o>
+<o n="="><o>game</o><i>__sys__t12</i></o>
+<o n="input"><o>__sys__t14</o><i>__sys__t2</i></o>
+<o n="="><o>userID</o><i>__sys__t14</i></o>
+<o n="input"><o>__sys__t16</o><i>__sys__t3</i></o>
+<o n="="><o>drawDevote</o><i>__sys__t16</i></o>
+<o n="input"><o>__sys__t18</o><i>__sys__t4</i></o>
+<o n="="><o>goldDrawCost</o><i>__sys__t18</i></o>
+<v t="s" n="__sys__t21">.rd.</v>
+<o n="." r="205"><o>__sys__t20</o><i>game</i><i>__sys__t21</i></o>
+<v t="s" n="__sys__t24">.updateRow.</v>
+<o n="." r="205"><o>__sys__t23</o><i>__sys__t20</i><i>__sys__t24</i></o>
+<v t="s" n="__sys__t27">.cnn.</v>
+<o n="." r="207"><o>__sys__t26</o><i>game</i><i>__sys__t27</i></o>
+<o n="full"><o>__sys__t29</o><i>__sys__t8</i></o>
+<o n="full"><o>__sys__t30</o><i>__sys__t9</i></o>
+<o n="full"><o>__sys__t31</o><i>__sys__t10</i></o>
+<o n="__sys__t23" r="205"><o>__sys__t32</o><i>__sys__t20</i><i>__sys__t26</i><i>__sys__t5</i><i>__sys__t6</i><i>userID</i><i>__sys__t7</i><i>__sys__t29</i><i>__sys__t30</i><i>__sys__t31</i><i>game</i><i>__sys__t11</i></o>
+<o n="=" r="205"><o>user</o><i>__sys__t32</i></o>
+<o n="return" r="265"><o>__sys__t34</o><i>user</i></o>
+<v n="__sys__t12" />
+<v n="__sys__t14" />
+<v n="__sys__t16" />
+<v n="__sys__t18" />
+<v n="__sys__t20" />
+<v n="__sys__t23" />
+<v n="__sys__t26" />
+<v n="__sys__t29" />
+<v n="__sys__t30" />
+<v n="__sys__t31" />
+<v n="__sys__t32" />
+<v n="__sys__t34" />
+<v n="drawDevote" />
+<v n="game" />
+<v n="goldDrawCost" />
+<v n="user" />
+<v n="userID" />
+</script>

@@ -1,0 +1,52 @@
+//获取界面聊天记录首页
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+cnn=game.cnn;
+chatID=0;
+info=arr();
+tableName=createDayTable(cnn,"chat");
+sql="select id,vip,level,head,nickname,txt,genTime,userID,titleID,type from "+tableName+" order by id desc limit 15";
+rs=mysqlCreateRs(cnn,sql);
+
+while(mysqlNextRow(rs))
+{
+	chatID=int(mysqlGetColVal(rs,0));
+	push
+	(
+		info,
+		arr(
+		"chat/worldRt",
+		mysqlGetColVal(rs,7),//userID
+		mysqlGetColVal(rs,4),//nickname
+		int(mysqlGetColVal(rs,1)),//vip
+		int(mysqlGetColVal(rs,2)),//level
+		int(mysqlGetColVal(rs,3)),//head
+		mysqlGetColVal(rs,5),//txt
+		mysqlGetColVal(rs,6),//genTime
+		mysqlGetColVal(rs,8),
+		mysqlGetColVal(rs,9),
+		)
+	);
+}
+mysqlDestroyRs(rs);
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,info,chatID)
+);

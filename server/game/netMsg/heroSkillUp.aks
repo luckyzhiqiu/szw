@@ -1,0 +1,113 @@
+//豪杰技能升级
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+heroIndex=int(netMsg[3]);//豪杰位置
+skillIndex=int(netMsg[4]);//技能位置
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,heroIndex,skillIndex;
+		json=json_decode(user.json);
+		heroArr=json.hero;
+
+		heroCount=size(heroArr);
+		if(heroIndex<0||heroIndex>=heroCount)//豪杰位置无效
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+		
+		hero=heroArr[heroIndex];
+		skillID=ref(hero.skill[skillIndex]);//技能ID
+		
+		//读取技能表
+		heroSkillTable=game.table.skill;
+		row=heroSkillTable.getRowFromColName("id",skillID);
+		nextLevel=number(row.getValFromColName("nextLevel"));//技能升级后ID
+		
+		if(nextLevel==0)//爆级
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		skillExp=ref(hero.skillExp);//技能经验
+		cost=number(row.getValFromColName("cost"));//技能升级需消耗
+		if(skillExp>=cost)//技能经验满足
+		{
+			skillExp-=cost;//扣除经验
+			skillID=nextLevel;//变为下一技能等级
+		}
+		else//技能经验不足
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		
+		//重新计算加成
+		numMgr=game.numMgr;
+		numMgr.computeHero(hero,json);
+		numMgr.computeUser(user,json);
+		
+		//保存
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,hero,user.strength,user.wisdom,user.charm,user.politics,user.power)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

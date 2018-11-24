@@ -1,0 +1,205 @@
+//经营:商业获取银两
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID;
+		json=json_decode(user.json);
+		makeMoney=ref(json.makeMoney);//经营:商业
+		beginTime=ref(makeMoney.beginTime);//资源增长开始时间戳（毫秒）
+		dt=ref(makeMoney.dt);//每轮间隔时间（秒）
+		dt1000=dt*1000;
+		recvSign=0;
+		newBeginTime=beginTime;
+		table=game.table;
+		row=table.level.getRowFromColName("level",user.level);//任务数据
+		maxRecvCount=number(row.getValFromColName("ERP1max"));//经营商产累积
+		curTime=time_milli();//当前时间
+		roundBeginTime=beginTime-dt1000*makeMoney.recvCount;//第1轮开始时间
+		roundEndTime=roundBeginTime+dt1000;//第1轮结束时间
+		if(makeMoney.recvCount>0)//有储存的收成轮数
+		{
+			recvSign=1;
+			endTime=beginTime+dt1000*(maxRecvCount-makeMoney.recvCount);
+			if(curTime<endTime)//未超时
+			{
+				--makeMoney.recvCount;//减少次数
+			}
+			else//已超时
+			{
+				makeMoney.recvCount=maxRecvCount-1;
+				newBeginTime=curTime;
+			}
+		}
+		else//没有储存的收成轮数
+		{
+			recvCount=floor((curTime-beginTime)/dt1000);//未储存的收成轮数
+			recvCount=limit(recvCount,0,maxRecvCount);
+			if(recvCount>0)//有未储存的收成轮数
+			{
+				recvSign=1;
+				makeMoney.recvCount=recvCount-1;//减少次数
+				if(recvCount<maxRecvCount)
+				{
+					remainingTime=curTime-beginTime;//剩下的时间
+					newCurTime=curTime-remainingTime+recvCount*dt1000;
+					newBeginTime=newCurTime;
+				}
+				else
+				{
+					newBeginTime=curTime;
+				}
+			}
+		}
+		numMgr=game.numMgr;
+		if(recvSign)//有收成
+		{
+			heroArr=json.hero;
+			wisdom=number(user.wisdom);//势力智力
+			money=number(user.money);
+			//收成
+			point=wisdom;//势力收益
+			pointPlus=0;//豪杰上阵收益加成
+			//上阵加成
+			useHeroArr=makeMoney.hero;
+			c=size(useHeroArr);
+			i=0;while(i<c)
+			{
+				info=useHeroArr[i];
+				heroIndex=info.heroIndex;
+				if(heroIndex>=0)
+				{
+					heroBeginTime=info.beginTime;
+					if(heroBeginTime<roundEndTime)
+					{
+						heroBeginTime=limit(heroBeginTime,roundBeginTime,roundEndTime);
+						useTime=roundEndTime-heroBeginTime;//当前轮的上阵时间
+						usePercent=useTime/dt1000;
+						heroInfo=heroArr[heroIndex];
+						pointPlus+=floor(heroInfo.wisdomTotal*usePercent);
+					}
+				}
+				++i;
+			}
+			//修改dt
+			if(wisdom<10000)
+			{
+				dt=60;
+			}
+			else if(wisdom<300000)
+			{
+				dt=floor(3*wisdom/500);
+			}
+			else
+			{
+				dt=1800;
+			}
+			
+			//十倍商产
+			nonuple=0;
+			rowVip=table.vip.getRowFromColName("level",user.vip);//角色VIP等级
+			if(!empty(rowVip))//返回行数据
+			{
+				miricle1=number(rowVip.getValFromColName("miricle1"));//十倍商产每日次数
+				vip=json.vip;
+				_makeMoneyCount=ref(vip.makeMoneyCount);//已获取十倍商产每日次数
+				if(_makeMoneyCount<miricle1)//未满十倍商产每日次数
+				{
+					rate1=number(rowVip.getValFromColName("rate1"));//十倍商产概率
+					num = rand()%10000;//随机数
+					if(rate1>num)
+					{
+						nonuple=9;//(point+pointPlus)*9;
+						_makeMoneyCount+=1;
+					}
+				}
+			}
+			
+			//各种万分比加成
+			percent=1;
+			//红颜势力万分比加成
+			percent+=json.wifePlus.businessPercent;
+			//豪杰势力万分比加成
+			percent+=numMgr.getHeroBusinessPercent(heroArr);
+			//权贵势力万分比加成
+			unionID=int(user.unionID);
+			richmanIDArr=numMgr.getRichmanIDArr(unionID);//已拉拢权贵ID数组
+			percent+=numMgr.getRichmanAddPercent(richmanIDArr,type=1);
+			
+			//加成
+			point*=percent;
+		
+			//保存
+			user.money=money+(floor(point)+pointPlus)*(nonuple+1);//商业收益=（势力智力）*（1+妻妾技能收益加成+豪杰技能收益加成）+派遣收益
+			beginTime=newBeginTime;
+			
+			makeMoneyCount=ref(json.dailyTask.makeMoneyCount);
+			makeMoneyCount+=1;//日常任务累计次数
+			
+			makeMoneyAchievement=ref(json.achievement.makeMoney);
+			makeMoneyAchievement+=1;//成就累计//经营商业次数
+			
+			limitTask=json.limitTask;
+			activityMgr=game.activityMgr;
+			activityMgr.updateLimitTask(limitTask);//更新限时任务数据
+			limitTask.makeMoneyCount+=1;//限时任务//经营商产
+			
+			//编码
+			user.json=json_encode(json);
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,makeMoney,money,point,pointPlus,makeMoneyCount,makeMoneyAchievement,nonuple,limitTask.makeMoneyCount)
+			);
+			return(1);//修改
+		}
+		else//没收成
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

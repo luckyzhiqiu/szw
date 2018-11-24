@@ -1,0 +1,171 @@
+//子嗣元气恢复
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+type=int(netMsg[3]);//1=恢复一个；2=一键恢复
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+if(type!=1 && type!=2)//类型错误
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,type,netMsg,;
+		json=json_decode(user.json);
+		vip=number(user.vip);
+		tableData=game.table;
+		vipTable=tableData.vip;
+		rowVip=vipTable.getRowFromColName("level",vip);
+		teach=number(rowVip.getValFromColName("teach"));//子嗣培养活力上限
+		nowTime=time();//现在时间
+		passTime=3600*teach;//必须经过时间
+		newTime=nowTime-passTime;//恢复时间
+		
+		itemDict=json.item;
+		itemID=56;
+		childSys=json.childSys;
+		childrenArr=childSys.children;
+		childrenCount=size(childrenArr);
+		
+		childConfigureTable=tableData.childConfigure;
+		rowCC=childConfigureTable.getRow(0);
+		
+		i=0;recoverChildIDMap=dict();
+		while(i<childrenCount)
+		{
+			ChildInfo=childrenArr[i];
+			childName=ChildInfo.name;
+			childLevel=ChildInfo.level;
+			childGrows=ChildInfo.grows;
+			talentLevelG=number(rowCC.getValFromColName("talentLevel"+childGrows));//资质*科举等级
+			
+			childOldBt=ChildInfo.bt;
+			childPassTime=nowTime-childOldBt;
+
+			if(childName!="" && childLevel!=talentLevelG && passTime>childPassTime)
+			{
+				childIDS=ChildInfo.id;
+				recoverChildIDMap[childIDS]=1;
+			}
+			++i;
+		}
+		
+		recoverChildIDMapCount=size(recoverChildIDMap);
+		if(type==1)
+		{
+			num=game.numMgr.subItem(itemID,1,itemDict);//返回数量
+		}
+		else if(type==2)
+		{
+			num=game.numMgr.subItem(itemID,recoverChildIDMapCount,itemDict);//返回数量
+		}
+		
+		if(num==-1)//数量不足扣除失败
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",2)
+			);
+			return(0);
+		}
+		
+		//道具使用次数字典itemID=56
+		achievement=json.achievement;
+		useItemMap=achievement.useItemMap;
+		
+		i=0;
+		while(i<childrenCount)
+		{
+			child=childrenArr[i];
+			cID=child.id;
+			if(type==1)
+			{
+				childID=netMsg[4];//子嗣ID
+				if(cID==childID)
+				{
+					child.bt=newTime;
+					if(exist(useItemMap,itemID))
+					{
+						useItemMap[itemID]+=1;
+					}
+					else
+					{
+						useItemMap[itemID]=1;
+					}
+		
+					break;
+				}
+			}
+			else if(type==2)
+			{
+				if(exist(recoverChildIDMap,cID))
+				{
+					child.bt=newTime;
+					if(exist(useItemMap,itemID))
+					{
+						useItemMap[itemID]+=1;
+					}
+					else
+					{
+						useItemMap[itemID]=1;
+					}
+				}
+			}
+			++i;
+		}
+		
+		//保存
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,childrenArr,itemDict,useItemMap)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

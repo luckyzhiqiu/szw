@@ -1,0 +1,249 @@
+//兑换码
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+sn=netMsg[3];//兑换码
+
+//检查cdkey
+if(strFind(sn,"'")>=0||strFind(sn,"\"")>=0 || sn=="")//cdkey不合法
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,sn,userID;
+		jsonExt=json_decode(user.jsonExt);
+		cdKey=jsonExt.cdKey;
+		cdkeyMap=cdKey.cdkeyMap;
+		if(exist(cdkeyMap,sn))//cdKey已使用
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);
+		}
+		else
+		{
+			sql="select type,useCount,soldier,money,food,gold,gold2,item,heroID,wifeID from cdkey where sn='"+sn+"' limit 1";
+			rs=mysqlCreateRs(game.cnn_account,sql);
+			cdKeyRow=mysqlNextRow(rs);
+			
+			if(!cdKeyRow)//cdKey不存在
+			{
+				mysqlDestroyRs(rs);
+				game.sendMsg//回复
+				(
+					sessionID,
+					arr(methodName+"Result",-4)
+				);
+				return(0);
+			}
+			type=number(mysqlGetColVal(rs,0));
+			useCount=number(mysqlGetColVal(rs,1));
+			if(type==0)
+			{
+				if(useCount>=1)//cdKey已使用且只能只用一次
+				{
+					game.sendMsg//回复
+					(
+						sessionID,
+						arr(methodName+"Result",-5)
+					);
+					return(0);
+				}
+				else//更新cdkey为使用
+				{
+					sqlUpdate="update `cdkey` set useCount=1 where sn='"+sn+"'";
+					mysqlExec(game.cnn_account,sqlUpdate);
+				}
+			}
+			else
+			{
+				useCount+=1;
+				sqlUpdate="update `cdkey` set useCount='"+useCount+"' where sn='"+sn+"'";
+				mysqlExec(game.cnn_account,sqlUpdate);
+			}
+			
+			numMgr=game.numMgr;
+			////////////////奖励列表////////////////
+			soldier=number(mysqlGetColVal(rs,2));
+			money=number(mysqlGetColVal(rs,3));
+			food=number(mysqlGetColVal(rs,4));
+			gold=number(mysqlGetColVal(rs,5));
+			gold2=number(mysqlGetColVal(rs,6));
+			item=mysqlGetColVal(rs,7);
+			heroID=number(mysqlGetColVal(rs,8));
+			wifeID=number(mysqlGetColVal(rs,9));
+			////////////////奖励列表////////////////	
+			mysqlDestroyRs(rs);
+			
+			uSoldier=number(user.soldier);
+			uMoney=number(user.money);
+			uFood=number(user.food);
+			uGold=number(user.gold);
+			uGold2=number(user.gold2);
+			
+			uSoldier+=soldier;
+			uMoney+=money;
+			uFood+=food;
+			uGold+=gold;
+			uGold2+=gold2;
+			
+			addGold=gold+gold2;
+			if(addGold>0)
+			{
+				//流水
+				allGold=uGold+uGold2;//元宝余额
+				game.saveResIO(userID,25,0,1,addGold,allGold);//使用CDKEY(type,itemID,（0=消耗，1=获得）,count,allGold)
+			}
+			
+			json=json_decode(user.json);
+			//赠送道具
+			itemDict=json.item;
+			newItemArr=arr();
+			addItemArr=split(arr(),item,",");
+			addIDCount=size(addItemArr);
+			if(addIDCount>=2)
+			{
+				i=0;j=0;addCount=addIDCount/2;
+				while(i<addCount)
+				{
+					itemID=number(addItemArr[j]);
+					itemCount=number(addItemArr[j+1]);
+					numMgr.addItem(itemID,itemCount,itemDict);//奖励道具
+					push(newItemArr,itemID,itemCount);
+					j+=2;
+					++i;
+				}
+			}
+
+			oneHeroData=arr();
+			oneWifeData=arr();
+			wifeDict=json.wife;
+			if(heroID!=0 || wifeID!=0)
+			{
+				if(wifeID!=0)
+				{
+					heroArr=json.hero;
+					heroZero=heroArr[0];//主角
+					newWife=numMgr.createWife(wifeID,wifeDict);
+					//公告群发
+					// nickname=user.nickname;
+					numMgr.computeHero(heroZero,json);
+					numMgr.computeUserWifeProperty(user,wifeDict);
+					numMgr.computeUser(user,json);
+					// str=nickname+"在兑换卷中获得"+table.wife.getRowFromColName("id",wifeID).getValFromColName("name")+"的青睐，并喜结良缘。";
+					// worldSendMsg(game,0,nickname,0,0,0,str,0,6);
+					if(!empty(newWife))//创建豪杰成功
+					{
+						//计算user红颜数值
+						numMgr.computeUserWifeProperty(user,wifeDict);
+						push(oneWifeData,newWife,heroZero);
+					}
+				}
+				
+				//赠送豪杰
+				if(heroID!=0)
+				{
+					heroArr=json.hero;
+					hero=numMgr.createHero(heroID,heroArr,json);
+					if(!empty(hero))//创建豪杰成功
+					{
+						push(oneHeroData,hero);
+					}
+				}
+				
+				//重新计算加成
+				numMgr.computeHeroArr(json);
+				numMgr.computeUser(user,json);
+			}
+			
+			wifePlus=json.wifePlus;
+			power=number(user.power);
+			strength=number(user.strength);
+			wisdom=number(user.wisdom);
+			charm=number(user.charm);
+			politics=number(user.politics);
+			intimate=number(user.intimate);
+			beauty=number(user.beauty);
+			
+			//保存
+			cdkeyMap[sn]=0;
+			user.soldier=uSoldier;
+			user.money=uMoney;
+			user.food=uFood;
+			if(uGold!=0)
+			{
+				rmb=gold;
+				rmbEd=int(user.rmb);
+				rmbEd+=rmb;//CNY
+				user.rmb=rmbEd;
+				vipEd=int(user.vip);
+				vip=numMgr.computeVip(rmbEd,vipEd);
+				user.vip=vip;
+				
+				user.gold=uGold;
+			}
+			if(uGold2!=0)
+			{
+				user.gold2=uGold2;
+			}
+			
+			user.json=json_encode(json);
+			user.jsonExt=json_encode(jsonExt);
+			
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,soldier,money,food,gold,gold2,wifePlus,power,strength,wisdom,charm,politics,intimate,beauty,itemDict,newItemArr,oneHeroData,oneWifeData,user.vip,user.rmb)
+			);
+			return(1);//修改
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

@@ -1,0 +1,68 @@
+//获取其它玩家信息
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+hisID=netMsg[3];//其它玩家id
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+//获取信息
+user=game.rd.getRow(game.cnn,"user","id",hisID,"*",1000);
+
+if(empty(user))
+{
+	//不存在
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+	
+}
+infoDict=dict();
+
+infoDict["userID"]=hisID;
+infoDict["nickname"]=user.nickname;
+infoDict["head"]=user.head;
+infoDict["level"]=user.level;
+infoDict["vip"]=user.vip;
+infoDict["power"]=user.power;
+infoDict["strength"]=user.strength;
+infoDict["wisdom"]=user.wisdom;
+infoDict["charm"]=user.charm;
+infoDict["politics"]=user.politics;
+infoDict["intimate"]=user.intimate;
+infoDict["score"]=user.score;
+infoDict["fashionID"]=user.fashionID;
+// infoDict["chapterID"]=user.chapterID;
+// infoDict["barrierID"]=user.barrierID;
+chapterTab=game.table.chapter;
+chapterID=int(user.chapterID);
+barrierID=int(user.barrierID);
+row=chapterTab.getRowFromColName("id",chapterID+1);
+name=row.getValFromColName("name");
+title=name+"("+(barrierID+1)+")";
+infoDict["barrierName"]=title;
+
+json=json_decode(user.json);
+
+
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,infoDict,json.titleMap)
+);
+	
+

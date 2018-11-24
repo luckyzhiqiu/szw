@@ -1,0 +1,140 @@
+//机器人管理器
+@class RebotMgr<game>
+	self.game=game;
+	
+	//创建机器人
+	@member createRebot<rebotID>
+		game=self.game;
+		cnn=game.cnn;
+		
+		table=game.table;
+		name1Table=table.name1;
+		name1Num=name1Table.size();
+		name1=rand()%name1Num;
+		surname=name1Table.getRow(name1).getValFromColName("name1");//姓
+		sex=rand()%2;
+		if(sex==1)
+		{
+			name2Table=table.name2;
+			name2Num=name2Table.size();
+			name2=rand()%name2Num;
+			name=name2Table.getRow(name2).getValFromColName("male");//男名
+			head=rand()%5+1;//头像ID
+		}
+		else
+		{
+			name3Table=table.name3;
+			name3Num=name3Table.size();
+			name3=rand()%name3Num;
+			name=name3Table.getRow(name3).getValFromColName("female");//女名
+			head=rand()%5+6;//头像ID
+		}
+		
+		nickname=surname+name;//姓名
+
+		//检查重名
+		sql="select id from user where nickname='"+nickname+"'";
+		rs=mysqlCreateRs(cnn,sql);
+		hasRow=mysqlNextRow(rs);
+		mysqlDestroyRs(rs);
+
+		if(hasRow)//昵称重名
+		{
+			return(-2);
+		}
+
+		numMgr=game.numMgr;
+		structMgr=game.structMgr;
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//填写用户json
+		json=structMgr_upgradeObj(structMgr,"Json",dict());
+		//上阵豪杰列表
+		heroArr=arr();
+		makeHero=structMgr_upgradeObj(structMgr,"MakeResHeroUp",dict());
+		push(heroArr,makeHero,makeHero,makeHero,makeHero,makeHero);
+		//经营:商业
+		makeMoney=json.makeMoney;
+		makeMoney.beginTime=0;//资源增长开始时间戳（毫秒）
+		makeMoney.hero=heroArr;//上阵豪杰列表
+		//经营:农业
+		makeFood=json.makeFood;
+		makeFood.beginTime=0;//资源增长开始时间戳（毫秒）
+		makeFood.hero=heroArr;//上阵豪杰列表
+		//经营:征兵
+		makeSoldier=json.makeSoldier;
+		makeSoldier.beginTime=0;//资源增长开始时间戳（毫秒）
+		makeSoldier.hero=heroArr;//上阵豪杰列表
+		//经营:兵营
+		push(json.battle.hero,-1,-1,-1,-1,-1);
+		//剧情
+		json.story.date=split(arr(),now()," ")[0];
+		//红颜随机宠幸
+		json.wifeRandomFuck.beginTime=0;//开始时间戳（毫秒）
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//创建主角豪杰
+		robotTable=table["robot"+rebotID];
+		heroNum=robotTable.size();
+		// debug(heroNum);
+		i=0;
+		while(i<heroNum)
+		{
+			row=robotTable.getRow(i);
+			id=row.getValFromColName("id");
+			numMgr.createHero(id,json.hero,json);
+			++i;
+		}
+		
+		//创建红颜
+		numMgr.createWife(1,json.wife);
+		//计算加成
+		numMgr.computeHeroArr(json);
+		//////////////////////////////////////////////////////////
+		//计算势力属性
+		strength=numMgr.getTotalStrength(json,handle());//总武力
+		wisdom=numMgr.getTotalWisdom(json,handle());//总智力
+		charm=numMgr.getTotalCharm(json,handle());//总魅力
+		politics=numMgr.getTotalPolitics(json,handle());//总政治
+		power=strength+wisdom+charm+politics;
+		//子嗣席位
+		rowC=table.childConfigure.getRow(0);
+		json.childSys.childMaxCount=number(rowC.getValFromColName("seat"));//默认席位
+
+		//填写用户扩展json
+		jsonExt=structMgr_upgradeObj(structMgr,"JsonExt",dict());
+
+		//编码
+		jsonStr=json_encode(json);
+		jsonExtStr=json_encode(jsonExt);
+		
+		newUserID=game.allocUserID();
+		if(newUserID==0)//分配用户ID错误
+		{
+			return(-3);
+		}
+
+		//创建用户
+		sql="insert into user set ";
+		sql+="id='"+newUserID+"'";
+		sql+=",genTime='"+now()+"'";
+		sql+=",level='3'";
+		sql+=",nickname='"+nickname+"'";
+		sql+=",strength='"+strength+"'";
+		sql+=",wisdom='"+wisdom+"'";
+		sql+=",charm='"+charm+"'";
+		sql+=",politics='"+politics+"'";
+		sql+=",power='"+power+"'";
+		sql+=",head='"+head+"'";
+		//sql+=",jsonVer='"+game.structVer+"'";
+		sql+=",json='"+jsonStr+"'";
+		sql+=",jsonExt='"+jsonExtStr+"'";
+		mysqlExec(cnn,sql);
+		//userID=mysqlInsertID(cnn);//新建用户ID
+		
+		//加入排行榜
+		game.addToRank(newUserID);
+
+		return(1);		
+	@member.
+	
+@class.

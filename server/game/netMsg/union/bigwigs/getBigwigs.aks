@@ -1,0 +1,82 @@
+//获取权贵
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+myUnionID=user.unionID;
+if(myUnionID==0)//未入盟
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+richmanInfoArr=arr();
+sql="select id,unionID,catchTime,json,keepTime from union_richman";
+rs=mysqlCreateRs(game.cnn,sql);
+while(mysqlNextRow(rs))
+{
+	richmanInDict=dict();
+	richmanInDict["id"]=mysqlGetColVal(rs,0);//权贵ID
+	unionID=mysqlGetColVal(rs,1);
+	richmanInDict["unionID"]=unionID;//权贵所属联盟ID
+	richmanInDict["catchTime"]=mysqlGetColVal(rs,2);//拉拢时间
+	richmanInDict["keepTime"]=mysqlGetColVal(rs,4);//拉拢保护时间
+	json=json_decode(mysqlGetColVal(rs,3));
+	unionFriendMap=json.unionFriendMap;
+	
+	it=dictIt();
+	dictItBegin(unionFriendMap,it);
+	while(!dictItEmpty(it))
+	{
+		selectUnionID=dictItKey(it);
+		friendVal=dictItVal(it);
+		if(selectUnionID==unionID)
+		{
+			richmanInDict["pertainFriendVal"]=friendVal;//所属联盟权贵好感度
+			if(unionID>=10001)
+			{
+				unionData=game.rd.getRow(game.cnn,"union","id",unionID,"*",1000);
+				unionName=unionData.name;
+				richmanInDict["belongUnionName"]=unionName;//所属方联盟名称
+			}
+		}
+		
+		if(selectUnionID==myUnionID)
+		{
+			richmanInDict["friendVal"]=friendVal;//我方联盟权贵好感度
+			if(unionID>=10001)
+			{
+				unionData=game.rd.getRow(game.cnn,"union","id",unionID,"*",1000);
+				unionName=unionData.name;
+				richmanInDict["unionName"]=unionName;//我方联盟名称
+			}
+		}
+		dictItNext(it);
+	}
+	push(richmanInfoArr,richmanInDict);
+}
+mysqlDestroyRs(rs);
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,richmanInfoArr)
+);

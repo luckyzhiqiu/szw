@@ -1,0 +1,161 @@
+//领取
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+type=netMsg[3];//1=领取道具奖励;2领取豪杰
+myRoadIDS=netMsg[4];//领取关卡ID奖励
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,type,myRoadIDS;
+		json=json_decode(user.json);
+		myRoad=json.myRoad;
+		myRoadID=myRoad.id;
+		
+		if(myRoadID<myRoadIDS)//此关卡没通过
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);
+		}
+		
+		getMap=myRoad.getMap;
+		if(exist(getMap,myRoadIDS) && type==1)//已领取此关卡奖励
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);
+		}
+
+		tableData=game.table;
+		itemDict=json.item;
+		heroArr=json.hero;
+		numMgr=game.numMgr;
+		heroID=0;newAddItemArr=arr();
+		if(type==1)
+		{
+			myRoadTable=tableData.myRoad;
+			rowM=myRoadTable.getRowFromColName("id",myRoadIDS);
+			item=rowM.getValFromColName("item");//奖励
+		
+			addItemArr=split(arr(),item,",");
+			addIDCount=size(addItemArr);
+			if(addIDCount>=2)
+			{
+				i=0;j=0;addCount=addIDCount/2;
+				while(i<addCount)
+				{
+					itemID=number(addItemArr[j]);
+					itemCount=number(addItemArr[j+1]);
+					numMgr.addItem(itemID,itemCount,itemDict);//奖励道具
+					push(newAddItemArr,itemID,itemCount);
+					j+=2;
+					++i;
+				}
+			}
+		}
+		else if(type==2)
+		{
+			if(myRoadID!=10)//没有打通最后关卡
+			{
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)
+				);
+				return(0);
+			}
+			
+			getHero=myRoad.getHero;
+			if(getHero==1)//已领取豪杰奖励
+			{
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-5)
+				);
+				return(0);
+			}
+			
+			myRoadConfigTable=tableData.myRoadConfig;
+			rowMC=myRoadConfigTable.getRow(0);
+			heroID=number(rowMC.getValFromColName("hero"));//通关10关奖励豪杰
+			if(heroID!=0)
+			{
+				newHero=numMgr.createHero(heroID,heroArr,json);
+				if(!empty(newHero))
+				{
+					numMgr.computeHeroArr(json);
+					numMgr.computeUser(user,json);
+				}
+				else
+				{
+					heroID=0;
+				}
+				myRoad.getHero=1;
+			}
+		}
+		
+		power=number(user.power);
+		strength=number(user.strength);
+		wisdom=number(user.wisdom);
+		charm=number(user.charm);
+		politics=number(user.politics);
+			
+		//保存
+		if(type==1)
+		{
+			getMap[myRoadIDS]=1;
+		}
+		user.json=json_encode(json);
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,myRoad,itemDict,heroArr,power,strength,wisdom,charm,politics,newAddItemArr,heroID)
+		);
+		
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

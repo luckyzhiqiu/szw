@@ -1,0 +1,112 @@
+//宴会列表
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link sessionID,methodName,userID;
+		json=json_decode(user.json);
+		jsonExt=json_decode(user.jsonExt);
+		party=jsonExt.party;
+		partyArrUpdateTime=party.partyArrUpdateTime;
+		nowTime=time();
+
+		tableData=game.table;
+		dinnerConfigTable=tableData.dinnerConfig;
+		rowDC=dinnerConfigTable.getRow(0);
+		dinnerRefresh=number(rowDC.getValFromColName("dinnerRefresh"));//宴会列表刷新时间（分钟）
+		dinnerRefreshTime=dinnerRefresh*60;
+		passTime=nowTime-partyArrUpdateTime;
+
+		structMgr=game.structMgr;	
+		partyArr=party.partyArr;//宴会列表
+		pass=0;
+		if(passTime>=dinnerRefreshTime)//刷新列表
+		{
+			pass=1;
+			clean(partyArr);
+			partyArrUpdateTime=nowTime;
+			
+			partyType=number(user.partyType);//宴会类型：0=家宴；1=官宴（必须公开）；
+			dinnerTable=tableData.dinner;
+			rowD=dinnerTable.getRowFromColName("type",partyType);
+			time=number(rowD.getValFromColName("time"));//持续时间（分钟）
+			timeS=time*60;
+			partyTime=nowTime-timeS;
+			
+			sql="select id,nickname,partyType,level,head from user where id!="+userID+" and partyBt>"+partyTime+" and partyBt>0 and partyOpen=1 order by rand() limit 6";
+			rs=mysqlCreateRs(game.cnn,sql);
+			while(mysqlNextRow(rs))
+			{
+				map=structMgr_upgradeObj(structMgr,"PartyInfo",dict());
+				map["userID"]=mysqlGetColVal(rs,0);
+				map["nickname"]=mysqlGetColVal(rs,1);
+				map["type"]=mysqlGetColVal(rs,2);
+				map["level"]=mysqlGetColVal(rs,3);
+				map["head"]=mysqlGetColVal(rs,4);
+				
+				push(partyArr,map);
+			}
+			mysqlDestroyRs(rs);
+		}
+		
+		dailyTask=json.dailyTask;
+		partyCount=dailyTask.partyCount;//赴宴次数
+		
+		//保存
+		party.partyArrUpdateTime=partyArrUpdateTime;
+		user.jsonExt=json_encode(jsonExt);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,partyArr,partyCount,partyArrUpdateTime)
+		);
+		
+		if(pass)
+		{
+			return(1);
+		}
+		else
+		{
+			return(0);
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

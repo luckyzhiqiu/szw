@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t56">36</v>
+<v t="n" n="__sys__t43">24</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="s" n="__sys__t4">._WorldBossHurtRank.</v>
+<v t="n" n="__sys__t5">1000</v>
+<v t="s" n="__sys__t6">. .</v>
+<v t="n" n="__sys__t7">0</v>
+<v t="s" n="__sys__t8">.select id,worldBossHurt from user where worldBossHurtDate='.</v>
+<v t="s" n="__sys__t9">.' and worldBossHurt&gt;0.</v>
+<v t="n" n="__sys__t10">0</v>
+<v t="n" n="__sys__t11">0</v>
+<v t="n" n="__sys__t12">1</v>
+<o n="input"><o>__sys__t13</o><i>__sys__t1</i></o>
+<o n="="><o>cnn</o><i>__sys__t13</i></o>
+<o n="input"><o>__sys__t15</o><i>__sys__t2</i></o>
+<o n="="><o>rdObj</o><i>__sys__t15</i></o>
+<o n="input"><o>__sys__t17</o><i>__sys__t3</i></o>
+<o n="="><o>gameConfig</o><i>__sys__t17</i></o>
+<v t="s" n="__sys__t20">.name.</v>
+<o n="." r="650"><o>__sys__t19</o><i>gameConfig</i><i>__sys__t20</i></o>
+<o n="+" r="650"><o>__sys__t22</o><i>__sys__t19</i><i>__sys__t4</i></o>
+<o n="=" r="650"><o>rankName</o><i>__sys__t22</i></o>
+<v t="s" n="__sys__t25">.delStr.</v>
+<o n="." r="652"><o>__sys__t24</o><i>rdObj</i><i>__sys__t25</i></o>
+<o n="__sys__t24" r="652"><o>__sys__t27</o><i>rdObj</i><i>rankName</i><i>__sys__t5</i></o>
+<v t="s" n="__sys__t29">.getRedisObj.</v>
+<o n="." r="658"><o>__sys__t28</o><i>rdObj</i><i>__sys__t29</i></o>
+<o n="__sys__t28" r="658"><o>__sys__t31</o><i>rdObj</i><i>rankName</i></o>
+<o n="=" r="658"><o>rd</o><i>__sys__t31</i></o>
+<o n="arr" r="659"><o>__sys__t33</o></o>
+<o n="now" r="659"><o>__sys__t34</o></o>
+<o n="split" r="659"><o>__sys__t35</o><i>__sys__t33</i><i>__sys__t34</i><i>__sys__t6</i></o>
+<o n="[]" r="659"><o>__sys__t36</o><i>__sys__t35</i><i>__sys__t7</i></o>
+<o n="=" r="659"><o>curDate</o><i>__sys__t36</i></o>
+<o n="+" r="660"><o>__sys__t38</o><i>__sys__t8</i><i>curDate</i></o>
+<o n="+" r="660"><o>__sys__t39</o><i>__sys__t38</i><i>__sys__t9</i></o>
+<o n="=" r="660"><o>sql</o><i>__sys__t39</i></o>
+<o n="mysqlCreateRs" r="662"><o>__sys__t41</o><i>cnn</i><i>sql</i></o>
+<o n="=" r="662"><o>rs</o><i>__sys__t41</i></o>
+<o n="mysqlNextRow" r="663"><o>__sys__t44</o><i>rs</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t44</i></o>
+<o n="=="><o>__sys__t46</o><i>__sys__rt</i><i>__sys__t10</i></o>
+<o n="if_goto"><o>__sys__t47</o><i>__sys__t46</i><i>__sys__t56</i></o>
+<o n="mysqlGetColVal" r="665"><o>__sys__t48</o><i>rs</i><i>__sys__t11</i></o>
+<o n="number" r="665"><o>__sys__t49</o><i>__sys__t48</i></o>
+<o n="=" r="665"><o>userID</o><i>__sys__t49</i></o>
+<o n="mysqlGetColVal" r="666"><o>__sys__t51</o><i>rs</i><i>__sys__t12</i></o>
+<o n="number" r="666"><o>__sys__t52</o><i>__sys__t51</i></o>
+<o n="=" r="666"><o>score</o><i>__sys__t52</i></o>
+<o n="redis_zadd" r="667"><o>__sys__t54</o><i>rd</i><i>rankName</i><i>score</i><i>userID</i></o>
+<o n="goto"><o>__sys__t55</o><i>__sys__t43</i></o>
+<o n="mysqlDestroyRs" r="669"><o>__sys__t57</o><i>rs</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t13" />
+<v n="__sys__t15" />
+<v n="__sys__t17" />
+<v n="__sys__t19" />
+<v n="__sys__t22" />
+<v n="__sys__t24" />
+<v n="__sys__t27" />
+<v n="__sys__t28" />
+<v n="__sys__t31" />
+<v n="__sys__t33" />
+<v n="__sys__t34" />
+<v n="__sys__t35" />
+<v n="__sys__t36" />
+<v n="__sys__t38" />
+<v n="__sys__t39" />
+<v n="__sys__t41" />
+<v n="__sys__t44" />
+<v n="__sys__t46" />
+<v n="__sys__t47" />
+<v n="__sys__t48" />
+<v n="__sys__t49" />
+<v n="__sys__t51" />
+<v n="__sys__t52" />
+<v n="__sys__t54" />
+<v n="__sys__t55" />
+<v n="__sys__t57" />
+<v n="cnn" />
+<v n="curDate" />
+<v n="gameConfig" />
+<v n="rankName" />
+<v n="rd" />
+<v n="rdObj" />
+<v n="rs" />
+<v n="score" />
+<v n="sql" />
+<v n="userID" />
+</script>

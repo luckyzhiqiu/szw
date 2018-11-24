@@ -1,0 +1,203 @@
+//豪杰提拔（突破）
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+heroIndex=int(netMsg[3]);//豪杰位置
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,heroIndex;
+		json=json_decode(user.json);
+		heroArr=json.hero;//所有门客
+		numMgr=game.numMgr;
+		if(!exist(heroArr,heroIndex))//豪杰不存在
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		hero=heroArr[heroIndex];//对应豪杰位置
+		promotion=hero.promotion;//豪杰爵位等级
+		if(promotion==6)//爆级
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//修改
+		}
+		
+		promotion+=1;	
+		
+		promotionTable=game.table.promotion;
+		rowP=promotionTable.getRowFromColName("id",promotion);
+		fourPower=number(rowP.getValFromColName("fourPower"));//增加四项属性
+		if(fourPower>0)
+		{
+			hero.strength+=fourPower;
+			hero.wisdom+=fourPower;
+			hero.charm+=fourPower;
+			hero.politics+=fourPower;
+		}
+		
+		itemDict=json.item;
+		count=1;
+		if(promotion==2)
+		{
+			item15=numMgr.getItemCount(15,itemDict);//获取物品数量
+			item16=numMgr.getItemCount(16,itemDict);//获取物品数量
+			item17=numMgr.getItemCount(17,itemDict);//获取物品数量
+			if(item15>=1 && item16>=1 && item17>=1)
+			{
+				num1=numMgr.subItem(15,1,itemDict);//返回数量
+				num2=numMgr.subItem(16,1,itemDict);//返回数量
+				num3=numMgr.subItem(17,1,itemDict);//返回数量
+			}
+			else
+			{
+				count=0;
+			}
+		}
+		else if(promotion==3)
+		{
+			item18=numMgr.getItemCount(18,itemDict);//获取物品数量
+			item19=numMgr.getItemCount(19,itemDict);//获取物品数量
+			item20=numMgr.getItemCount(20,itemDict);//获取物品数量
+			if(item18>=1 && item19>=1 && item20>=1)
+			{
+				num1=numMgr.subItem(18,1,itemDict);//返回数量
+				num2=numMgr.subItem(19,1,itemDict);//返回数量
+				num3=numMgr.subItem(20,1,itemDict);//返回数量
+			}
+			else
+			{
+				count=0;
+			}
+		}
+		else if(promotion==4)
+		{
+			item21=numMgr.getItemCount(21,itemDict);//获取物品数量
+			item22=numMgr.getItemCount(22,itemDict);//获取物品数量
+			item23=numMgr.getItemCount(23,itemDict);//获取物品数量
+			if(item21>=1 && item22>=1 && item23>=1)
+			{
+				num1=numMgr.subItem(21,1,itemDict);//返回数量
+				num2=numMgr.subItem(22,1,itemDict);//返回数量
+				num3=numMgr.subItem(23,1,itemDict);//返回数量
+			}
+			else
+			{
+				count=0;
+			}
+		}
+		else if(promotion==5)
+		{
+			item24=numMgr.getItemCount(24,itemDict);//获取物品数量
+			item25=numMgr.getItemCount(25,itemDict);//获取物品数量
+			item26=numMgr.getItemCount(26,itemDict);//获取物品数量
+			if(item24>=1 && item25>=1 && item26>=1)
+			{
+				num1=numMgr.subItem(24,1,itemDict);//返回数量
+				num2=numMgr.subItem(25,1,itemDict);//返回数量
+				num3=numMgr.subItem(26,1,itemDict);//返回数量
+			}
+			else
+			{
+				count=0;
+			}
+		}
+		else if(promotion==6)
+		{
+			item27=numMgr.getItemCount(27,itemDict);//获取物品数量
+			item28=numMgr.getItemCount(28,itemDict);//获取物品数量
+			item29=numMgr.getItemCount(29,itemDict);//获取物品数量
+			if(item27>=1 && item28>=1 && item29>=1)
+			{
+				num1=numMgr.subItem(27,1,itemDict);//返回数量
+				num2=numMgr.subItem(28,1,itemDict);//返回数量
+				num3=numMgr.subItem(29,1,itemDict);//返回数量
+			}
+			else
+			{
+				count=0;
+			}
+		}
+			
+		if(count)//道具数量充足
+		{
+			numMgr.computeHero(hero,json);
+			numMgr.computeUser(user,json);
+			
+			
+			//保存
+			hero.promotion=promotion;
+			user.json=json_encode(json);
+			
+			power=number(user.power);
+			strength=number(user.strength);
+			wisdom=number(user.wisdom);
+			charm=number(user.charm);
+			politics=number(user.politics);
+			
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,promotion,num1,num2,num3,hero,power,strength,wisdom,charm,politics)
+			);
+			return(1);//修改
+		}
+		else//道具数量不足
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);
+		}
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

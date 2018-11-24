@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t118">76</v>
+<v t="n" n="__sys__t117">76</v>
+<v t="n" n="__sys__t107">67</v>
+<v t="n" n="__sys__t106">67</v>
+<v t="n" n="__sys__t104">66</v>
+<v t="n" n="__sys__t103">66</v>
+<v t="n" n="__sys__t62">32</v>
+<v t="n" n="__sys__t40">11</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="s" n="__sys__t3">.select id,uid,platformID,serverID,nickname from account_info_queue.</v>
+<v t="n" n="__sys__t4">0</v>
+<v t="n" n="__sys__t5">0</v>
+<v t="n" n="__sys__t6">1</v>
+<v t="n" n="__sys__t7">2</v>
+<v t="n" n="__sys__t8">3</v>
+<v t="n" n="__sys__t9">4</v>
+<v t="s" n="__sys__t10">.uid.</v>
+<v t="s" n="__sys__t11">.platformID.</v>
+<v t="s" n="__sys__t12">.serverID.</v>
+<v t="s" n="__sys__t13">.nickname.</v>
+<v t="n" n="__sys__t14">0</v>
+<v t="n" n="__sys__t15">0</v>
+<v t="s" n="__sys__t16">./api/account.php.</v>
+<v t="s" n="__sys__t17">.action=batchSaveAccountInfo&amp;json=.</v>
+<v t="s" n="__sys__t18">.send_account_info_queue.</v>
+<v t="n" n="__sys__t19">10000</v>
+<v t="n" n="__sys__t20">1</v>
+<v t="n" n="__sys__t21">0</v>
+<v t="s" n="__sys__t22">.delete from account_info_queue where id in (.</v>
+<v t="s" n="__sys__t23">.,.</v>
+<v t="s" n="__sys__t24">.).</v>
+<v t="n" n="__sys__t25">0</v>
+<v t="n" n="__sys__t26">0</v>
+<v t="s" n="__sys__t27">.send_account_info_queue.log.</v>
+<v t="s" n="__sys__t28">.&#x000D;&#x000A;.</v>
+<o n="input"><o>__sys__t29</o><i>__sys__t1</i></o>
+<o n="="><o>cnn</o><i>__sys__t29</i></o>
+<o n="input"><o>__sys__t31</o><i>__sys__t2</i></o>
+<o n="="><o>account_php_config</o><i>__sys__t31</i></o>
+<o n="arr" r="2718"><o>__sys__t33</o></o>
+<o n="=" r="2718"><o>idArr</o><i>__sys__t33</i></o>
+<o n="arr" r="2719"><o>__sys__t35</o></o>
+<o n="=" r="2719"><o>json</o><i>__sys__t35</i></o>
+<o n="=" r="2720"><o>sql</o><i>__sys__t3</i></o>
+<o n="mysqlCreateRs" r="2721"><o>__sys__t38</o><i>cnn</i><i>sql</i></o>
+<o n="=" r="2721"><o>rs</o><i>__sys__t38</i></o>
+<o n="mysqlNextRow" r="2722"><o>__sys__t41</o><i>rs</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t41</i></o>
+<o n="=="><o>__sys__t43</o><i>__sys__rt</i><i>__sys__t4</i></o>
+<o n="if_goto"><o>__sys__t44</o><i>__sys__t43</i><i>__sys__t62</i></o>
+<o n="mysqlGetColVal" r="2724"><o>__sys__t45</o><i>rs</i><i>__sys__t5</i></o>
+<o n="int" r="2724"><o>__sys__t46</o><i>__sys__t45</i></o>
+<o n="=" r="2724"><o>id</o><i>__sys__t46</i></o>
+<o n="mysqlGetColVal" r="2725"><o>__sys__t48</o><i>rs</i><i>__sys__t6</i></o>
+<o n="=" r="2725"><o>uid</o><i>__sys__t48</i></o>
+<o n="mysqlGetColVal" r="2726"><o>__sys__t50</o><i>rs</i><i>__sys__t7</i></o>
+<o n="int" r="2726"><o>__sys__t51</o><i>__sys__t50</i></o>
+<o n="=" r="2726"><o>platformID</o><i>__sys__t51</i></o>
+<o n="mysqlGetColVal" r="2727"><o>__sys__t53</o><i>rs</i><i>__sys__t8</i></o>
+<o n="int" r="2727"><o>__sys__t54</o><i>__sys__t53</i></o>
+<o n="=" r="2727"><o>serverID</o><i>__sys__t54</i></o>
+<o n="mysqlGetColVal" r="2728"><o>__sys__t56</o><i>rs</i><i>__sys__t9</i></o>
+<o n="=" r="2728"><o>nickname</o><i>__sys__t56</i></o>
+<o n="push" r="2730"><o>__sys__t58</o><i>idArr</i><i>id</i></o>
+<o n="dict" r="2734"><o>__sys__t59</o><i>__sys__t10</i><i>uid</i><i>__sys__t11</i><i>platformID</i><i>__sys__t12</i><i>serverID</i><i>__sys__t13</i><i>nickname</i></o>
+<o n="push" r="2731"><o>__sys__t60</o><i>json</i><i>__sys__t59</i></o>
+<o n="goto"><o>__sys__t61</o><i>__sys__t40</i></o>
+<o n="mysqlDestroyRs" r="2743"><o>__sys__t63</o><i>rs</i></o>
+<o n="try" r="2745"><o>__sys__t64</o></o>
+<o n="size" r="2746"><o>__sys__t65</o><i>json</i></o>
+<o n=">" r="2746"><o>__sys__t66</o><i>__sys__t65</i><i>__sys__t14</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t66</i></o>
+<o n="=="><o>__sys__t68</o><i>__sys__rt</i><i>__sys__t15</i></o>
+<o n="if_goto"><o>__sys__t69</o><i>__sys__t68</i><i>__sys__t106</i></o>
+<v t="s" n="__sys__t71">.domain.</v>
+<o n="." r="2748"><o>__sys__t70</o><i>account_php_config</i><i>__sys__t71</i></o>
+<o n="=" r="2748"><o>domain</o><i>__sys__t70</i></o>
+<v t="s" n="__sys__t75">.port.</v>
+<o n="." r="2749"><o>__sys__t74</o><i>account_php_config</i><i>__sys__t75</i></o>
+<o n="=" r="2749"><o>port</o><i>__sys__t74</i></o>
+<o n="=" r="2750"><o>url</o><i>__sys__t16</i></o>
+<o n="json_encode" r="2751"><o>__sys__t79</o><i>json</i></o>
+<o n="base64_encode" r="2751"><o>__sys__t80</o><i>__sys__t79</i></o>
+<o n="urlencode" r="2751"><o>__sys__t81</o><i>__sys__t80</i></o>
+<o n="+" r="2751"><o>__sys__t82</o><i>__sys__t17</i><i>__sys__t81</i></o>
+<o n="=" r="2751"><o>params</o><i>__sys__t82</i></o>
+<o n="trace" r="2752"><o>__sys__t84</o><i>__sys__t18</i></o>
+<o n="debug" r="2753"><o>__sys__t85</o><i>json</i></o>
+<o n="form" r="2754"><o>__sys__t86</o><i>domain</i><i>port</i><i>url</i><i>params</i><i>__sys__t19</i></o>
+<o n="=" r="2754"><o>rt</o><i>__sys__t86</i></o>
+<o n="json_decode" r="2756"><o>__sys__t88</o><i>rt</i></o>
+<o n="=" r="2756"><o>rtJson</o><i>__sys__t88</i></o>
+<v t="s" n="__sys__t91">.result.</v>
+<o n="." r="2757"><o>__sys__t90</o><i>rtJson</i><i>__sys__t91</i></o>
+<o n="==" r="2757"><o>__sys__t93</o><i>__sys__t90</i><i>__sys__t20</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t93</i></o>
+<o n="=="><o>__sys__t95</o><i>__sys__rt</i><i>__sys__t21</i></o>
+<o n="if_goto"><o>__sys__t96</o><i>__sys__t95</i><i>__sys__t103</i></o>
+<o n="join" r="2759"><o>__sys__t97</o><i>idArr</i><i>__sys__t23</i></o>
+<o n="+" r="2759"><o>__sys__t98</o><i>__sys__t22</i><i>__sys__t97</i></o>
+<o n="+" r="2759"><o>__sys__t99</o><i>__sys__t98</i><i>__sys__t24</i></o>
+<o n="=" r="2759"><o>sql</o><i>__sys__t99</i></o>
+<o n="mysqlExec" r="2761"><o>__sys__t101</o><i>cnn</i><i>sql</i></o>
+<o n="goto"><o>__sys__t102</o><i>__sys__t104</i></o>
+<o n="goto"><o>__sys__t105</o><i>__sys__t107</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t25</i></o>
+<o n="=="><o>__sys__t109</o><i>__sys__rt</i><i>__sys__t26</i></o>
+<o n="if_goto"><o>__sys__t110</o><i>__sys__t109</i><i>__sys__t117</i></o>
+<o n="catch" r="2764"><o>__sys__t111</o></o>
+<o n="+" r="2765"><o>__sys__t112</o><i>rt</i><i>__sys__t28</i></o>
+<o n="log" r="2765"><o>__sys__t113</o><i>__sys__t27</i><i>__sys__t112</i></o>
+<o n="error" r="2766"><o>__sys__t114</o></o>
+<o n="trace" r="2766"><o>__sys__t115</o><i>__sys__t114</i></o>
+<o n="goto"><o>__sys__t116</o><i>__sys__t118</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t101" />
+<v n="__sys__t102" />
+<v n="__sys__t105" />
+<v n="__sys__t109" />
+<v n="__sys__t110" />
+<v n="__sys__t111" />
+<v n="__sys__t112" />
+<v n="__sys__t113" />
+<v n="__sys__t114" />
+<v n="__sys__t115" />
+<v n="__sys__t116" />
+<v n="__sys__t29" />
+<v n="__sys__t31" />
+<v n="__sys__t33" />
+<v n="__sys__t35" />
+<v n="__sys__t38" />
+<v n="__sys__t41" />
+<v n="__sys__t43" />
+<v n="__sys__t44" />
+<v n="__sys__t45" />
+<v n="__sys__t46" />
+<v n="__sys__t48" />
+<v n="__sys__t50" />
+<v n="__sys__t51" />
+<v n="__sys__t53" />
+<v n="__sys__t54" />
+<v n="__sys__t56" />
+<v n="__sys__t58" />
+<v n="__sys__t59" />
+<v n="__sys__t60" />
+<v n="__sys__t61" />
+<v n="__sys__t63" />
+<v n="__sys__t64" />
+<v n="__sys__t65" />
+<v n="__sys__t66" />
+<v n="__sys__t68" />
+<v n="__sys__t69" />
+<v n="__sys__t70" />
+<v n="__sys__t74" />
+<v n="__sys__t79" />
+<v n="__sys__t80" />
+<v n="__sys__t81" />
+<v n="__sys__t82" />
+<v n="__sys__t84" />
+<v n="__sys__t85" />
+<v n="__sys__t86" />
+<v n="__sys__t88" />
+<v n="__sys__t90" />
+<v n="__sys__t93" />
+<v n="__sys__t95" />
+<v n="__sys__t96" />
+<v n="__sys__t97" />
+<v n="__sys__t98" />
+<v n="__sys__t99" />
+<v n="account_php_config" />
+<v n="cnn" />
+<v n="domain" />
+<v n="id" />
+<v n="idArr" />
+<v n="json" />
+<v n="nickname" />
+<v n="params" />
+<v n="platformID" />
+<v n="port" />
+<v n="rs" />
+<v n="rt" />
+<v n="rtJson" />
+<v n="serverID" />
+<v n="sql" />
+<v n="uid" />
+<v n="url" />
+</script>

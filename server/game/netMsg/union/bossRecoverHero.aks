@@ -1,0 +1,127 @@
+//使用出战令
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+heroIndex=netMsg[3];//豪杰下标
+
+
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+
+	//修改行数据
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link methodName,sessionID,heroIndex,userID;
+			
+			json=json_decode(user.json);
+			itemDict=ref(json.item);
+			heroArr=ref(json.hero);
+			heroInfo=heroArr[heroIndex];
+			if(empty(heroInfo))
+			{
+				//豪杰不存在
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)
+				);
+				return(0);//不修改
+				
+			}
+					
+			dailyTask=json.dailyTask;
+			unionBossHeroMap=ref(dailyTask.unionBossHeroMap);
+			unionBossHeroRecoveMap=ref(dailyTask.unionBossHeroRecoveMap);
+			
+			if(game.numMgr.subItem(7,1,itemDict)==-1)
+			{
+				//出战令不足
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-7)
+				);
+				return(0);	
+				
+			}
+			
+			if(exist(unionBossHeroRecoveMap,heroIndex))
+			{
+				//已用出战令
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-5)
+				);
+				return(0);//不修改
+			}
+			
+			if(exist(unionBossHeroMap,heroIndex))
+			{
+				remove(unionBossHeroMap,heroIndex);
+				push(unionBossHeroRecoveMap,heroIndex,1);	
+			}else
+			{
+				//没打过不能用
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-6)
+				);
+				return(0);//不修改
+			}
+				
+			
+			
+
+			//保存
+			user.json=json_encode(json);
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",1,unionBossHeroMap,unionBossHeroRecoveMap,itemDict)
+			);
+			
+			return(1);//修改
+		
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+	
+
+
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}

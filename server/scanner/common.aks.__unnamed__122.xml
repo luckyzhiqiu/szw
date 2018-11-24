@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="n" n="__sys__t4">3</v>
+<v t="n" n="__sys__t5">0</v>
+<v t="s" n="__sys__t6">.global_var.</v>
+<v t="s" n="__sys__t7">.name.</v>
+<v t="s" n="__sys__t8">.waterBattleDayRank.</v>
+<v t="s" n="__sys__t9">.*.</v>
+<v t="s" n="__sys__t10">.@__unnamed__119.</v>
+<v t="s" n="__sys__t11">.@__unnamed__120.</v>
+<v t="s" n="__sys__t12">.@__unnamed__121.</v>
+<v t="n" n="__sys__t13">1000</v>
+<o n="input"><o>__sys__t14</o><i>__sys__t1</i></o>
+<o n="="><o>cnn</o><i>__sys__t14</i></o>
+<o n="input"><o>__sys__t16</o><i>__sys__t2</i></o>
+<o n="="><o>rdObj</o><i>__sys__t16</i></o>
+<o n="input"><o>__sys__t18</o><i>__sys__t3</i></o>
+<o n="="><o>table</o><i>__sys__t18</i></o>
+<o n="input"><o>__sys__t20</o><i>__sys__t4</i></o>
+<o n="="><o>gameConfig</o><i>__sys__t20</i></o>
+<o n="dict" r="2772"><o>__sys__t22</o></o>
+<o n="=" r="2772"><o>userData</o><i>__sys__t22</i></o>
+<v t="s" n="__sys__t25">.nextDaySign.</v>
+<o n="." r="2773"><o>__sys__t24</o><i>userData</i><i>__sys__t25</i></o>
+<o n="=" r="2773"><o>__sys__t24</o><i>__sys__t5</i></o>
+<v t="s" n="__sys__t29">.updateRow.</v>
+<o n="." r="2774"><o>__sys__t28</o><i>rdObj</i><i>__sys__t29</i></o>
+<o n="full"><o>__sys__t31</o><i>__sys__t10</i></o>
+<o n="full"><o>__sys__t32</o><i>__sys__t11</i></o>
+<o n="full"><o>__sys__t33</o><i>__sys__t12</i></o>
+<o n="__sys__t28" r="2774"><o>__sys__t34</o><i>rdObj</i><i>cnn</i><i>__sys__t6</i><i>__sys__t7</i><i>__sys__t8</i><i>__sys__t9</i><i>__sys__t31</i><i>__sys__t32</i><i>__sys__t33</i><i>userData</i><i>__sys__t13</i></o>
+<v n="__sys__t14" />
+<v n="__sys__t16" />
+<v n="__sys__t18" />
+<v n="__sys__t20" />
+<v n="__sys__t22" />
+<v n="__sys__t24" />
+<v n="__sys__t28" />
+<v n="__sys__t31" />
+<v n="__sys__t32" />
+<v n="__sys__t33" />
+<v n="__sys__t34" />
+<v n="cnn" />
+<v n="gameConfig" />
+<v n="rdObj" />
+<v n="table" />
+<v n="userData" />
+</script>

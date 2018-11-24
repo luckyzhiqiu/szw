@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="n" n="__sys__t4">3</v>
+<v t="n" n="__sys__t5">4</v>
+<v t="s" n="__sys__t6">.global_var.</v>
+<v t="s" n="__sys__t7">.name.</v>
+<v t="s" n="__sys__t8">.rushLoop.</v>
+<v t="s" n="__sys__t9">.*.</v>
+<v t="s" n="__sys__t10">.@__unnamed__31.</v>
+<v t="s" n="__sys__t11">.@__unnamed__32.</v>
+<v t="s" n="__sys__t12">.@__unnamed__33.</v>
+<v t="n" n="__sys__t13">1000</v>
+<o n="input"><o>__sys__t14</o><i>__sys__t1</i></o>
+<o n="="><o>cnn</o><i>__sys__t14</i></o>
+<o n="input"><o>__sys__t16</o><i>__sys__t2</i></o>
+<o n="="><o>rd</o><i>__sys__t16</i></o>
+<o n="input"><o>__sys__t18</o><i>__sys__t3</i></o>
+<o n="="><o>gameConfig</o><i>__sys__t18</i></o>
+<o n="input"><o>__sys__t20</o><i>__sys__t4</i></o>
+<o n="="><o>rushLoopTable</o><i>__sys__t20</i></o>
+<o n="input"><o>__sys__t22</o><i>__sys__t5</i></o>
+<o n="="><o>game</o><i>__sys__t22</i></o>
+<v t="s" n="__sys__t25">.table.</v>
+<o n="." r="674"><o>__sys__t24</o><i>game</i><i>__sys__t25</i></o>
+<o n="=" r="674"><o>table</o><i>__sys__t24</i></o>
+<o n="dict" r="675"><o>__sys__t28</o></o>
+<o n="=" r="675"><o>userData</o><i>__sys__t28</i></o>
+<v t="s" n="__sys__t31">.updateRow.</v>
+<o n="." r="676"><o>__sys__t30</o><i>rd</i><i>__sys__t31</i></o>
+<o n="full"><o>__sys__t33</o><i>__sys__t10</i></o>
+<o n="full"><o>__sys__t34</o><i>__sys__t11</i></o>
+<o n="full"><o>__sys__t35</o><i>__sys__t12</i></o>
+<o n="__sys__t30" r="676"><o>__sys__t36</o><i>rd</i><i>cnn</i><i>__sys__t6</i><i>__sys__t7</i><i>__sys__t8</i><i>__sys__t9</i><i>__sys__t33</i><i>__sys__t34</i><i>__sys__t35</i><i>userData</i><i>__sys__t13</i></o>
+<v n="__sys__t14" />
+<v n="__sys__t16" />
+<v n="__sys__t18" />
+<v n="__sys__t20" />
+<v n="__sys__t22" />
+<v n="__sys__t24" />
+<v n="__sys__t28" />
+<v n="__sys__t30" />
+<v n="__sys__t33" />
+<v n="__sys__t34" />
+<v n="__sys__t35" />
+<v n="__sys__t36" />
+<v n="cnn" />
+<v n="game" />
+<v n="gameConfig" />
+<v n="rd" />
+<v n="rushLoopTable" />
+<v n="table" />
+<v n="userData" />
+</script>

@@ -1,0 +1,35 @@
+//玩家信息-查看自己势力排名®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//获取
+rankName=game.gameConfig.name+"_powerRank";//势力排行榜名称
+
+
+rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+//自己的排名
+rankID=-1;
+@try
+	rankID=redis_zrevrank(rd,rankName,userID);
+@catch
+	rankID=-1;//未上榜
+@catch.
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,rankID)
+);

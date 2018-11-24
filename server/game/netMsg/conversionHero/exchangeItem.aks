@@ -1,0 +1,116 @@
+//
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+ID=netMsg[3];
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID,ID;
+		json=json_decode(user.json);
+		
+		ladyHero=ref(json.ladyHero);
+		event17ItemIDMap=ref(ladyHero.event17ItemIDMap);
+	
+		if(exist(event17ItemIDMap,ID))
+		{
+			//已领取
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-5)
+			);
+			return(0);
+		}
+		push(event17ItemIDMap,ID,1);
+		
+		tabelData=game.table;
+		rowCY=tabelData.event17Item.getRowFromColName("id",ID);
+		if(empty(rowCY))//
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-99)
+			);
+			return(0);
+		}
+		ShopItemID=number(rowCY.getValFromColName("ShopItemID"));
+		itemID=number(rowCY.getValFromColName("itemID"));
+		num=number(rowCY.getValFromColName("num"));
+		
+		itemDict=ref(json.item);
+		count=game.numMgr.subItem(itemID,num,itemDict);
+		if(count==-1)//道具数量不足扣除失败
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+			
+		game.numMgr.addItem(ShopItemID,1,itemDict);
+			
+		
+		
+		
+				
+		//保存
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,itemDict,event17ItemIDMap,ShopItemID)
+		);
+		
+		return(1);//修改
+	
+				
+		
+		
+		
+		
+	
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

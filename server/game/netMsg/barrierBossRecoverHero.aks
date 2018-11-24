@@ -1,0 +1,124 @@
+//关卡BOSS豪杰恢复
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+heroIndex=netMsg[3];//豪杰位置
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,heroIndex;
+		json=json_decode(user.json);
+		heroArr=json.hero;//所有门客
+		itemDict=json.item;
+		
+		if(!exist(heroArr,heroIndex))//豪杰不存在
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		
+		itemID=7;//道具ID
+		if(!exist(itemDict,itemID))//道具ID无效
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		row=game.table.item.getRowFromColName("id",itemID);
+		type=number(row.getValFromColName("type"));//道具类型
+		if(type!=4)//类型必须4
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+		
+		num=game.numMgr.subItem(itemID,1,itemDict);//返回数量
+		if(num==-1)//数量不足扣除失败
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-5)
+			);
+			return(0);//不修改
+		}
+		
+		//删除剧情关卡BOSS已对战豪杰列表
+		story=json.story;
+		heroIndexMap=ref(story.heroIndexMap);
+		recoverHeroIndexMap=ref(story.recoverHeroIndexMap);
+		if(exist(recoverHeroIndexMap,heroIndex))//豪杰已恢复一次不能再次恢复
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-6)
+			);
+			return(0);//不修改
+		}
+		
+		recoverHeroIndexMap[heroIndex]=1;
+		remove(heroIndexMap,heroIndex);
+		
+		//保存
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,heroIndexMap,recoverHeroIndexMap)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

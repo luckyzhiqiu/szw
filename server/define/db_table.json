@@ -1,0 +1,87 @@
+/*
+mysql数据库生成配置文件
+db:数据表生成信息
+defineTable:定义一般表（每一条定义包括：表名和注释）
+defineTableIndex:定义表索引（每一条定义包括：表名和列名）
+defineTemplateTable:定义模板表（每一条定义包括：表名和注释）
+scriptDir:表格生成脚本所在的目录
+*/
+{
+	db0:
+	{
+		scriptDir:"db/tables",
+		defineTable:
+		[
+			["index_my_platform","自有平台帐号索引"],
+			["user","用户表"],
+			["user_report","用户举报表"],
+			["unmarry_child","招亲表（未婚孩子表）"],
+			["wang1","历任王爷表1"],
+			["wang2","历任王爷表2"],
+			["wang3","历任王爷表3"],
+			["wang4","历任王爷表4"],
+			["wang5","历任王爷表5"],
+			["kill_world_boss","击杀世界BOSS榜表"],
+			["union","联盟表"],
+			["union_richman","联盟权贵表"],
+			["global_var","全局变量表"],
+			["order","订单表"],
+			["account_info_queue","帐号信息队列表"],
+			["public_msg","服内公告表"],
+			["luck_draw","抽签记录表（抽到品质好的物品的信息记录）"],
+		],
+		defineTableIndex:
+		[
+			["user","nickname"],
+			["global_var","name"],
+			["order","num"],
+			["index_my_platform","uid"],
+		],
+		defineTemplateTable:
+		[
+			["login","登录日志模板表（每天一个表）"],
+			["online","在线日志表（每天一个表）"],
+			["water_battle","议政日志模板表（每天一个表）"],
+			["mail","邮件表（每用户一个表）"],
+			["chat","世界聊天日志表（每天一个表）"],
+			["chat_union","联盟聊天日志表（每天一个表）"],
+			["res_flow","游戏资源流水模板表（日志表）"],
+			["union_hurt","联盟BOSS伤害表（每个联盟一个表）"],
+			["guide","新手引导日志表（每天一个表）"],
+		]
+	},
+	db_global:
+	{
+		scriptDir:"db/global_tables",
+		defineTable:
+		[
+			["global_var","全局变量表"],
+			["game_server","游戏服表"],
+			["mgr_user","后台用户表"],
+		],
+		defineTableIndex:
+		[
+			["global_var","name"],
+		],
+		defineTemplateTable:
+		[
+		]
+	},
+	db_account:
+	{
+		scriptDir:"db/account_tables",
+		defineTable:
+		[
+			["account","帐号信息表"],
+			["cdkey","游戏兑换码表"],
+		],
+		defineTableIndex:
+		[
+			["account","uid"],
+			["cdkey","sn"],
+		],
+		defineTemplateTable:
+		[
+		]
+	}
+}

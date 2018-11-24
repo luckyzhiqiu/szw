@@ -1,0 +1,158 @@
+//一键上阵
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID;
+		numMgr=game.numMgr;
+	
+		json=json_decode(user.json);
+		heroArr=json.hero;//豪杰数组
+		
+		arr1=numMgr.sortHeroByStrength(heroArr);//返回豪杰数组（按武力排序）
+		arr2=numMgr.sortHeroByWisdom(heroArr);//返回豪杰数组（按智力排序）
+		arr3=numMgr.sortHeroByCharm(heroArr);//返回豪杰数组（按魅力排序）
+		arr4=numMgr.sortHeroByPolitics(heroArr);//返回豪杰数组（按政治排序）
+		
+		//上阵类型
+		makeMoneyHero=json.makeMoney.hero;
+		makeFoodHero=json.makeFood.hero;
+		makeSoldierHero=json.makeSoldier.hero;
+		battleHero=json.battle.hero;
+		
+		
+		row=game.table.level.getRowFromColName("level",user.level);//官阶等级数据
+		ERP1=number(row.getValFromColName("ERP1"));//商业空位
+		ERP2=number(row.getValFromColName("ERP2"));//农业空位
+		ERP3=number(row.getValFromColName("ERP3"));//征兵空位
+		ERP4=number(row.getValFromColName("ERP4"));//上阵空位
+		
+		pos=0;seatCount=5;
+		while(pos<seatCount)
+		{
+			if(ERP4>pos)
+			{
+				//军营
+				if(battleHero[pos]==-1)//位置空闲
+				{
+					freeHero=numMgr.getFreeHero(arr1);
+					if(empty(freeHero))//没有空闲豪杰可以上阵
+					{
+						break;
+					}
+					heroIndex=freeHero.heroIndex;
+					battleHero[pos]=heroIndex;//上阵座位
+					heroArr[heroIndex].useSign=1;//上阵变换
+				}
+			}
+	
+			if(ERP1>pos)
+			{
+				//商业
+				if(makeMoneyHero[pos].heroIndex==-1)//位置空闲
+				{
+					freeHero=numMgr.getFreeHero(arr2);
+					if(empty(freeHero))//没有空闲豪杰可以上阵
+					{
+						break;
+					}
+					heroIndex=freeHero.heroIndex;
+					makeMoneyHero[pos].heroIndex=heroIndex;//上阵座位
+					makeMoneyHero[pos].beginTime=time_milli();;//上阵时间
+					heroArr[heroIndex].useSign=1;//上阵变换
+				}
+			}
+			
+			if(ERP2>pos)
+			{
+				//农业
+				if(makeFoodHero[pos].heroIndex==-1)//位置空闲
+				{
+					freeHero=numMgr.getFreeHero(arr4);
+					if(empty(freeHero))//没有空闲豪杰可以上阵
+					{
+						break;
+					}
+					heroIndex=freeHero.heroIndex;
+					makeFoodHero[pos].heroIndex=heroIndex;//上阵座位
+					makeFoodHero[pos].beginTime=time_milli();;//上阵时间
+					heroArr[heroIndex].useSign=1;//上阵变换
+				}
+			}
+			
+			if(ERP3>pos)
+			{
+				//征兵
+				if(makeSoldierHero[pos].heroIndex==-1)//位置空闲
+				{
+					freeHero=numMgr.getFreeHero(arr3);
+					if(empty(freeHero))//没有空闲豪杰可以上阵
+					{
+						break;
+					}
+					heroIndex=freeHero.heroIndex;
+					makeSoldierHero[pos].heroIndex=heroIndex;//上阵座位
+					makeSoldierHero[pos].beginTime=time_milli();;//上阵时间
+					heroArr[heroIndex].useSign=1;//上阵变换
+				}
+			}
+			
+			++pos;
+		}
+		
+		//保存
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(
+				methodName+"Result",1,
+				json.makeMoney,
+				json.makeFood,
+				json.makeSoldier,
+				json.battle
+			)
+		);
+
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

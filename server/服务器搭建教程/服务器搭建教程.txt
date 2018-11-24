@@ -1,0 +1,98 @@
+将压缩包中akserver解压到d:\
+将压缩包中akh5解压到d:\
+将压缩包中game_jipin解压到d:\
+
+打开源码中client/game目录，运行link.bat
+打开源码中server目录，运行link.bat
+打开源码中server/www目录，运行link.bat
+
+打开client/game，使用wing3打开工程，修改MyData.ts中的配置并发布
+使用PNGoo对发布目录中的图片进行压缩
+复制"前端版本工具"到发布目录，并添加资源文件指纹
+修改index.html中的版本号
+
+
+
+登录winscp
+复制源码中server目录中所有文件到/usr/data/szw001/
+复制刚才发布的游戏版本中所有文件到/usr/data/szw001/www/game/
+复制d:\akserver\bin中的akserver和akload到/usr/data/szw001
+将/usr/data/szw001/中akserver和akload的权限修改为777
+将/usr/data/szw001/中所有.sh的文件权限修改为777
+修改/usr/data/szw001/config/中的配置文件
+修改/usr/data/szw001/www/config/中的配置文件
+修改
+game.sh
+hub.sh
+scanner.sh
+tinyWeb.sh
+
+
+
+登录linux主机
+mkdir /usr/data/
+cd usr/data/
+mkdir /usr/data/szw/
+
+安装宝塔linux面板（中途输入y并回车）
+yum install -y wget && wget -O install.sh http://download.bt.cn/install/install.sh && sh install.sh
+安装成功后，提示：
+Bt-Panel: http://www.xx.com:8888
+username: admin
+password: xxxxxx
+
+在浏览器打开
+http://www.xx.com:8888
+输入以上帐号密码进行登录，进入宝塔面板
+
+点击左边栏“软件管理”，安装如下软件：
+PHP-5.6
+Nginx1.14
+mysql 5.6
+Redis
+安装完这些，再安装：
+phpMyAdmin
+
+软件->PHP-5.6->设置->安装扩展->redis
+
+可选操作：关闭mysql日志
+
+创建网站，路径网站路径为/usr/data/szw/www/
+
+
+
+
+
+redis位置
+/www/server/redis/src/redis-server
+
+中心服端口配置
+redis_center	5000
+
+游戏服端口配置
+redis_szw001	5100
+game001			5101
+hub001			5102
+tinyWeb001		5103
+
+
+中心服开机启动
+vim /etc/rc.local
+/www/server/redis/src/redis-server /usr/data/redis/redis_center.conf &
+
+游戏服开机启动
+vim /etc/rc.local
+/www/server/redis/src/redis-server /usr/data/redis/redis_szw001.conf &
+/usr/data/szw001/hub.sh &
+/usr/data/szw001/scanner.sh &
+/usr/data/szw001/game.sh &
+/usr/data/szw001/tinyWeb.sh &
+
+
+启动中心服redis和游戏服redis
+运行以下脚本创建数据库
+./upgradeAccountDB.sh
+./upgradeGlobalDB.sh
+./upgradeDB.sh
+
+

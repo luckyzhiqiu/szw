@@ -1,0 +1,133 @@
+//商店兑换
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+addItemID=netMsg[3];//道具ID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link sessionID,methodName,addItemID;
+		unionID=number(user.unionID);
+		if(unionID==0)//未加入联盟
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);
+		}
+		
+		unionData=game.rd.getRow(game.cnn,"union","id",unionID,"*",1000);
+		if(empty(unionData))//联盟不存在
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			exit();
+		}
+		
+		levelU=number(unionData.level);//联盟等级
+		allianceShopTable=game.table.allianceShop;
+		rowAS=allianceShopTable.getRowFromColName("itemID",addItemID);
+
+		level=number(rowAS.getValFromColName("level"));//所需联盟等级
+		if(levelU<level)//联盟等级不足
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);
+		}
+		
+		devote=number(user.devote);//联盟贡献
+		devoteCost=number(rowAS.getValFromColName("devoteCost"));//所需贡献
+		if(devote<devoteCost)//联盟贡献不足
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-5)
+			);
+			return(0);
+		}
+		devote-=devoteCost;
+		
+		uJson=json_decode(user.json);
+		dailyTask=uJson.dailyTask;
+		unionExchangeItemIDMap=dailyTask.unionExchangeItemIDMap;
+		if(exist(unionExchangeItemIDMap,addItemID))
+		{
+			limit=number(rowAS.getValFromColName("limit"));//限购数量
+			count=unionExchangeItemIDMap[addItemID];
+			if(count>=limit)//兑换已达上限
+			{
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-6)
+				);
+				return(0);
+			}
+			unionExchangeItemIDMap[addItemID]+=1;
+		}
+		else
+		{
+			unionExchangeItemIDMap[addItemID]=1;
+		}
+		
+		itemDict=uJson.item;
+		numMgr=game.numMgr;
+		numMgr.addItem(addItemID,1,itemDict);
+		user.json=json_encode(uJson);
+		//保存
+		user.devote=devote;
+
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,unionExchangeItemIDMap,itemDict,devote)
+		);
+		return(1);
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

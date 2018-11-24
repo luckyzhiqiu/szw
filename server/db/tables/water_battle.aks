@@ -1,0 +1,14 @@
+//议政日志模板表（每天一个表）
+mysqlCol("key","id");
+mysqlCol("datetime","genTime");//生成时间
+////////////////////////////////////////////////////////////////
+mysqlCol("int","userID",0);//攻击方用户ID
+mysqlCol("varchar","userName",0);//攻击方玩家名称
+mysqlCol("int","heroID",0);//攻击方豪杰ID
+////////////////////////////////////////////////////////////////
+mysqlCol("int","enemyUserID",0);//受击方用户ID
+mysqlCol("varchar","enemyUserName",0);//受击方玩家名称
+mysqlCol("int","killCount",0);//击败豪杰数量
+mysqlCol("int","enemyCount",0);//受击方豪杰数量
+////////////////////////////////////////////////////////////////
+mysqlCol("int","winCount",0);//连胜次数

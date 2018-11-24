@@ -1,0 +1,163 @@
+//论战被打记录
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+residue=int(netMsg[3]);//剩余数
+
+if(residue==0)//已是最后一页
+{
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}
+jsonExt=json_decode(user.jsonExt);
+waterBattleExt=jsonExt.waterBattleExt;
+
+hitUnreadCount=waterBattleExt.hitUnreadCount;//被打数组未读计数
+if(hitUnreadCount!=0)
+{
+	//修改行数据
+	user=game.rd.updateRow
+	(
+		game.cnn,"user","id",userID,"*",
+		//修改回调
+		##<user,game>
+			@link methodName,sessionID,hitUnreadCount;
+			jsonExt=json_decode(user.jsonExt);
+			waterBattleExt=jsonExt.waterBattleExt;
+			waterBattleExt.hitUnreadCount=0;
+			
+			user.jsonExt=json_encode(jsonExt);
+			return(1);
+		##.,
+		//修改完成回调
+		##<row,userData>
+			//...
+		##.,
+		//解锁后回调
+		##<row,userData>
+			//...
+		##.,
+		game,//自定义数据userData
+		1000//加锁时间（毫秒），例如：1000
+	);
+}
+
+hitArr=waterBattleExt.hitArr;
+count=size(hitArr);
+if(count==0)//被打数组为空
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",2,hitArr)
+	);
+	exit();
+}
+
+enemyUseIDArr=arr();//当页userIDArr
+enemyUseIDTimeArr=arr();//当页userIDTimeArr
+enemyInfoMapArr=arr();//当页被打userIDMapArr数据
+
+countPerPage=10;//每页条数
+start=0;//从第几个到第几个
+end=10;//循环几次
+
+if(residue==-1)
+{
+	residue=count;
+}
+
+if(residue>countPerPage)
+{
+	//start=residue-countPerPage;
+	end=countPerPage;
+	//residue-=countPerPage;
+}
+else
+{
+	end=residue;
+	//residue=0;
+}
+
+i=0;
+while(i<end)
+{
+	--residue;
+	
+	info=hitArr[residue];
+	userID=info.userID;
+	time=info.time;
+	push(enemyUseIDArr,userID);
+	push(enemyUseIDTimeArr,time);
+	newEnemyInfoMap=dict();
+	
+	newEnemyInfoMap["userID"]=info.userID;
+	newEnemyInfoMap["time"]=info.time;
+	newEnemyInfoMap["enemyHeroID"]=info.enemyHeroID;
+	newEnemyInfoMap["winCount"]=info.winCount;
+	newEnemyInfoMap["battleScore"]=info.battleScore;
+
+	push(enemyInfoMapArr,newEnemyInfoMap);
+	
+	++i;
+}
+
+curEnemyCount=size(enemyUseIDArr);
+if(curEnemyCount>0)
+{
+	userIDStr=join(enemyUseIDArr,",");
+	sql="select id,nickname,waterBattleScore from user where id in("+userIDStr+") limit "+curEnemyCount;
+	rs=mysqlCreateRs(game.cnn,sql);
+	while(mysqlNextRow(rs))
+	{
+		i=0;
+		while(i<size(enemyInfoMapArr))
+		{
+			userIDS=mysqlGetColVal(rs,0);
+			enemyUserIDS=enemyInfoMapArr[i]["userID"];
+			if(enemyUserIDS==userIDS)
+			{
+				enemyInfoMapArr[i]["nickname"]=mysqlGetColVal(rs,1);
+				enemyInfoMapArr[i]["waterBattleScore"]=mysqlGetColVal(rs,2);
+			}
+			
+			++i;
+		}
+		
+	}
+	mysqlDestroyRs(rs);
+}
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,enemyUseIDArr,enemyInfoMapArr,enemyUseIDTimeArr,residue)
+);

@@ -1,0 +1,30 @@
+/*
+mysql数据库连接信息配置文件
+cnn:mysql连接信息
+*/
+{
+	cnn0:
+	{
+		domain:"127.0.0.1",
+		port:3306,
+		user:"root",
+		password:"c543008d622d8d63505d909760b7a184",
+		name:"szw001"
+	},
+	cnn_global:
+	{
+		domain:"test1.aawan.cn",
+		port:3306,
+		user:"root",
+		password:"c543008d622d8d63505d909760b7a184",
+		name:"szw_global"
+	},
+	cnn_account:
+	{
+		domain:"test1.aawan.cn",
+		port:3306,
+		user:"root",
+		password:"c543008d622d8d63505d909760b7a184",
+		name:"szw_account"
+	}
+}

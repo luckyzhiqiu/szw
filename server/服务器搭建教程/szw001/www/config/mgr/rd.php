@@ -1,0 +1,18 @@
+<?php
+include_once(dirname(__FILE__)."/../../ak/AKRedis.php");
+//游戏服redis节点信息
+$redisInfoArr=array
+(
+	array("127.0.0.1","5100"),
+);
+//全局数据库redis节点信息
+$redisInfoArr_global=array
+(
+	array("134.175.173.177","5000","c543008d622d8d63505d909760b7a184"),
+);
+//帐号信息数据库redis节点信息
+$redisInfoArr_account=array
+(
+	array("134.175.173.177","5000","c543008d622d8d63505d909760b7a184"),
+);
+?>

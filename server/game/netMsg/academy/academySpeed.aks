@@ -1,0 +1,137 @@
+//书院读书加速
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+heroIndex=int(netMsg[3]);//豪杰位置
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,userID,heroIndex;
+		json=json_decode(user.json);
+		bookHouse=json.bookHouse;
+		heroArr=bookHouse.heroArr;
+		count=size(heroArr);
+		if(count==0)//没有人读书
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)
+			);
+			return(0);//不修改
+		}
+		
+		i=0;
+		needMin=0;//经过多少分钟
+		while(i<count)
+		{
+			heroInfo=heroArr[i];
+			heroIndexS=heroInfo.heroIndex;
+			if(heroIndexS==heroIndex)
+			{
+				bt=heroInfo.bt;
+				nowTime=time();
+				remainTime=nowTime-bt;
+				needMin=floor(remainTime/60);
+				heroInfo.bt=0;
+				break;
+			}
+			++i;
+		}
+		
+		table=game.table;
+		schoolTable=table.school;
+		rowS=schoolTable.getRow(0);
+		timeCost=number(rowS.getValFromColName("timeCost"));//等待时间(分钟)
+		if(needMin>=timeCost)//时间已过，不需要加速时间
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3)
+			);
+			return(0);//不修改
+		}
+		
+		goldCost=number(rowS.getValFromColName("goldCost"));//秒CD每分钟消耗元宝
+		needMin=limit(needMin,0,timeCost);
+		allNeedGold=(timeCost-needMin)*goldCost;//总需要消耗元宝
+		
+		gold=number(user.gold);//元宝（充值，优先使用）
+		gold2=number(user.gold2);//元宝（赠送）
+		if(allNeedGold>(gold+gold2))//元宝不足
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+		
+		//扣减元宝
+		if(allNeedGold>gold)
+		{
+			allNeedGold-=gold;
+			gold=0;
+			gold2-=allNeedGold;
+		}
+		else
+		{
+			gold-=allNeedGold;
+		}
+		
+		//流水
+		allGold=gold+gold2;//元宝余额
+		game.saveResIO(userID,39,0,0,allNeedGold,allGold);//书院秒CD(type,itemID,（0=消耗，1=获得）,count,allGold)
+		
+		//保存
+		user.gold=gold;
+		user.gold2=gold2;
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,gold,gold2,heroArr)
+		);
+		
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

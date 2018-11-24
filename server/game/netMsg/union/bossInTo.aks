@@ -1,0 +1,97 @@
+//
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+bossId=netMsg[3];
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+user=game.rd.getRow(game.cnn,"user","id",userID,"*",1000);
+
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}
+unionID=number(user.unionID);
+if(unionID==0)//没有联盟
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-4)
+	);
+	exit();
+}
+unionRow=game.rd.getRow(game.cnn,"union","id",unionID,"*",1000);
+if(empty(unionRow))
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+	exit();
+}
+
+jsonStr=unionRow.json;
+json=json_decode(jsonStr);
+bossMap=json.bossMap;
+if(!exist(bossMap,bossId))
+{
+	//没有这个boss
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-5)
+	);
+	exit();
+	
+}
+
+tableName=createIDTable(game.cnn,"union_hurt",unionID);
+sql="SELECT id,nickname,userID,genTime,heroID,hurt FROM "+tableName+" where bossID="+bossId+" and genTime>=date(now()) and genTime<DATE_ADD(date(now()) ,INTERVAL 1 DAY) order by id desc limit 10";
+rs=mysqlCreateRs(game.cnn,sql);
+info=arr();
+while(mysqlNextRow(rs))
+{
+	push
+	(
+		info,
+		arr(
+		mysqlGetColVal(rs,0),
+		mysqlGetColVal(rs,1),
+		mysqlGetColVal(rs,2),
+		mysqlGetColVal(rs,3),
+		mysqlGetColVal(rs,4),
+		mysqlGetColVal(rs,5),
+		)
+	);
+}
+mysqlDestroyRs(rs);
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,bossMap[bossId],info)
+);
+
+

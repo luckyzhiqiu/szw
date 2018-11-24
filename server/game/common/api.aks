@@ -1,0 +1,188 @@
+//发送联盟系统聊天信息
+@def unionSendMsg<game,userID,nickname,outStr,userIDMap,unionID,type>
+	//user:0=系统推送;
+	//群发
+	genTime=now();
+	rtMsg=arr("chat/unionRt",userID,nickname,0,0,0,outStr,genTime,0,type);
+	game.sendMsgToAnyUser(rtMsg,userIDMap,userID);
+
+	//发给hub
+	push(rtMsg,userIDMap,userID);
+	game.sendMsgToHub(rtMsg);
+	cnn=game.cnn;
+
+	//记录聊天日志
+	tableName=createDayTable(cnn,"chat_union");
+	sql="insert into "+tableName+" set genTime='"+genTime+"'";
+	sql+=",nickname='"+nickname+"'";
+	sql+=",txt='"+outStr+"'";
+	sql+=",type='"+type+"'";
+	sql+=",unionID='"+unionID+"'";
+	mysqlExec(cnn,sql);
+@def.
+
+
+//发送世界聊天信息
+
+/*
+0=普通聊天；
+1=百废待兴，跳转至百废待兴主界面
+2=提升VIP，跳转到VIP福利界面，默认进入玩家下一级VIP标签界面
+3=创建联盟，点击跳转至联盟界面，如果玩家已加入联盟，则跳转至联盟榜单界面
+4=冲榜更变，跳转至冲榜主界面
+5=白夜缉凶，都跳转至白夜缉凶主界面
+6=寻访，跳转至寻访界面
+*/
+@def worldSendMsg<game,userID,nickname,vip,level,head,str,titleID,type>
+	//user:0=系统推送;
+	//群发
+	genTime=now();
+	//群发
+	rtMsg=arr("chat/worldRt",userID,nickname,vip,level,head,str,genTime,titleID,type);
+	game.sendMsgToAllExceptUserID(rtMsg,userID);
+
+	//发给hub
+	game.sendMsgToHub(rtMsg);
+
+	cnn=game.cnn;
+
+	//记录聊天日志
+	tableName=createDayTable(cnn,"chat");
+	sql="insert into "+tableName+" set genTime='"+genTime+"'";
+	sql+=",userID="+userID;
+	sql+=",nickname='"+nickname+"'";
+	sql+=",vip="+vip;
+	sql+=",level="+level;
+	sql+=",head="+head;
+	sql+=",type="+type;
+	sql+=",titleID="+titleID;
+	sql+=",txt='"+str+"'";
+	mysqlExec(cnn,sql);
+	
+@def.
+
+//增加分数和刷新联姻冲榜
+@def addAndUpdateMarryRank<game,user>
+	activityMgr=game.activityMgr;
+	activityID=207;//联姻冲榜
+	if(activityMgr.getActivityStatus(activityID)==1)//活动进行中
+	{
+		global_var=game.global_var;
+		rushLoop=global_var.rushLoop;
+		rushLoopBt=rushLoop.bt;//阶段开始时间
+	
+		marryAddBT=number(user.marryAddBT);
+		marryAdd=number(user.marryAdd);
+		score=1;
+		if(marryAddBT!=rushLoopBt)//重置活动积分
+		{
+			user.marryAddBT=rushLoopBt;
+			marryAdd=score;
+			user.marryAddReward=0;
+		}
+		else//累计活动积分
+		{
+			marryAdd+=score;
+		}
+		user.marryAdd=marryAdd;
+		//刷新榜
+		score=marryAdd;
+		rankName=game.gameConfig.name+"_marryAddRank";//排行榜名称
+		rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+		userID=user.id;
+		redis_zadd(rd,rankName,score,userID);//更新榜单
+		//国子监势力涨幅返回
+		userSessionMap=game.userSessionMap;
+		if(exist(userSessionMap,userID))
+		{
+			session=userSessionMap[userID];
+			msg=arr("marryAddResult",marryAdd);
+			game.sendMsg(session.id,msg);
+		}
+	}
+@def.
+
+//增加分数和刷新子嗣冲榜
+@def addAndUpdateChildAddRank<game,user,addScore>
+	activityMgr=game.activityMgr;
+	activityID=205;//子嗣冲榜
+	if(activityMgr.getActivityStatus(activityID)==1)//活动进行中
+	{
+		global_var=game.global_var;
+		rushLoop=global_var.rushLoop;
+		rushLoopBt=rushLoop.bt;//阶段开始时间
+	
+		childAddBT=number(user.childAddBT);
+		childAdd=number(user.childAdd);
+		score=addScore;
+		if(childAddBT!=rushLoopBt)//重置活动积分
+		{
+			user.childAddBT=rushLoopBt;
+			childAdd=score;
+			user.childAddReward=0;
+		}
+		else//累计活动积分
+		{
+			childAdd+=score;
+		}
+		user.childAdd=childAdd;
+		//刷新榜
+		score=childAdd;
+		rankName=game.gameConfig.name+"_childAddRank";//排行榜名称
+		rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+		userID=user.id;
+		redis_zadd(rd,rankName,score,userID);//更新榜单
+		//子嗣势力涨幅返回
+		userSessionMap=game.userSessionMap;
+		if(exist(userSessionMap,userID))
+		{
+			session=userSessionMap[userID];
+			msg=arr("childAddResult",childAdd);
+			game.sendMsg(session.id,msg);
+		}
+	}
+@def.
+
+//增加分数和刷新关卡冲榜
+@def addAndUpdateBarrierAddRank<game,user>
+	// trace("===============1");
+	activityMgr=game.activityMgr;
+	activityID=203;//关卡冲榜
+	if(activityMgr.getActivityStatus(activityID)==1)//活动进行中
+	{
+		// trace("===============2");
+		global_var=game.global_var;
+		rushLoop=global_var.rushLoop;
+		rushLoopBt=rushLoop.bt;//阶段开始时间
+	
+		barrierAddBT=number(user.barrierAddBT);
+		barrierAdd=number(user.barrierAdd);
+		score=1;
+		if(barrierAddBT!=rushLoopBt)//重置活动积分
+		{
+			user.barrierAddBT=rushLoopBt;
+			barrierAdd=score;
+			user.barrierAddReward=0;
+		}
+		else//累计活动积分
+		{
+			barrierAdd+=score;
+		}
+		user.barrierAdd=barrierAdd;
+		//刷新榜
+		score=barrierAdd;
+		rankName=game.gameConfig.name+"_barrierAddRank";//排行榜名称
+		rd=game.rd.getRedisObj(rankName);//排行榜所在的redis对象
+		userID=user.id;
+		redis_zadd(rd,rankName,score,userID);//更新榜单
+		//关卡涨幅返回
+		userSessionMap=game.userSessionMap;
+		if(exist(userSessionMap,user.id))
+		{
+			trace("===============3");
+			session=userSessionMap[user.id];
+			msg=arr("barrierAddResult",barrierAdd);
+			game.sendMsg(session.id,msg);
+		}
+	}
+@def.

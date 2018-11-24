@@ -1,0 +1,76 @@
+//白夜缉凶[世界Boss]-击杀积分排行榜®
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+page=int(netMsg[3]);//页码（从0开始）
+
+countPerPage=10;//每页条数
+begin=page*countPerPage;
+
+if(page==-1)
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+
+tableName="kill_world_boss";//击杀boss表
+sql="select userID,nickname,genTime from "+tableName+" order by id desc  limit "+begin+","+countPerPage;
+userInfoArr=arr();
+rankUserIDArr=arr();
+rs=mysqlCreateRs(game.cnn,sql);
+while(mysqlNextRow(rs))
+{
+	push(rankUserIDArr,mysqlGetColVal(rs,0));
+	push(userInfoArr,mysqlGetColVal(rs,0));
+	push(userInfoArr,mysqlGetColVal(rs,1));
+	push(userInfoArr,mysqlGetColVal(rs,2));
+}
+mysqlDestroyRs(rs);
+
+rd=game.rd;
+rankUserIDArrLength=size(rankUserIDArr);
+unionNameArr=arr();
+i=0;while(i<rankUserIDArrLength)
+{
+	userIdX=rankUserIDArr[i];
+	userX=rd.getRow(game.cnn,"user","id",userIdX,"*",1000);
+	unionIdX=userX.unionID;
+	if(unionIdX==0)
+	{
+		push(unionNameArr,"无");
+	}
+	else
+	{
+		unionX=rd.getRow(game.cnn,"union","id",unionIdX,"*",1000);
+		name=unionX.name;
+		push(unionNameArr,name);
+	}
+	
+	i++;
+}
+
+
+//回复
+game.sendMsg
+(
+	sessionID,
+	arr(methodName+"Result",1,rankUserIDArr,userInfoArr,unionNameArr)
+);

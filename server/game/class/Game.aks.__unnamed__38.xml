@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="s" n="__sys__t1">.@__unnamed__0.</v>
+<v t="s" n="__sys__t2">.@__unnamed__1.</v>
+<v t="s" n="__sys__t3">.@__unnamed__2.</v>
+<v t="s" n="__sys__t4">.@__unnamed__3.</v>
+<v t="s" n="__sys__t5">.@__unnamed__4.</v>
+<v t="s" n="__sys__t6">.@__unnamed__5.</v>
+<v t="s" n="__sys__t7">.@__unnamed__6.</v>
+<v t="s" n="__sys__t8">.@__unnamed__8.</v>
+<v t="s" n="__sys__t9">.@__unnamed__10.</v>
+<v t="s" n="__sys__t10">.@__unnamed__11.</v>
+<v t="s" n="__sys__t11">.@__unnamed__15.</v>
+<v t="s" n="__sys__t12">.@__unnamed__19.</v>
+<v t="s" n="__sys__t13">.@__unnamed__20.</v>
+<v t="s" n="__sys__t14">.@__unnamed__21.</v>
+<v t="s" n="__sys__t15">.@__unnamed__22.</v>
+<v t="s" n="__sys__t16">.@__unnamed__23.</v>
+<v t="s" n="__sys__t17">.@__unnamed__24.</v>
+<v t="s" n="__sys__t18">.@__unnamed__25.</v>
+<v t="s" n="__sys__t19">.@__unnamed__26.</v>
+<v t="s" n="__sys__t20">.@__unnamed__27.</v>
+<v t="s" n="__sys__t21">.@__unnamed__28.</v>
+<v t="s" n="__sys__t22">.@__unnamed__29.</v>
+<v t="s" n="__sys__t23">.@__unnamed__30.</v>
+<v t="s" n="__sys__t24">.@__unnamed__34.</v>
+<v t="s" n="__sys__t25">.@__unnamed__35.</v>
+<v t="s" n="__sys__t26">.@__unnamed__36.</v>
+<v t="s" n="__sys__t27">.@__unnamed__37.</v>
+<o n="dict" r="2"><o>__sys__t28</o></o>
+<o n="=" r="2"><o>self</o><i>__sys__t28</i></o>
+<v t="s" n="__sys__t31">.initServer.</v>
+<o n="." r="4"><o>__sys__t30</o><i>self</i><i>__sys__t31</i></o>
+<o n="full"><o>__sys__t33</o><i>__sys__t1</i></o>
+<o n="=" r="4"><o>__sys__t30</o><i>__sys__t33</i></o>
+<v t="s" n="__sys__t36">.initGame.</v>
+<o n="." r="9"><o>__sys__t35</o><i>self</i><i>__sys__t36</i></o>
+<o n="full"><o>__sys__t38</o><i>__sys__t2</i></o>
+<o n="=" r="9"><o>__sys__t35</o><i>__sys__t38</i></o>
+<v t="s" n="__sys__t41">.initStory.</v>
+<o n="." r="33"><o>__sys__t40</o><i>self</i><i>__sys__t41</i></o>
+<o n="full"><o>__sys__t43</o><i>__sys__t3</i></o>
+<o n="=" r="33"><o>__sys__t40</o><i>__sys__t43</i></o>
+<v t="s" n="__sys__t46">.getTmpData.</v>
+<o n="." r="39"><o>__sys__t45</o><i>self</i><i>__sys__t46</i></o>
+<o n="full"><o>__sys__t48</o><i>__sys__t4</i></o>
+<o n="=" r="39"><o>__sys__t45</o><i>__sys__t48</i></o>
+<v t="s" n="__sys__t51">.cleanTmpData.</v>
+<o n="." r="51"><o>__sys__t50</o><i>self</i><i>__sys__t51</i></o>
+<o n="full"><o>__sys__t53</o><i>__sys__t5</i></o>
+<o n="=" r="51"><o>__sys__t50</o><i>__sys__t53</i></o>
+<v t="s" n="__sys__t56">.initStruct.</v>
+<o n="." r="56"><o>__sys__t55</o><i>self</i><i>__sys__t56</i></o>
+<o n="full"><o>__sys__t58</o><i>__sys__t6</i></o>
+<o n="=" r="56"><o>__sys__t55</o><i>__sys__t58</i></o>
+<v t="s" n="__sys__t61">.initDB.</v>
+<o n="." r="68"><o>__sys__t60</o><i>self</i><i>__sys__t61</i></o>
+<o n="full"><o>__sys__t63</o><i>__sys__t7</i></o>
+<o n="=" r="68"><o>__sys__t60</o><i>__sys__t63</i></o>
+<v t="s" n="__sys__t66">.initRedis.</v>
+<o n="." r="84"><o>__sys__t65</o><i>self</i><i>__sys__t66</i></o>
+<o n="full"><o>__sys__t68</o><i>__sys__t8</i></o>
+<o n="=" r="84"><o>__sys__t65</o><i>__sys__t68</i></o>
+<v t="s" n="__sys__t71">.initJsonTable.</v>
+<o n="." r="584"><o>__sys__t70</o><i>self</i><i>__sys__t71</i></o>
+<o n="full"><o>__sys__t73</o><i>__sys__t9</i></o>
+<o n="=" r="584"><o>__sys__t70</o><i>__sys__t73</i></o>
+<v t="s" n="__sys__t76">.addToRank.</v>
+<o n="." r="612"><o>__sys__t75</o><i>self</i><i>__sys__t76</i></o>
+<o n="full"><o>__sys__t78</o><i>__sys__t10</i></o>
+<o n="=" r="612"><o>__sys__t75</o><i>__sys__t78</i></o>
+<v t="s" n="__sys__t81">.allocUserID.</v>
+<o n="." r="650"><o>__sys__t80</o><i>self</i><i>__sys__t81</i></o>
+<o n="full"><o>__sys__t83</o><i>__sys__t11</i></o>
+<o n="=" r="650"><o>__sys__t80</o><i>__sys__t83</i></o>
+<v t="s" n="__sys__t86">.allocUnionID.</v>
+<o n="." r="681"><o>__sys__t85</o><i>self</i><i>__sys__t86</i></o>
+<o n="full"><o>__sys__t88</o><i>__sys__t12</i></o>
+<o n="=" r="681"><o>__sys__t85</o><i>__sys__t88</i></o>
+<v t="s" n="__sys__t91">.createRebot.</v>
+<o n="." r="712"><o>__sys__t90</o><i>self</i><i>__sys__t91</i></o>
+<o n="full"><o>__sys__t93</o><i>__sys__t13</i></o>
+<o n="=" r="712"><o>__sys__t90</o><i>__sys__t93</i></o>
+<v t="s" n="__sys__t96">.loadVar.</v>
+<o n="." r="731"><o>__sys__t95</o><i>self</i><i>__sys__t96</i></o>
+<o n="full"><o>__sys__t98</o><i>__sys__t14</i></o>
+<o n="=" r="731"><o>__sys__t95</o><i>__sys__t98</i></o>
+<v t="s" n="__sys__t101">.loadGlobalVar.</v>
+<o n="." r="747"><o>__sys__t100</o><i>self</i><i>__sys__t101</i></o>
+<o n="full"><o>__sys__t103</o><i>__sys__t15</i></o>
+<o n="=" r="747"><o>__sys__t100</o><i>__sys__t103</i></o>
+<v t="s" n="__sys__t106">.loadManyGlobalVar.</v>
+<o n="." r="756"><o>__sys__t105</o><i>self</i><i>__sys__t106</i></o>
+<o n="full"><o>__sys__t108</o><i>__sys__t16</i></o>
+<o n="=" r="756"><o>__sys__t105</o><i>__sys__t108</i></o>
+<v t="s" n="__sys__t111">.getTick.</v>
+<o n="." r="763"><o>__sys__t110</o><i>self</i><i>__sys__t111</i></o>
+<o n="full"><o>__sys__t113</o><i>__sys__t17</i></o>
+<o n="=" r="763"><o>__sys__t110</o><i>__sys__t113</i></o>
+<v t="s" n="__sys__t116">.checkTick.</v>
+<o n="." r="768"><o>__sys__t115</o><i>self</i><i>__sys__t116</i></o>
+<o n="full"><o>__sys__t118</o><i>__sys__t18</i></o>
+<o n="=" r="768"><o>__sys__t115</o><i>__sys__t118</i></o>
+<v t="s" n="__sys__t121">.sendMsg.</v>
+<o n="." r="774"><o>__sys__t120</o><i>self</i><i>__sys__t121</i></o>
+<o n="full"><o>__sys__t123</o><i>__sys__t19</i></o>
+<o n="=" r="774"><o>__sys__t120</o><i>__sys__t123</i></o>
+<v t="s" n="__sys__t126">.sendMsgToAllExceptUserID.</v>
+<o n="." r="784"><o>__sys__t125</o><i>self</i><i>__sys__t126</i></o>
+<o n="full"><o>__sys__t128</o><i>__sys__t20</i></o>
+<o n="=" r="784"><o>__sys__t125</o><i>__sys__t128</i></o>
+<v t="s" n="__sys__t131">.sendMsgToAnyUser.</v>
+<o n="." r="804"><o>__sys__t130</o><i>self</i><i>__sys__t131</i></o>
+<o n="full"><o>__sys__t133</o><i>__sys__t21</i></o>
+<o n="=" r="804"><o>__sys__t130</o><i>__sys__t133</i></o>
+<v t="s" n="__sys__t136">.sendMail.</v>
+<o n="." r="827"><o>__sys__t135</o><i>self</i><i>__sys__t136</i></o>
+<o n="full"><o>__sys__t138</o><i>__sys__t22</i></o>
+<o n="=" r="827"><o>__sys__t135</o><i>__sys__t138</i></o>
+<v t="s" n="__sys__t141">.saveResIO.</v>
+<o n="." r="866"><o>__sys__t140</o><i>self</i><i>__sys__t141</i></o>
+<o n="full"><o>__sys__t143</o><i>__sys__t23</i></o>
+<o n="=" r="866"><o>__sys__t140</o><i>__sys__t143</i></o>
+<v t="s" n="__sys__t146">.saveLogin.</v>
+<o n="." r="890"><o>__sys__t145</o><i>self</i><i>__sys__t146</i></o>
+<o n="full"><o>__sys__t148</o><i>__sys__t24</i></o>
+<o n="=" r="890"><o>__sys__t145</o><i>__sys__t148</i></o>
+<v t="s" n="__sys__t151">.initHubClient.</v>
+<o n="." r="943"><o>__sys__t150</o><i>self</i><i>__sys__t151</i></o>
+<o n="full"><o>__sys__t153</o><i>__sys__t25</i></o>
+<o n="=" r="943"><o>__sys__t150</o><i>__sys__t153</i></o>
+<v t="s" n="__sys__t156">.updateHubClient.</v>
+<o n="." r="957"><o>__sys__t155</o><i>self</i><i>__sys__t156</i></o>
+<o n="full"><o>__sys__t158</o><i>__sys__t26</i></o>
+<o n="=" r="957"><o>__sys__t155</o><i>__sys__t158</i></o>
+<v t="s" n="__sys__t161">.sendMsgToHub.</v>
+<o n="." r="1023"><o>__sys__t160</o><i>self</i><i>__sys__t161</i></o>
+<o n="full"><o>__sys__t163</o><i>__sys__t27</i></o>
+<o n="=" r="1023"><o>__sys__t160</o><i>__sys__t163</i></o>
+<o n="return" r="1037"><o>__sys__t165</o><i>self</i></o>
+<v n="__sys__t100" />
+<v n="__sys__t103" />
+<v n="__sys__t105" />
+<v n="__sys__t108" />
+<v n="__sys__t110" />
+<v n="__sys__t113" />
+<v n="__sys__t115" />
+<v n="__sys__t118" />
+<v n="__sys__t120" />
+<v n="__sys__t123" />
+<v n="__sys__t125" />
+<v n="__sys__t128" />
+<v n="__sys__t130" />
+<v n="__sys__t133" />
+<v n="__sys__t135" />
+<v n="__sys__t138" />
+<v n="__sys__t140" />
+<v n="__sys__t143" />
+<v n="__sys__t145" />
+<v n="__sys__t148" />
+<v n="__sys__t150" />
+<v n="__sys__t153" />
+<v n="__sys__t155" />
+<v n="__sys__t158" />
+<v n="__sys__t160" />
+<v n="__sys__t163" />
+<v n="__sys__t165" />
+<v n="__sys__t28" />
+<v n="__sys__t30" />
+<v n="__sys__t33" />
+<v n="__sys__t35" />
+<v n="__sys__t38" />
+<v n="__sys__t40" />
+<v n="__sys__t43" />
+<v n="__sys__t45" />
+<v n="__sys__t48" />
+<v n="__sys__t50" />
+<v n="__sys__t53" />
+<v n="__sys__t55" />
+<v n="__sys__t58" />
+<v n="__sys__t60" />
+<v n="__sys__t63" />
+<v n="__sys__t65" />
+<v n="__sys__t68" />
+<v n="__sys__t70" />
+<v n="__sys__t73" />
+<v n="__sys__t75" />
+<v n="__sys__t78" />
+<v n="__sys__t80" />
+<v n="__sys__t83" />
+<v n="__sys__t85" />
+<v n="__sys__t88" />
+<v n="__sys__t90" />
+<v n="__sys__t93" />
+<v n="__sys__t95" />
+<v n="__sys__t98" />
+<v n="self" />
+</script>

@@ -1,0 +1,13 @@
+//抽签记录表（抽到品质好的物品的信息记录）
+mysqlCol("key","id");
+mysqlCol("datetime","genTime");//生成时间
+mysqlCol("int","userID",0);//用户ID
+mysqlCol("varchar","nickname");//玩家昵称
+mysqlCol("int","level",0);//等级
+mysqlCol("int","vip",0);//VIP
+mysqlCol("int","heroID",0);//豪杰ID
+mysqlCol("int","wifeID",0);//红颜ID
+mysqlCol("int","itemID",0);//物品ID
+mysqlCol("int","gold",0);//元宝
+mysqlCol("int","itemCount",0);//物品数量
+mysqlCol("int","q",0);//品质

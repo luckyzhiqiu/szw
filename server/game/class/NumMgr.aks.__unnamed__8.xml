@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t26">13</v>
+<v t="n" n="__sys__t25">13</v>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="n" n="__sys__t4">0</v>
+<v t="s" n="__sys__t5">.id.</v>
+<v t="s" n="__sys__t6">.wifeSkill.</v>
+<v t="s" n="__sys__t7">.,.</v>
+<v t="s" n="__sys__t8">.Wife.</v>
+<v t="s" n="__sys__t9">.id.</v>
+<v t="s" n="__sys__t10">.beauty.</v>
+<v t="s" n="__sys__t11">.intimate.</v>
+<o n="input"><o>__sys__t12</o><i>__sys__t1</i></o>
+<o n="="><o>self</o><i>__sys__t12</i></o>
+<o n="input"><o>__sys__t14</o><i>__sys__t2</i></o>
+<o n="="><o>wifeID</o><i>__sys__t14</i></o>
+<o n="input"><o>__sys__t16</o><i>__sys__t3</i></o>
+<o n="="><o>wifeDict</o><i>__sys__t16</i></o>
+<o n="exist" r="210"><o>__sys__t18</o><i>wifeDict</i><i>wifeID</i></o>
+<o n="="><o>__sys__rt</o><i>__sys__t18</i></o>
+<o n="=="><o>__sys__t20</o><i>__sys__rt</i><i>__sys__t4</i></o>
+<o n="if_goto"><o>__sys__t21</o><i>__sys__t20</i><i>__sys__t25</i></o>
+<o n="handle" r="212"><o>__sys__t22</o></o>
+<o n="return" r="212"><o>__sys__t23</o><i>__sys__t22</i></o>
+<o n="goto"><o>__sys__t24</o><i>__sys__t26</i></o>
+<v t="s" n="__sys__t28">.game.</v>
+<o n="." r="214"><o>__sys__t27</o><i>self</i><i>__sys__t28</i></o>
+<o n="=" r="214"><o>game</o><i>__sys__t27</i></o>
+<v t="s" n="__sys__t32">.table.</v>
+<o n="." r="217"><o>__sys__t31</o><i>game</i><i>__sys__t32</i></o>
+<v t="s" n="__sys__t35">.wife.</v>
+<o n="." r="217"><o>__sys__t34</o><i>__sys__t31</i><i>__sys__t35</i></o>
+<v t="s" n="__sys__t38">.getRowFromColName.</v>
+<o n="." r="217"><o>__sys__t37</o><i>__sys__t34</i><i>__sys__t38</i></o>
+<o n="__sys__t37" r="217"><o>__sys__t40</o><i>__sys__t34</i><i>__sys__t5</i><i>wifeID</i></o>
+<o n="=" r="217"><o>info</o><i>__sys__t40</i></o>
+<v t="s" n="__sys__t43">.getValFromColName.</v>
+<o n="." r="218"><o>__sys__t42</o><i>info</i><i>__sys__t43</i></o>
+<o n="__sys__t42" r="218"><o>__sys__t45</o><i>info</i><i>__sys__t6</i></o>
+<o n="=" r="218"><o>skillStr</o><i>__sys__t45</i></o>
+<o n="arr" r="219"><o>__sys__t47</o></o>
+<o n="split" r="219"><o>__sys__t48</o><i>__sys__t47</i><i>skillStr</i><i>__sys__t7</i></o>
+<o n="=" r="219"><o>skillArr</o><i>__sys__t48</i></o>
+<o n="dict" r="222"><o>__sys__t50</o></o>
+<o n="=" r="222"><o>wife</o><i>__sys__t50</i></o>
+<v t="s" n="__sys__t53">.structMgr.</v>
+<o n="." r="223"><o>__sys__t52</o><i>game</i><i>__sys__t53</i></o>
+<o n="dict" r="223"><o>__sys__t55</o></o>
+<o n="structMgr_upgradeObj" r="223"><o>__sys__t56</o><i>__sys__t52</i><i>__sys__t8</i><i>__sys__t55</i></o>
+<o n="=" r="223"><o>wife</o><i>__sys__t56</i></o>
+<v t="s" n="__sys__t59">.wifeID.</v>
+<o n="." r="224"><o>__sys__t58</o><i>wife</i><i>__sys__t59</i></o>
+<v t="s" n="__sys__t62">.getValFromColName.</v>
+<o n="." r="224"><o>__sys__t61</o><i>info</i><i>__sys__t62</i></o>
+<o n="__sys__t61" r="224"><o>__sys__t64</o><i>info</i><i>__sys__t9</i></o>
+<o n="number" r="224"><o>__sys__t65</o><i>__sys__t64</i></o>
+<o n="=" r="224"><o>__sys__t58</o><i>__sys__t65</i></o>
+<v t="s" n="__sys__t68">.beauty.</v>
+<o n="." r="225"><o>__sys__t67</o><i>wife</i><i>__sys__t68</i></o>
+<v t="s" n="__sys__t71">.getValFromColName.</v>
+<o n="." r="225"><o>__sys__t70</o><i>info</i><i>__sys__t71</i></o>
+<o n="__sys__t70" r="225"><o>__sys__t73</o><i>info</i><i>__sys__t10</i></o>
+<o n="number" r="225"><o>__sys__t74</o><i>__sys__t73</i></o>
+<o n="=" r="225"><o>__sys__t67</o><i>__sys__t74</i></o>
+<v t="s" n="__sys__t77">.intimate.</v>
+<o n="." r="226"><o>__sys__t76</o><i>wife</i><i>__sys__t77</i></o>
+<v t="s" n="__sys__t80">.getValFromColName.</v>
+<o n="." r="226"><o>__sys__t79</o><i>info</i><i>__sys__t80</i></o>
+<o n="__sys__t79" r="226"><o>__sys__t82</o><i>info</i><i>__sys__t11</i></o>
+<o n="number" r="226"><o>__sys__t83</o><i>__sys__t82</i></o>
+<o n="=" r="226"><o>__sys__t76</o><i>__sys__t83</i></o>
+<v t="s" n="__sys__t86">.skill.</v>
+<o n="." r="229"><o>__sys__t85</o><i>wife</i><i>__sys__t86</i></o>
+<o n="=" r="229"><o>__sys__t85</o><i>skillArr</i></o>
+<o n="[]" r="232"><o>__sys__t89</o><i>wifeDict</i><i>wifeID</i></o>
+<o n="=" r="232"><o>__sys__t89</o><i>wife</i></o>
+<o n="return" r="234"><o>__sys__t91</o><i>wife</i></o>
+<v n="__sys__rt" />
+<v n="__sys__t12" />
+<v n="__sys__t14" />
+<v n="__sys__t16" />
+<v n="__sys__t18" />
+<v n="__sys__t20" />
+<v n="__sys__t21" />
+<v n="__sys__t22" />
+<v n="__sys__t23" />
+<v n="__sys__t24" />
+<v n="__sys__t27" />
+<v n="__sys__t31" />
+<v n="__sys__t34" />
+<v n="__sys__t37" />
+<v n="__sys__t40" />
+<v n="__sys__t42" />
+<v n="__sys__t45" />
+<v n="__sys__t47" />
+<v n="__sys__t48" />
+<v n="__sys__t50" />
+<v n="__sys__t52" />
+<v n="__sys__t55" />
+<v n="__sys__t56" />
+<v n="__sys__t58" />
+<v n="__sys__t61" />
+<v n="__sys__t64" />
+<v n="__sys__t65" />
+<v n="__sys__t67" />
+<v n="__sys__t70" />
+<v n="__sys__t73" />
+<v n="__sys__t74" />
+<v n="__sys__t76" />
+<v n="__sys__t79" />
+<v n="__sys__t82" />
+<v n="__sys__t83" />
+<v n="__sys__t85" />
+<v n="__sys__t89" />
+<v n="__sys__t91" />
+<v n="game" />
+<v n="info" />
+<v n="self" />
+<v n="skillArr" />
+<v n="skillStr" />
+<v n="wife" />
+<v n="wifeDict" />
+<v n="wifeID" />
+</script>

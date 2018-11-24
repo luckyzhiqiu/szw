@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<script>
+<v t="n" n="__sys__t1">0</v>
+<v t="n" n="__sys__t2">1</v>
+<v t="n" n="__sys__t3">2</v>
+<v t="n" n="__sys__t4">3</v>
+<v t="n" n="__sys__t5">4</v>
+<v t="n" n="__sys__t6">5</v>
+<v t="n" n="__sys__t7">6</v>
+<v t="n" n="__sys__t8">7</v>
+<v t="n" n="__sys__t9">8</v>
+<v t="n" n="__sys__t10">9</v>
+<v t="n" n="__sys__t11">3</v>
+<v t="s" n="__sys__t12">.union.</v>
+<v t="s" n="__sys__t13">.id.</v>
+<v t="s" n="__sys__t14">.*.</v>
+<v t="s" n="__sys__t15">.@__unnamed__0.</v>
+<v t="s" n="__sys__t16">.@__unnamed__1.</v>
+<v t="s" n="__sys__t17">.@__unnamed__2.</v>
+<v t="n" n="__sys__t18">1000</v>
+<o n="input"><o>__sys__t19</o><i>__sys__t1</i></o>
+<o n="="><o>game</o><i>__sys__t19</i></o>
+<o n="input"><o>__sys__t21</o><i>__sys__t2</i></o>
+<o n="="><o>damage</o><i>__sys__t21</i></o>
+<o n="input"><o>__sys__t23</o><i>__sys__t3</i></o>
+<o n="="><o>userID</o><i>__sys__t23</i></o>
+<o n="input"><o>__sys__t25</o><i>__sys__t4</i></o>
+<o n="="><o>pNickname</o><i>__sys__t25</i></o>
+<o n="input"><o>__sys__t27</o><i>__sys__t5</i></o>
+<o n="="><o>head</o><i>__sys__t27</i></o>
+<o n="input"><o>__sys__t29</o><i>__sys__t6</i></o>
+<o n="="><o>level</o><i>__sys__t29</i></o>
+<o n="input"><o>__sys__t31</o><i>__sys__t7</i></o>
+<o n="="><o>unionID</o><i>__sys__t31</i></o>
+<o n="input"><o>__sys__t33</o><i>__sys__t8</i></o>
+<o n="="><o>bossId</o><i>__sys__t33</i></o>
+<o n="input"><o>__sys__t35</o><i>__sys__t9</i></o>
+<o n="="><o>heroID</o><i>__sys__t35</i></o>
+<o n="input"><o>__sys__t37</o><i>__sys__t10</i></o>
+<o n="="><o>fashionID</o><i>__sys__t37</i></o>
+<o n="arr" r="24"><o>__sys__t39</o></o>
+<o n="=" r="24"><o>backArr</o><i>__sys__t39</i></o>
+<o n=" -" r="25"><o>__sys__t41</o><i>__sys__t11</i></o>
+<o n="push" r="25"><o>__sys__t42</o><i>backArr</i><i>__sys__t41</i></o>
+<v t="s" n="__sys__t44">.rd.</v>
+<o n="." r="29"><o>__sys__t43</o><i>game</i><i>__sys__t44</i></o>
+<v t="s" n="__sys__t47">.updateRow.</v>
+<o n="." r="29"><o>__sys__t46</o><i>__sys__t43</i><i>__sys__t47</i></o>
+<v t="s" n="__sys__t50">.cnn.</v>
+<o n="." r="31"><o>__sys__t49</o><i>game</i><i>__sys__t50</i></o>
+<o n="full"><o>__sys__t52</o><i>__sys__t15</i></o>
+<o n="full"><o>__sys__t53</o><i>__sys__t16</i></o>
+<o n="full"><o>__sys__t54</o><i>__sys__t17</i></o>
+<o n="__sys__t46" r="29"><o>__sys__t55</o><i>__sys__t43</i><i>__sys__t49</i><i>__sys__t12</i><i>__sys__t13</i><i>unionID</i><i>__sys__t14</i><i>__sys__t52</i><i>__sys__t53</i><i>__sys__t54</i><i>game</i><i>__sys__t18</i></o>
+<o n="=" r="29"><o>unionRow</o><i>__sys__t55</i></o>
+<o n="return" r="155"><o>__sys__t57</o><i>backArr</i></o>
+<v n="__sys__t19" />
+<v n="__sys__t21" />
+<v n="__sys__t23" />
+<v n="__sys__t25" />
+<v n="__sys__t27" />
+<v n="__sys__t29" />
+<v n="__sys__t31" />
+<v n="__sys__t33" />
+<v n="__sys__t35" />
+<v n="__sys__t37" />
+<v n="__sys__t39" />
+<v n="__sys__t41" />
+<v n="__sys__t42" />
+<v n="__sys__t43" />
+<v n="__sys__t46" />
+<v n="__sys__t49" />
+<v n="__sys__t52" />
+<v n="__sys__t53" />
+<v n="__sys__t54" />
+<v n="__sys__t55" />
+<v n="__sys__t57" />
+<v n="backArr" />
+<v n="bossId" />
+<v n="damage" />
+<v n="fashionID" />
+<v n="game" />
+<v n="head" />
+<v n="heroID" />
+<v n="level" />
+<v n="pNickname" />
+<v n="unionID" />
+<v n="unionRow" />
+<v n="userID" />
+</script>

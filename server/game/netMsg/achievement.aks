@@ -1,0 +1,381 @@
+//成就领取奖励
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+achievementID=int(netMsg[3]);//成就ID
+
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,achievementID,userID;
+		json=json_decode(user.json);
+		achievement=ref(json.achievement);//
+		achievementDict=achievement.achievement;
+		
+
+		///////
+		if(exist(achievementDict,achievementID))
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-2)//已领取
+			);
+			return(0);//不修改
+		}
+		
+		//读取成就表
+		achievementTable=game.table.achievement;
+		row=achievementTable.getRowFromColName("id",achievementID);
+		if(empty(row))
+		{
+			//回复
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-99)//achievementID无效
+			);
+			return(0);//不修改
+		}
+
+		addMap=dict();//增加的数据
+		//成就类型
+		type=number(row.getValFromColName("type"));//...查表
+		
+		if(type==1)//登录天数
+		{
+			if(achievement.loginDayCount<number(row.getValFromColName("num")))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)//登录天数够
+				);
+				return(0);//不修改
+			}
+				
+		}
+		else if(type==2)//官位
+		{
+			if(user.level<number(row.getValFromColName("num")))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)//官位不足
+				);
+				return(0);//不修改
+			}
+			
+		}
+		else if(type==3)//势力
+		{
+			if((user.power)<number(row.getValFromColName("num")))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)//势力不足
+				);
+				return(0);//不修改
+			}
+	
+		}
+		else if(type==4)//豪杰数量
+		{
+			if(size(json.hero[0])<number(row.getValFromColName("num")))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)//豪杰不足
+				);
+				return(0);//不修改
+			}
+	
+		}
+		else if(type==5)//关卡胜利
+		{
+			if((user.chapterID*7+user.barrierID+1)<number(row.getValFromColName("num")))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)//豪杰不足
+				);
+				return(0);//不修改
+			}
+	
+		}
+		else if(type==6)//经营商产
+		{
+			if(achievement.makeMoney<number(row.getValFromColName("num")))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)//商产不足
+				);
+				return(0);//不修改
+			}
+		
+			
+		}
+		else if(type==7)//经营农产
+		{
+			if(achievement.makeFood<number(row.getValFromColName("num")))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)//农产不足
+				);
+				return(0);//不修改
+			}
+			
+		}
+		else if(type==8)//征兵
+		{
+			if(achievement.makeSoldier<number(row.getValFromColName("num")))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)//农产不足
+				);
+				return(0);//不修改
+			}
+			
+		}
+		else if(type==9)//处理政务
+		{
+			
+		}
+		else if(type==10)//VIP等级
+		{
+			if(user.vip<number(row.getValFromColName("num")))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)
+				);
+				return(0);//不修改
+			}
+			
+		}
+		else if(type==11)//议政厅论战
+		{
+			if(achievement.waterCount<number(row.getValFromColName("num")))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)//议政厅论战不足
+				);
+				return(0);//不修改
+			}
+			
+		}
+		else if(type==12)//红颜数量
+		{
+			if(size(json.wife)<number(row.getValFromColName("num")))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)//红颜不足
+				);
+				return(0);//不修改
+			}
+			
+		}
+		else if(type==13)//随机传唤
+		{
+			if(achievement.randomFuckCount<number(row.getValFromColName("num")))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)//传唤不足
+				);
+				return(0);//不修改
+			}
+		}
+		else if(type==14)//子女数量
+		{
+			if(achievement.childrenCount<number(row.getValFromColName("num")))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)//子女数量不足
+				);
+				return(0);//不修改
+			}	
+		}
+		else if(type==15)//联姻次数
+		{
+			if(achievement.marryCount<number(row.getValFromColName("num")))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)//联姻次数不足
+				);
+				return(0);//不修改
+			}
+		
+		}
+		else if(type==16)//寻访次数
+		{
+			if(achievement.visitCount<number(row.getValFromColName("num")))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)//寻访次数不足
+				);
+				return(0);//不修改
+			}
+		}
+		else if(type==17)//联盟捐献
+		{
+			if(achievement.unionCount<number(row.getValFromColName("num")))
+			{
+				//回复
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-4)//联姻次数不足
+				);
+				return(0);//不修改
+			}
+			
+			
+		}else
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-3) //类型不存在
+			);
+			exit();
+		}
+		
+		money=number(row.getValFromColName("money"));
+		newGold=number(user.money)+money;
+		user.money=newGold;
+		push(addMap,"money",money);
+		
+		food=number(row.getValFromColName("food"));
+		newFood=number(user.food)+food;
+		user.food=newFood;
+		push(addMap,"food",food);
+		
+		soldier=number(row.getValFromColName("soldier"));
+		newSoldier=number(user.soldier)+soldier;
+		user.soldier=newSoldier;
+		push(addMap,"soldier",soldier);
+		
+		gold2=number(row.getValFromColName("gold"));
+		newgold2=number(user.gold2)+gold2;
+		if(newgold2!=0)
+		{
+			user.gold2=newgold2;
+		}
+		
+		push(addMap,"gold2",gold2);
+		if(number(gold2)>0)
+		{
+			//流水
+			allGold=number(user.gold)+number(newgold2);//元宝余额
+			game.saveResIO(userID,10,0,1,gold2,allGold);//成就(type,itemID,（0=消耗，1=获得）,count,allGold)
+		}
+		
+		
+		
+		itemArr=arr();
+		itemStr=row.getValFromColName("item");
+		if(itemStr!="0")
+		{
+			split(itemArr,itemStr,",");
+		}	
+		
+		
+		itemDict=json.item;
+		
+		c=size(itemArr);
+		i=0;while(i<c)
+		{
+			game.numMgr.addItem(number(itemArr[i]),number(itemArr[i+1]),itemDict);//返回数量
+			i+=2;
+		}
+		
+		
+		push(achievementDict,achievementID,1);
+		//保存
+		user.json=json_encode(json);
+		
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,addMap,json.item,itemArr,achievementDict)
+		);
+		
+		return(1);//修改
+		
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}

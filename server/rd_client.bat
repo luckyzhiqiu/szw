@@ -1,0 +1,1 @@
+redis-cli.exe -p 6379 -a 123456

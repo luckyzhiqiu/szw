@@ -1,0 +1,113 @@
+//兑换豪杰
+<server,sessionID,game,netMsg>
+methodName=netMsg[0];//方法名
+userID=netMsg[1];//用户ID
+tick=netMsg[2];//通行证
+addHeroID=int(netMsg[3]);//豪杰ID
+
+if(!game.checkTick(userID,tick))//通行证校验失败
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",0)
+	);
+	exit();
+}
+
+//判断活动是否领奖时间
+status=game.activityMgr.getActivityStatus(17);
+if(status!=1)//活动不再进行中
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-2)
+	);
+	exit();
+}
+
+//修改行数据
+user=game.rd.updateRow
+(
+	game.cnn,"user","id",userID,"*",
+	//修改回调
+	##<user,game>
+		@link methodName,sessionID,addHeroID;
+		json=json_decode(user.json);
+		itemDict=json.item;
+		numMgr=game.numMgr;
+		tableData=game.table;
+		heroArr=json.hero;
+
+		i=0;heroCount=size(heroArr);
+		while(i<heroCount)
+		{
+			hero=heroArr[i];
+			heroID=hero.heroID;
+			if(heroID==addHeroID)//豪杰已存在
+			{
+				game.sendMsg
+				(
+					sessionID,
+					arr(methodName+"Result",-3)
+				);
+				return(0);
+			}
+			++i;
+		}
+
+		row=tableData.event17.getRowFromColName("heroID",addHeroID);
+		num=number(row.getValFromColName("num"));//需求数量
+		itemID=number(row.getValFromColName("itemID"));//需求物品
+		
+		count=numMgr.subItem(itemID,num,itemDict);
+		if(count==-1)//道具数量不足扣除失败
+		{
+			game.sendMsg
+			(
+				sessionID,
+				arr(methodName+"Result",-4)
+			);
+			return(0);//不修改
+		}
+
+		//增加豪杰
+		hero=numMgr.createHero(addHeroID,heroArr,json);
+		//重新计算加成
+		numMgr.computeHero(hero,json);
+		numMgr.computeUser(user,json);
+		
+		//保存
+		user.json=json_encode(json);
+
+		//回复
+		game.sendMsg
+		(
+			sessionID,
+			arr(methodName+"Result",1,user.strength,user.wisdom,user.charm,user.politics,user.power,itemDict,hero)
+		);
+		return(1);//修改
+	##.,
+	//修改完成回调
+	##<row,userData>
+		//...
+	##.,
+	//解锁后回调
+	##<row,userData>
+		//...
+	##.,
+	game,//自定义数据userData
+	1000//加锁时间（毫秒），例如：1000
+);
+if(empty(user))//用户不存在
+{
+	//回复
+	game.sendMsg
+	(
+		sessionID,
+		arr(methodName+"Result",-1)
+	);
+}
